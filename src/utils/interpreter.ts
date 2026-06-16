@@ -1,6 +1,6 @@
 import { generalSettings, saveSettings } from './storage-utils';
 import { PromptVariable, Template, ModelConfig } from '../types/types';
-import { compileTemplate } from './template-compiler';
+import { compileTemplate, restoreBraces } from './template-compiler';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';
@@ -449,7 +449,7 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 			|| generalSettings.defaultPromptContext
 			|| '{{fullHtml|remove_html:("#navbar,.footer,#footer,header,footer,style,script")|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,s,strike,u,sup,sub,img,video,audio,math,table,cite,td,th,tr,caption")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}';
 		promptToDisplay = await compileTemplate(tabId, promptToDisplay, variables, currentUrl);
-		promptContextTextarea.value = promptToDisplay;
+		promptContextTextarea.value = restoreBraces(promptToDisplay);
 		
 		// Initial token count
 		if (tokenCounter) {

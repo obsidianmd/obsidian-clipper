@@ -1,0 +1,5 @@
+{
+	"noteNameFormat": "{{title}}",
+	"noteContentFormat": "{{content}}\n{{selectorHtml:body|markdown}}\n{{'summary'}}",
+	"properties": [{ "name": "title", "value": "{{title}}", "type": "text" }]
+}
