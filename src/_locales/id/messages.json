@@ -1054,7 +1054,7 @@
 	},
 	"vaultsDescription": {
 		"message": "Secara default, catatan yang diklip akan disimpan ke vault yang sedang dibuka. Anda dapat menambahkan vault di sini jika Anda ingin menambah opsi untuk menyimpan ke vault lain. Nama vault harus sama persis dengan nama vault Obsidian. Tekan $strong_start$enter$strong_end$ untuk menambah vault.",
-		"placeholders": a{
+		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
 			},
