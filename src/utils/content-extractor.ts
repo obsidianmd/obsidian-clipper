@@ -7,6 +7,7 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
+import { normalizeImageUrls } from './image-url-normalization';
 import {
 	getElementByXPath,
 	wrapElementWithMark,
@@ -148,8 +149,9 @@ export async function initializePageContent(
 
 		let selectedMarkdown = '';
 		if (selectedHtml) {
-			content = selectedHtml;
-			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
+			const normalizedSelectedHtml = normalizeImageUrls(selectedHtml, currentUrl);
+			content = normalizedSelectedHtml;
+			selectedMarkdown = createMarkdownContent(normalizedSelectedHtml, currentUrl);
 		}
 
 		// Process highlights after getting the base content
@@ -157,6 +159,7 @@ export async function initializePageContent(
 			content = processHighlights(content, highlights);
 		}
 
+		content = normalizeImageUrls(content, currentUrl);
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
 		const highlightsData = collapseGroupsForExport(highlights, c => createMarkdownContent(c, currentUrl));

@@ -11,6 +11,7 @@ import { serializeChildren } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
+import { normalizeImageUrls } from './utils/image-url-normalization';
 import { parseForClip } from './utils/clip-utils';
 
 declare global {
@@ -156,7 +157,7 @@ declare global {
 					const defuddled = parseForClip(document);
 
 					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createMarkdownContent(normalizeImageUrls(defuddled.content, document.URL), document.URL);
 
 					// Copy to clipboard
 					const textArea = document.createElement("textarea");
@@ -179,7 +180,7 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createMarkdownContent(normalizeImageUrls(defuddled.content, document.URL), document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({

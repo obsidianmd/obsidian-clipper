@@ -9,6 +9,7 @@ import { AsyncResolver, RenderContext } from './utils/renderer';
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
+import { normalizeImageUrls } from './utils/image-url-normalization';
 import { Template, Property } from './types/types';
 
 // ---------------------------------------------------------------------------
@@ -182,18 +183,20 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 
 	// Extract content with defuddle
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
+	const defuddleInput = doc?.nodeType === 9 ? doc : documentElement;
+	const defuddle = new DefuddleClass(defuddleInput as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
+	const normalizedContent = normalizeImageUrls(defuddleResult.content, url, documentParser);
 
 	// Convert to markdown
-	const markdownContent = createMarkdownContent(defuddleResult.content, url);
+	const markdownContent = createMarkdownContent(normalizedContent, url);
 
 	// Build template variables
 	const variables = buildVariables({
 		title: defuddleResult.title,
 		author: defuddleResult.author,
 		content: markdownContent,
-		contentHtml: defuddleResult.content,
+		contentHtml: normalizedContent,
 		url,
 		fullHtml: html,
 		description: defuddleResult.description,

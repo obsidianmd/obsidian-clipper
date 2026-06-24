@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, test, expect } from 'vitest';
-import { processHighlights } from './content-extractor';
+import { initializePageContent, processHighlights } from './content-extractor';
 import { TextHighlightData } from './highlighter';
 
 // Default settings already use highlighterEnabled + 'highlight-inline', the
@@ -45,5 +45,31 @@ describe('processHighlights — highlight-inline', () => {
 		expect(mark!.textContent?.replace(/\s+/g, ' ').trim()).toBe('A seismic shift is rocking the healthcare industry.');
 		// The link must survive inside the mark, proving the range crossed it.
 		expect(mark!.querySelector('a')).not.toBeNull();
+	});
+});
+
+describe('initializePageContent image URL normalization', () => {
+	test('includes promoted lazy image URLs in markdown content', async () => {
+		const result = await initializePageContent(
+			'<article><p><img data-src="/images/a.jpg" alt="A"></p></article>',
+			'',
+			{},
+			'https://example.com/articles/post',
+			{},
+			'',
+			[],
+			'Lazy image article',
+			'',
+			'',
+			'',
+			'',
+			'',
+			'',
+			0,
+			'',
+			[]
+		);
+
+		expect(result.currentVariables['{{content}}']).toContain('https://example.com/images/a.jpg');
 	});
 });
