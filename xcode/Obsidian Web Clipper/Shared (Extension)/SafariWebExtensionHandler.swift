@@ -6,6 +6,7 @@
 //
 
 import SafariServices
+import FoundationModels
 import os.log
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
@@ -38,6 +39,14 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         switch type {
         case "fetchRequest":
             handleFetchRequest(context: context, message: messageDict)
+        case "appleIntelligencePrompt":
+            if #available(iOS 26.0, macOS 26.0, *) {
+                handleAppleIntelligencePrompt(context: context, message: messageDict)
+            } else {
+                sendResponse(context: context, data: [
+                    "success": false, "error": "unavailable", "reason": "osVersionTooOld"
+                ])
+            }
         default:
             // Echo back for any other message type (original behavior)
             sendResponse(context: context, data: ["echo": message as Any])
@@ -88,6 +97,88 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         semaphore.wait()
 
         sendResponse(context: context, data: responseData)
+    }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    private func handleAppleIntelligencePrompt(context: NSExtensionContext, message: [String: Any]) {
+        guard let systemPrompt = message["systemPrompt"] as? String,
+              let userMessage = message["userMessage"] as? String else {
+            sendResponse(context: context, data: ["success": false, "error": "Invalid parameters"])
+            return
+        }
+
+        let modelId = message["model"] as? String ?? "on-device"
+
+        if modelId == "private-cloud" {
+            if #available(iOS 27.0, macOS 27.0, *) {
+                handleWithPCC(context: context, systemPrompt: systemPrompt, userMessage: userMessage)
+            } else {
+                sendResponse(context: context, data: [
+                    "success": false, "error": "unavailable", "reason": "pccRequiresNewerOS"
+                ])
+            }
+            return
+        }
+
+        if case .unavailable(let reason) = SystemLanguageModel.default.availability {
+            let reasonString: String
+            switch reason {
+            case .deviceNotEligible:           reasonString = "deviceNotEligible"
+            case .appleIntelligenceNotEnabled: reasonString = "appleIntelligenceNotEnabled"
+            default:                           reasonString = "unknown"
+            }
+            sendResponse(context: context, data: [
+                "success": false, "error": "unavailable", "reason": reasonString
+            ])
+            return
+        }
+
+        // Bridge async FoundationModels call to synchronous extension context,
+        // matching the pattern used in handleFetchRequest.
+        let semaphore = DispatchSemaphore(value: 0)
+        var responseData: [String: Any] = ["success": false, "error": "Timeout"]
+
+        Task {
+            do {
+                let session = LanguageModelSession(instructions: systemPrompt)
+                let response = try await session.respond(to: userMessage)
+                responseData = ["success": true, "content": response.content]
+            } catch {
+                // Map known FoundationModels error patterns to stable codes the JS side can handle.
+                // TODO: LanguageModelError is only available in macOS 27 / iOS 27+.
+                // Once minimum deployment target is raised, replace with typed case matching.
+                let desc = error.localizedDescription.lowercased()
+                let code: String
+                if desc.contains("context") || desc.contains("too long") || desc.contains("token") {
+                    code = "contextWindowExceeded"
+                } else if desc.contains("guardrail") || desc.contains("policy") {
+                    code = "guardrailsViolation"
+                } else {
+                    code = "languageModelError"
+                }
+                responseData = ["success": false, "error": code, "detail": error.localizedDescription]
+            }
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        sendResponse(context: context, data: responseData)
+    }
+
+    @available(iOS 27.0, macOS 27.0, *)
+    private func handleWithPCC(context: NSExtensionContext, systemPrompt: String, userMessage: String) {
+        // TODO: PrivateCloudComputeLanguageModel is not available in the macOS 26 SDK.
+        // Replace this stub with the full implementation once the macOS 27 SDK ships:
+        //
+        //   let model = PrivateCloudComputeLanguageModel()
+        //   if model.quotaUsage.isLimitReached { ... }
+        //   let session = LanguageModelSession(model: model, instructions: systemPrompt)
+        //   let response = try await session.respond(to: userMessage)
+        //   // include quotaWarning flag if model.quotaUsage.status isApproachingLimit
+        //
+        sendResponse(context: context, data: [
+            "success": false, "error": "unavailable", "reason": "pccNotYetImplemented"
+        ])
     }
 
     private func sendResponse(context: NSExtensionContext, data: [String: Any]) {

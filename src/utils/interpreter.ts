@@ -37,12 +37,17 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		const systemContent = 
 			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
 		
-		const promptContent = {	
+		const promptContent = {
 			prompts: promptVariables.reduce((acc, { key, prompt }) => {
 				acc[key] = prompt;
 				return acc;
 			}, {} as { [key: string]: string })
 		};
+
+		if (provider.providerType === 'apple-intelligence') {
+			lastRequestTime = now;
+			return await sendToAppleIntelligence(systemContent, promptContext, promptContent, promptVariables, model.providerModelId);
+		}
 
 		let requestUrl: string;
 		let requestBody: any;
@@ -229,6 +234,67 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		console.error(`Error sending to ${provider.name} LLM:`, error);
 		throw error;
 	}
+}
+
+async function sendToAppleIntelligence(
+	systemContent: string,
+	promptContext: string,
+	promptContent: { prompts: Record<string, string> },
+	promptVariables: PromptVariable[],
+	modelId: string
+): Promise<{ promptResponses: any[] }> {
+	if (typeof (browser.runtime as any).sendNativeMessage !== 'function') {
+		throw new Error(
+			'Apple Intelligence requires Safari on a Mac or iPhone. ' +
+			'Please switch to Safari or choose a different model.'
+		);
+	}
+
+	const result = await browser.runtime.sendMessage({
+		action: 'appleIntelligencePrompt',
+		systemPrompt: systemContent,
+		userMessage: `${promptContext}\n\n${JSON.stringify(promptContent)}`,
+		model: modelId,
+	}) as { success: boolean; content?: string; error?: string; reason?: string; quotaWarning?: boolean };
+
+	if (!result.success) {
+		const { reason, error } = result;
+		if (reason === 'appleIntelligenceNotEnabled') {
+			throw new Error('Apple Intelligence is not enabled on this device. Go to Settings → Apple Intelligence & Siri to enable it.');
+		}
+		if (reason === 'deviceNotEligible') {
+			throw new Error('This device does not support Apple Intelligence.');
+		}
+		if (reason === 'osVersionTooOld') {
+			throw new Error('Apple Intelligence requires macOS 26 or iOS 26 or later.');
+		}
+		if (reason === 'pccRequiresNewerOS') {
+			throw new Error('Private Cloud Compute requires macOS 27 or iOS 27 or later.');
+		}
+		if (reason === 'pccNotYetImplemented') {
+			throw new Error('Private Cloud Compute support is not yet available in this version.');
+		}
+		if (error === 'quotaExceeded') {
+			throw new Error('You have reached your Private Cloud Compute daily limit.');
+		}
+		if (error === 'contextWindowExceeded') {
+			throw new Error('The prompt context is too long for this model\'s context window. In interpreter settings, set the template\'s Context field to {{content}} to send only the clipped text instead of the full page, or choose a model with a larger context window.');
+		}
+		if (error === 'guardrailsViolation') {
+			throw new Error('Apple Intelligence declined to process this content.');
+		}
+		if (error === 'languageModelError') {
+			const detail = (result as any).detail;
+			throw new Error(`Apple Intelligence model error${detail ? `: ${detail}` : '.'}`);
+		}
+		throw new Error(`Apple Intelligence error: ${error ?? 'Unknown error'}`);
+	}
+
+	if (result.quotaWarning) {
+		debugLog('Interpreter', 'Apple Intelligence: Private Cloud Compute quota is approaching its daily limit.');
+	}
+
+	return parseLLMResponse(result.content!, promptVariables);
 }
 
 interface LLMResponse {
