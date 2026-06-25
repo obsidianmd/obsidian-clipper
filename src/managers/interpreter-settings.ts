@@ -482,7 +482,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 
 		const appleIntelligenceNote = document.createElement('p');
 		appleIntelligenceNote.className = 'setting-item-description';
-		appleIntelligenceNote.textContent = 'Requires Safari on Mac or iPhone with Apple Intelligence enabled in Settings.';
+		appleIntelligenceNote.textContent = 'Requires Safari on iOS or macOS 26+ on a supported device with Apple Intelligence enabled.';
 		appleIntelligenceNote.style.display = 'none';
 		baseUrlContainer.insertAdjacentElement('beforebegin', appleIntelligenceNote);
 
