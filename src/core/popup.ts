@@ -1358,7 +1358,10 @@ async function handleClipObsidian(): Promise<void> {
 		}
 	} catch (error) {
 		console.error('Error in handleClipObsidian:', error);
-		showError('failedToSaveFile');
+		// Don't overwrite the interpreter's own error display with a generic save error
+		if (!interpretBtn?.classList.contains('error')) {
+			showError('failedToSaveFile');
+		}
 		throw error;
 	}
 }

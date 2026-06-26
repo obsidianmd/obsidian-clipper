@@ -725,6 +725,22 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+		if (typedRequest.action === 'appleIntelligencePrompt') {
+			const { systemPrompt, userMessage, model } = typedRequest as {
+				action: string;
+				systemPrompt: string;
+				userMessage: string;
+				model?: string;
+			};
+			(browser.runtime as any).sendNativeMessage('application.id', {
+				type: 'appleIntelligencePrompt',
+				systemPrompt,
+				userMessage,
+				model: model ?? 'on-device',
+			}).then(sendResponse).catch((err: Error) => sendResponse({ success: false, error: err.message }));
+			return true;
+		}
+
 		// For other actions that use sendResponse
 		if (typedRequest.action === "extractContent" ||
 			typedRequest.action === "ensureContentScriptLoaded" ||
