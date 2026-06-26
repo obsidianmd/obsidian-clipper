@@ -20,6 +20,9 @@
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},
+	"videoLabel": {
+		"message": "Video"
+	},
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"
 	},
@@ -344,6 +347,12 @@
 	},
 	"folder": {
 		"message": "Folder"
+	},
+	"fetchVaultFolders": {
+		"message": "Fetch vault folders"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "This browser does not support folder selection. Please use Chrome or Edge."
 	},
 	"general": {
 		"message": "General"

@@ -20,6 +20,9 @@
 	"addToObsidian": {
 		"message": "添加到 Obsidian"
 	},
+	"videoLabel": {
+		"message": "视频"
+	},
 	"addVaultPlaceholder": {
 		"message": "按回车键添加保管库"
 	},
@@ -344,6 +347,12 @@
 	},
 	"folder": {
 		"message": "文件夹"
+	},
+	"fetchVaultFolders": {
+		"message": "获取 Vault 文件夹"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "当前浏览器不支持文件夹选择，请使用 Chrome 或 Edge。"
 	},
 	"general": {
 		"message": "常规"

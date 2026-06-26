@@ -166,6 +166,26 @@
 			min-width: 100px;
 			cursor: default;
 		}
+		#path-name-field {
+			flex-grow: 1;
+			min-width: 0;
+		}
+		.fetch-folders-btn {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: var(--input-height, 36px);
+			height: var(--input-height, 36px);
+			border-radius: var(--radius-s);
+			color: var(--text-muted);
+			@media (hover: hover) {
+				&:hover {
+					background-color: var(--background-modifier-hover);
+					color: var(--text-normal);
+				}
+			}
+		}
 	}
 }
 
@@ -370,6 +390,48 @@
 			&.active:hover {
 				background-color: hsla(var(--color-accent-hsl), 0.15);
 			}
+		}
+	}
+}
+
+.language-switcher {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.language-dropdown {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 4px;
+	min-width: 180px;
+	max-height: 300px;
+	overflow-y: auto;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-l);
+	z-index: 1000;
+	padding: 4px 0;
+
+	.language-option {
+		display: flex;
+		align-items: center;
+		padding: 6px 14px;
+		font-size: var(--font-ui-smaller);
+		color: var(--text-normal);
+		cursor: default;
+		user-select: none;
+		-webkit-user-select: none;
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+			}
+		}
+		&.selected {
+			color: var(--text-accent);
+			font-weight: 600;
 		}
 	}
 }

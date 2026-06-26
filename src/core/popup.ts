@@ -21,7 +21,7 @@ import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
-import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { translatePage, getMessage, setupLanguageAndDirection, getAvailableLanguages, getCurrentLanguage, setLanguage } from '../utils/i18n';
 import { formatPropertyValue } from '../utils/shared';
 
 interface ReaderModeResponse {
@@ -35,6 +35,9 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let lastSelectedPath: string | null = null;
+let pathHistory: string[] = [];
+let vaultFolders: string[] = [];
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -197,6 +200,14 @@ async function initializeExtension(tabId: number) {
 			lastSelectedVault = loadedSettings.vaults[0];
 		}
 		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
+
+		// Load last selected path, path history, and vault folders
+		lastSelectedPath = await getLocalStorage('lastSelectedPath');
+		const storedHistory = await getLocalStorage('pathHistory');
+		pathHistory = Array.isArray(storedHistory) ? storedHistory.filter((p: unknown) => typeof p === 'string') : [];
+		const storedFolders = await getLocalStorage('vaultFolders');
+		vaultFolders = Array.isArray(storedFolders) ? storedFolders.filter((f: unknown) => typeof f === 'string') : [];
+		debugLog('Path', 'Last selected path:', lastSelectedPath, 'history:', pathHistory, 'vaultFolders:', vaultFolders.length);
 
 		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -368,6 +379,40 @@ document.addEventListener('DOMContentLoaded', async function() {
 			initializeIcons(settingsButton);
 		}
 
+		// Language switcher dropdown
+		const languageBtn = document.getElementById('language-btn') as HTMLAnchorElement | null;
+		const languageDropdown = document.getElementById('language-dropdown');
+		if (languageBtn && languageDropdown) {
+			initializeIcons(languageBtn);
+
+			languageBtn.addEventListener('click', async function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				const isVisible = languageDropdown.style.display !== 'none';
+				languageDropdown.style.display = isVisible ? 'none' : 'block';
+				if (!isVisible) {
+					await populateLanguageDropdown(languageDropdown);
+				}
+			});
+
+			document.addEventListener('click', function(e) {
+				if (!languageDropdown.contains(e.target as Node) && e.target !== languageBtn && !languageBtn.contains(e.target as Node)) {
+					languageDropdown.style.display = 'none';
+				}
+			});
+		}
+
+		// Fetch vault folders button
+		const fetchFoldersBtn = document.getElementById('fetch-folders-btn');
+		if (fetchFoldersBtn) {
+			initializeIcons(fetchFoldersBtn);
+			fetchFoldersBtn.addEventListener('click', async function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				await fetchVaultFolders();
+			});
+		}
+
 		// Initialize the rest of the popup
 		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
@@ -378,6 +423,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			try {
 				// DOM-dependent initializations
 				updateVaultDropdown(loadedSettings.vaults);
+				populatePathDatalist();
 				populateTemplateDropdown();
 				setupEventListeners(currentTabId);
 				await initializeUI();
@@ -421,6 +467,18 @@ function setupEventListeners(tabId: number) {
 		noteNameField.addEventListener('keydown', function(e) {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
+			}
+		});
+	}
+
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	if (pathField) {
+		pathField.addEventListener('change', () => {
+			const value = pathField.value.trim();
+			if (value) {
+				lastSelectedPath = value;
+				setLocalStorage('lastSelectedPath', value);
+				addToPathHistory(value);
 			}
 		});
 	}
@@ -929,7 +987,14 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	if (pathField) {
-		pathField.value = formattedPath;
+		// If the template's path contains variables, always use the compiled value.
+		// Otherwise, restore the user's last manually-entered path if one exists.
+		const templatePathHasVariables = /{{.*?}}/.test(template.path || '');
+		if (!templatePathHasVariables && lastSelectedPath) {
+			pathField.value = lastSelectedPath;
+		} else {
+			pathField.value = formattedPath;
+		}
 	}
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -1078,6 +1143,121 @@ function updateVaultDropdown(vaults: string[]) {
 		lastSelectedVault = vaultDropdown.value;
 		setLocalStorage('lastSelectedVault', lastSelectedVault);
 	});
+}
+
+function populatePathDatalist() {
+	const datalist = document.getElementById('path-history-list') as HTMLDataListElement | null;
+	if (!datalist) return;
+	datalist.textContent = '';
+	// Show vault folders first (sorted), then history entries
+	const seen = new Set<string>();
+	vaultFolders.forEach(path => {
+		if (seen.has(path)) return;
+		seen.add(path);
+		const option = document.createElement('option');
+		option.value = path;
+		datalist.appendChild(option);
+	});
+	pathHistory.forEach(path => {
+		if (seen.has(path)) return;
+		seen.add(path);
+		const option = document.createElement('option');
+		option.value = path;
+		datalist.appendChild(option);
+	});
+}
+
+async function addToPathHistory(path: string): Promise<void> {
+	const trimmed = path.trim();
+	if (!trimmed) return;
+	// Remove existing entry to move it to the front (most recently used first)
+	pathHistory = pathHistory.filter(p => p !== trimmed);
+	pathHistory.unshift(trimmed);
+	// Keep only the last 50 entries
+	pathHistory = pathHistory.slice(0, 50);
+	await setLocalStorage('pathHistory', pathHistory);
+	populatePathDatalist();
+}
+
+async function populateLanguageDropdown(dropdown: HTMLElement): Promise<void> {
+	dropdown.textContent = '';
+	const languages = getAvailableLanguages();
+	const currentLang = await getCurrentLanguage();
+	languages.forEach((lang: { code: string; name: string }) => {
+		const item = document.createElement('div');
+		item.className = 'language-option';
+		if (lang.code === currentLang) {
+			item.classList.add('selected');
+		}
+		item.textContent = lang.code === '' ? getMessage('systemDefault') : lang.name;
+		item.addEventListener('click', async () => {
+			try {
+				await setLanguage(lang.code);
+				dropdown.style.display = 'none';
+			} catch (error) {
+				console.error('Failed to change language:', error);
+			}
+		});
+		dropdown.appendChild(item);
+	});
+}
+
+// Recursively read subdirectory names from a FileSystemDirectoryHandle.
+// Returns paths relative to the root, using '/' as separator (Obsidian convention).
+async function readDirectoryTree(
+	dirHandle: any,
+	prefix: string,
+	maxDepth: number,
+	results: string[]
+): Promise<void> {
+	if (maxDepth < 0) return;
+	try {
+		for await (const entry of dirHandle.values()) {
+			if (entry.kind === 'directory') {
+				const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+				results.push(relativePath);
+				// Skip hidden folders and common noise directories
+				if (!entry.name.startsWith('.') && entry.name !== 'node_modules' && entry.name !== '.obsidian' && entry.name !== '.trash') {
+					await readDirectoryTree(entry, relativePath, maxDepth - 1, results);
+				}
+			}
+		}
+	} catch (e) {
+		// Permission or read error on a subdirectory — skip silently
+	}
+}
+
+async function fetchVaultFolders(): Promise<void> {
+	// File System Access API — Chrome/Edge only
+	if (typeof (window as any).showDirectoryPicker !== 'function') {
+		alert(getMessage('fileSystemApiNotSupported'));
+		return;
+	}
+
+	try {
+		const dirHandle = await (window as any).showDirectoryPicker({
+			mode: 'read',
+			id: 'obsidian-vault',
+		});
+
+		const folders: string[] = [];
+		// Read up to 5 levels deep — enough for any reasonable vault structure
+		await readDirectoryTree(dirHandle, '', 5, folders);
+
+		// Sort alphabetically for a clean dropdown
+		folders.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+		vaultFolders = folders;
+		await setLocalStorage('vaultFolders', vaultFolders);
+		populatePathDatalist();
+
+		debugLog('Path', `Fetched ${vaultFolders.length} vault folders`);
+	} catch (e) {
+		// User cancelled the picker or denied permission — do nothing
+		if ((e as Error).name !== 'AbortError') {
+			console.error('Failed to fetch vault folders:', e);
+		}
+	}
 }
 
 function refreshPopup() {
@@ -1352,6 +1532,13 @@ async function handleClipObsidian(): Promise<void> {
 
 		lastSelectedVault = selectedVault;
 		await setLocalStorage('lastSelectedVault', lastSelectedVault);
+
+		// Persist the path so it survives popup reopen
+		if (path) {
+			lastSelectedPath = path;
+			await setLocalStorage('lastSelectedPath', path);
+			await addToPathHistory(path);
+		}
 
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);

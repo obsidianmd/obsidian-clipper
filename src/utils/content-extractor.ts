@@ -4,6 +4,7 @@ import { sanitizeFileName } from './string-utils';
 import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
+import { getMessage } from './i18n';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
@@ -41,6 +42,150 @@ function stripHtml(html: string): string {
 
 function normalizeText(html: string): string {
 	return stripHtml(html).replace(/\s+/g, ' ').trim();
+}
+
+// Convert non-YouTube/non-Twitter video and iframe embeds into Obsidian-friendly
+// markdown so they don't disappear when Obsidian strips raw HTML. YouTube and
+// Twitter/X are already handled by defuddle's embedToMarkdown rule, so we skip
+// those here. Supported platforms: Bilibili, Reddit, Instagram, Vimeo, TikTok,
+// Dailymotion, Facebook, plus generic <video> elements and unknown iframes.
+export function convertMediaEmbeds(html: string): string {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+
+	let modified = false;
+
+	// --- <iframe> embeds ---
+	const iframes = Array.from(doc.querySelectorAll('iframe'));
+	for (const iframe of iframes) {
+		const src = (iframe.getAttribute('src') || '').trim();
+		if (!src) {
+			iframe.remove();
+			modified = true;
+			continue;
+		}
+
+		// Skip YouTube/Twitter — defuddle already converts these to ![](...)
+		if (/(?:youtube\.com|youtube-nocookie\.com|youtu\.be)/i.test(src) ||
+			/(?:twitter\.com|x\.com)/i.test(src)) {
+			continue;
+		}
+
+		const replacement = iframeToMarkdown(src);
+		if (replacement) {
+			iframe.replaceWith(doc.createTextNode(replacement));
+			modified = true;
+		}
+	}
+
+	// --- <video> elements ---
+	const videos = Array.from(doc.querySelectorAll('video'));
+	for (const video of videos) {
+		// Try to find a usable source URL
+		let src = (video.getAttribute('src') || '').trim();
+		if (!src) {
+			const source = video.querySelector('source');
+			if (source) src = (source.getAttribute('src') || '').trim();
+		}
+		// Prefer the poster image as the displayed embed, with the video src as a link
+		const poster = (video.getAttribute('poster') || '').trim();
+
+		if (src || poster) {
+			const parts: string[] = [];
+			if (poster) {
+				parts.push(`![](${poster})`);
+			}
+			if (src) {
+				parts.push(`[▶ ${getMessage('videoLabel')}](${src})`);
+			}
+			video.replaceWith(doc.createTextNode('\n' + parts.join('\n') + '\n'));
+			modified = true;
+		}
+	}
+
+	if (!modified) return html;
+
+	const serializer = new XMLSerializer();
+	let result = '';
+	Array.from(doc.body.childNodes).forEach(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			result += serializer.serializeToString(node);
+		} else if (node.nodeType === Node.TEXT_NODE) {
+			result += node.textContent;
+		}
+	});
+	return result;
+}
+
+// Map a known-platform iframe src to an Obsidian-friendly markdown link.
+// Returns '' when no conversion applies (caller leaves the iframe untouched
+// — defuddle will keep the raw HTML, which is still better than dropping it).
+function iframeToMarkdown(src: string): string {
+	try {
+		const url = new URL(src);
+		const host = url.hostname.toLowerCase();
+		const path = url.pathname;
+		const q = url.searchParams;
+
+		// Bilibili: player.bilibili.com/player.html?bvid=XXX or ?aid=XXX
+		if (host.includes('bilibili.com')) {
+			const bvid = q.get('bvid');
+			if (bvid) return `\n![](https://www.bilibili.com/video/${bvid})\n`;
+			const aid = q.get('aid');
+			if (aid) return `\n![](https://www.bilibili.com/video/av${aid})\n`;
+			// Some embeds use /video/BVxxx in the path
+			const pathMatch = path.match(/\/video\/(BV[\w]+)/);
+			if (pathMatch) return `\n![](https://www.bilibili.com/video/${pathMatch[1]})\n`;
+		}
+
+		// Reddit: embed.reddit.com/r/<sub>/comments/<id>/<slug>/?context=...
+		if (host.includes('reddit.com') || host.includes('redditmedia.com')) {
+			// /r/sub/comments/id/slug/
+			const m = path.match(/\/r\/([^/]+)\/comments\/([a-z0-9]+)\//i);
+			if (m) return `\n![](https://www.reddit.com/r/${m[1]}/comments/${m[2]})\n`;
+			// /comments/<id>/...
+			const m2 = path.match(/\/comments\/([a-z0-9]+)\//i);
+			if (m2) return `\n![](https://www.reddit.com/comments/${m2[1]})\n`;
+		}
+
+		// Instagram: instagram.com/p/<id>/embed or /reel/<id>/embed
+		if (host.includes('instagram.com')) {
+			const m = path.match(/\/(p|reel|reels)\/([^/]+)/i);
+			if (m) return `\n![](https://www.instagram.com/${m[1]}/${m[2]})\n`;
+		}
+
+		// Vimeo: player.vimeo.com/video/<id>
+		if (host.includes('vimeo.com')) {
+			const m = path.match(/\/video\/(\d+)/);
+			if (m) return `\n![](https://vimeo.com/${m[1]})\n`;
+		}
+
+		// TikTok: tiktok.com/embed/v2/<id> or player.tiktok.com
+		if (host.includes('tiktok.com')) {
+			const m = path.match(/\/embed\/v?2?\/(\d+)/i);
+			if (m) return `\n![](https://www.tiktok.com/video/${m[1]})\n`;
+		}
+
+		// Dailymotion: dailymotion.com/embed/video/<id>
+		if (host.includes('dailymotion.com')) {
+			const m = path.match(/\/embed\/video\/([^/]+)/);
+			if (m) return `\n![](https://www.dailymotion.com/video/${m[1]})\n`;
+		}
+
+		// Facebook: facebook.com/plugins/video.php?href=...
+		if (host.includes('facebook.com') || host.includes('fbcdn')) {
+			const href = q.get('href');
+			if (href) return `\n![](${href})\n`;
+		}
+
+		// Generic fallback: link to the iframe src so it's never invisible
+		if (src.startsWith('http')) {
+			return `\n[▶ ${getMessage('videoLabel')}](${src})\n`;
+		}
+	} catch {
+		// Invalid URL — fall through
+	}
+	return '';
 }
 
 interface ContentResponse {
@@ -149,13 +294,17 @@ export async function initializePageContent(
 		let selectedMarkdown = '';
 		if (selectedHtml) {
 			content = selectedHtml;
-			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
+			selectedMarkdown = createMarkdownContent(convertMediaEmbeds(selectedHtml), currentUrl);
 		}
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			content = processHighlights(content, highlights);
 		}
+
+		// Convert video/iframe embeds (Bilibili, Reddit, Instagram, Vimeo, etc.)
+		// to markdown links so they survive Obsidian's HTML sanitization.
+		content = convertMediaEmbeds(content);
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
 

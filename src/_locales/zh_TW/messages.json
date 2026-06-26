@@ -20,6 +20,9 @@
 	"addToObsidian": {
 		"message": "新增到 Obsidian"
 	},
+	"videoLabel": {
+		"message": "影片"
+	},
 	"addVaultPlaceholder": {
 		"message": "按 Enter 鍵新增儲存庫"
 	},
@@ -344,6 +347,12 @@
 	},
 	"folder": {
 		"message": "資料夾"
+	},
+	"fetchVaultFolders": {
+		"message": "取得 Vault 資料夾"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "目前瀏覽器不支援資料夾選擇，請使用 Chrome 或 Edge。"
 	},
 	"general": {
 		"message": "一般"

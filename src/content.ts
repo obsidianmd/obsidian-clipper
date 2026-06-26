@@ -12,6 +12,7 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { convertMediaEmbeds } from './utils/content-extractor';
 
 declare global {
 	interface Window {
@@ -156,7 +157,7 @@ declare global {
 					const defuddled = parseForClip(document);
 
 					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createMarkdownContent(convertMediaEmbeds(defuddled.content), document.URL);
 
 					// Copy to clipboard
 					const textArea = document.createElement("textarea");
@@ -179,7 +180,7 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createMarkdownContent(convertMediaEmbeds(defuddled.content), document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({

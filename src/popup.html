@@ -26,14 +26,22 @@
 					data-i18n-title="reader">
 					<i data-lucide="book-open"></i>
 				</a>
-				<a href="#" id="embedded-mode" class="clickable-icon" 
-					data-i18n-title="openEmbedded">
-					<i data-lucide="picture-in-picture-2"></i>
+			<a href="#" id="embedded-mode" class="clickable-icon" 
+				data-i18n-title="openEmbedded">
+				<i data-lucide="picture-in-picture-2"></i>
+			</a>
+			<div id="language-switcher" class="language-switcher">
+				<a href="#" id="language-btn" class="clickable-icon"
+					data-i18n-title="language">
+					<i data-lucide="globe"></i>
 				</a>
-				<a href="#" id="open-settings" class="clickable-icon" 
-					data-i18n-title="settings">
-					<i data-lucide="settings"></i>
-				</a>		
+				<div id="language-dropdown" class="language-dropdown" style="display: none;">
+				</div>
+			</div>
+			<a href="#" id="open-settings" class="clickable-icon" 
+				data-i18n-title="settings">
+				<i data-lucide="settings"></i>
+			</a>
 			</div>
 		</div>
 		<p class="error-message" style="display: none;"></p>
@@ -52,7 +60,12 @@
 					<div id="vault-container" style="display: none;">
 						<select id="vault-select"></select>
 					</div>
-					<input id="path-name-field" type="text" data-i18n="folder"/>
+					<input id="path-name-field" type="text" list="path-history-list" data-i18n="folder"/>
+					<datalist id="path-history-list"></datalist>
+					<a href="#" id="fetch-folders-btn" class="clickable-icon fetch-folders-btn"
+						data-i18n-title="fetchVaultFolders">
+						<i data-lucide="folder-tree"></i>
+					</a>
 				</div>
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>

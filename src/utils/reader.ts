@@ -29,6 +29,7 @@ import { getFontCss } from './font-utils';
 import { createMarkdownContent } from 'defuddle/full';
 import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
+import { convertMediaEmbeds } from './content-extractor';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './iframe-resize';
 import { setElementHTML, setSVGChildren, serializeChildren } from './dom-utils';
 
@@ -2747,9 +2748,9 @@ export class Reader {
 
 	static copyMarkdownOnReaderPage(doc: Document): void {
 		try {
-			const defuddled = parseForClip(doc);
-			const markdown = createMarkdownContent(defuddled.content, doc.URL);
-			navigator.clipboard.writeText(markdown).catch(() => {
+		const defuddled = parseForClip(doc);
+		const markdown = createMarkdownContent(convertMediaEmbeds(defuddled.content), doc.URL);
+		navigator.clipboard.writeText(markdown).catch(() => {
 				const textArea = doc.createElement('textarea');
 				textArea.value = markdown;
 				doc.body.appendChild(textArea);
@@ -2764,9 +2765,9 @@ export class Reader {
 
 	static async saveMarkdownOnReaderPage(doc: Document): Promise<void> {
 		try {
-			const defuddled = parseForClip(doc);
-			const markdown = createMarkdownContent(defuddled.content, doc.URL);
-			const title = defuddled.title || doc.title || 'Untitled';
+		const defuddled = parseForClip(doc);
+		const markdown = createMarkdownContent(convertMediaEmbeds(defuddled.content), doc.URL);
+		const title = defuddled.title || doc.title || 'Untitled';
 			const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 			await saveFile({ content: markdown, fileName, mimeType: 'text/markdown' });
 		} catch (err) {
