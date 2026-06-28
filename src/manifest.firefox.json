@@ -7,12 +7,16 @@
 	"description": "Save and highlight web pages in a private and durable format that you can access offline. The official extension for Obsidian.",
 	"permissions": [
 		"activeTab",
+		"tabs",
 		"clipboardWrite",
 		"contextMenus",
 		"storage",
 		"scripting",
 		"webRequest",
 		"webRequestBlocking"
+	],
+	"optional_permissions": [
+		"notifications"
 	],
 	"host_permissions": [
 		"<all_urls>",
@@ -90,10 +94,7 @@
 			}
 		},
 		"gecko_android": {
-			"strict_min_version": "113.0",
-			"data_collection_permissions": {
-				"required": ["none"]
-			}
+			"strict_min_version": "113.0"
 		}
 	}
 }

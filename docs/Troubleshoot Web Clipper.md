@@ -25,6 +25,23 @@ If you don't see any content in Obsidian when you click **Add to Obsidian**:
 - Check that your vault name in Web Clipper settings exactly matches your *vault name* in Obsidian *not the vault path*.
 - Check that the folder name is correctly formatted.
 
+### Batch clipping leaves tabs open
+
+When you [[Clip web pages#Batch clip URLs|batch clip URLs]], Web Clipper closes tabs only after the page is clipped and handed off to Obsidian. If a tab stays open, check the batch log for the error message.
+
+Common causes include:
+
+- The page requires sign-in, cookie consent, captcha verification, or another manual action.
+- The website blocks content scripts or changes the page before Web Clipper can extract content.
+- The clipped note is too large to send safely during batch mode.
+- The page is not an `http` or `https` URL.
+
+After handling the page, use **Retry failed URLs** on the batch page.
+
+### Batch clipping permissions
+
+Batch clipping requires permission to create, inspect, update, and close the tabs it opens. Completion notifications use an optional browser notification permission and are requested only if you choose a notification-based completion alert. Web Clipper does not collect usage data; batch URLs are processed locally in your browser and sent to Obsidian using the same clipping pipeline as single-page clipping.
+
 ## Linux
 
 #### Obsidian does not open
