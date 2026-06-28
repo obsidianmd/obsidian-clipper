@@ -144,6 +144,7 @@ module.exports = (env, argv) => {
 						to: "manifest.json" 
 					},
 					{ from: "src/popup.html", to: "popup.html" },
+					{ from: "src/batch.html", to: "batch.html" },
 					{ from: "src/side-panel.html", to: "side-panel.html" },
 					{ from: "src/settings.html", to: "settings.html" },
 					{ from: "src/highlights.html", to: "highlights.html" },

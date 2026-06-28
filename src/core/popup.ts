@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
-import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
+import { generateFrontmatter, saveToObsidian, SaveToObsidianDiagnostics } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
@@ -23,6 +23,7 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { formatPropertyValue } from '../utils/shared';
+import { formatBatchDuration, parseBatchUrls } from '../utils/batch-utils';
 
 interface ReaderModeResponse {
 	success: boolean;
@@ -39,6 +40,89 @@ let lastSelectedVault: string | null = null;
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
 const isIframe = urlParams.get('context') === 'iframe';
+const isBatchMode = urlParams.get('batch') === '1' || window.location.pathname.includes('batch.html');
+
+const BATCH_CONCURRENCY = 5;
+const BATCH_PAGE_TIMEOUT_MS = 60000;
+const BATCH_SETTLE_TIMEOUT_MS = 15000;
+const BATCH_SAVE_SETTLE_MS = 1500;
+const BATCH_CLIPBOARD_SAVE_SETTLE_MS = 3000;
+const BATCH_MAX_URI_LENGTH = 60000;
+
+interface PreparedObsidianClip {
+	fileContent: string;
+	noteName: string;
+	path: string;
+	vault: string;
+	behavior: Template['behavior'];
+	title?: string;
+	url: string;
+	contentLength: number;
+	templateName: string;
+}
+
+interface BatchClipResult {
+	url: string;
+	success: boolean;
+	tabId?: number;
+	title?: string;
+	error?: string;
+	debugDetails?: BatchDebugDetails;
+}
+
+interface BatchTimings {
+	startedAt: number;
+	loadedAt?: number;
+	settledAt?: number;
+	preparedAt?: number;
+	saveStartedAt?: number;
+	failedAt?: number;
+	savedAt?: number;
+}
+
+interface BatchDebugDetails {
+	stage: string;
+	inputUrl: string;
+	finalUrl?: string;
+	tabId?: number;
+	title?: string;
+	templateName?: string;
+	behavior?: Template['behavior'];
+	vault?: string;
+	path?: string;
+	noteName?: string;
+	contentLength?: number;
+	uriLength?: number;
+	usesClipboard?: boolean;
+	usesUriContent?: boolean;
+	silent?: boolean;
+	fallbackReason?: string;
+	errorName?: string;
+	errorStack?: string;
+	timings: BatchTimings;
+}
+
+interface PreparedBatchClipItem {
+	url: string;
+	position: number;
+	total: number;
+	tabId: number;
+	preparedClip: PreparedObsidianClip;
+	timings: BatchTimings;
+}
+
+type BatchPreparationResult =
+	| { success: true; item: PreparedBatchClipItem }
+	| { success: false; result: BatchClipResult };
+
+type BatchCompletionAlert = 'none' | 'notification' | 'sound' | 'both';
+
+class BatchSettleTimeoutError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'BatchSettleTimeoutError';
+	}
+}
 
 // Memoize compileTemplate with a short expiration and URL-sensitive key
 const memoizedCompileTemplate = memoizeWithExpiration(
@@ -288,6 +372,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 		document.documentElement.classList.add('is-embedded');
 	}
 
+	if (isBatchMode) {
+		await initializeBatchClipperPage();
+		return;
+	}
+
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
 	try {
@@ -441,6 +530,21 @@ function setupEventListeners(tabId: number) {
 				}
 			});
 		}
+
+	const batchClipperButton = document.getElementById('batch-clipper');
+	if (batchClipperButton) {
+		batchClipperButton.addEventListener('click', async function(e) {
+			e.preventDefault();
+			try {
+				await browser.runtime.sendMessage({ action: "openBatchClipper" });
+				if (!isSidePanel && !isIframe) {
+					setTimeout(() => window.close(), 50);
+				}
+			} catch (error) {
+				console.error('Error opening batch clipper:', error);
+			}
+		});
+	}
 
 	const moreButton = document.getElementById('more-btn');
 	const moreDropdown = document.getElementById('more-dropdown');
@@ -603,6 +707,733 @@ async function initializeUI() {
 			browser.runtime.sendMessage({ action: "sidePanelClosed" });
 		});
 	}
+}
+
+async function initializeBatchClipperPage() {
+	await translatePage();
+	await setupLanguageAndDirection();
+	await addBrowserClassToHtml();
+
+	document.title = getMessage('batchClipUrls');
+	document.documentElement.classList.add('is-batch-mode');
+	document.body.classList.add('batch-mode');
+	document.body.innerHTML = `
+		<div class="batch-clipper-page">
+			<header class="batch-header">
+				<div>
+					<h1>${escapeHtml(getMessage('batchClipUrls'))}</h1>
+					<p>${escapeHtml(getMessage('batchClipUrlsDescription', BATCH_CONCURRENCY.toString()))}</p>
+				</div>
+				<button id="batch-settings-btn" class="clickable-icon" title="${escapeHtml(getMessage('settings'))}"><i data-lucide="settings"></i></button>
+			</header>
+			<main class="batch-main">
+				<section class="batch-inputs">
+					<label for="batch-url-list">${escapeHtml(getMessage('batchUrls'))}</label>
+					<textarea id="batch-url-list" spellcheck="false" placeholder="${escapeHtml(getMessage('batchUrlPlaceholder'))}"></textarea>
+					<div class="batch-options">
+						<label for="batch-alert-mode">${escapeHtml(getMessage('batchWhenFinished'))}</label>
+						<select id="batch-alert-mode">
+							<option value="none">${escapeHtml(getMessage('batchAlertNone'))}</option>
+							<option value="notification">${escapeHtml(getMessage('batchAlertNotification'))}</option>
+							<option value="sound">${escapeHtml(getMessage('batchAlertSound'))}</option>
+							<option value="both">${escapeHtml(getMessage('batchAlertBoth'))}</option>
+						</select>
+					</div>
+					<div class="batch-controls">
+						<button id="batch-start-btn" class="mod-cta">${escapeHtml(getMessage('batchStart'))}</button>
+						<button id="batch-retry-btn" style="display: none;">${escapeHtml(getMessage('batchRetryFailedUrls'))}</button>
+					</div>
+				</section>
+				<section class="batch-progress" aria-live="polite">
+					<div class="batch-progress-bar"><div id="batch-progress-fill"></div></div>
+					<div id="batch-timer">${escapeHtml(getMessage('batchElapsed', '00:00'))}</div>
+					<div id="batch-summary">${escapeHtml(getMessage('batchWaiting'))}</div>
+					<ol id="batch-log"></ol>
+				</section>
+			</main>
+		</div>
+	`;
+
+	initializeIcons(document.body);
+	templates = await loadTemplates();
+	initializeTriggers(templates);
+	lastSelectedVault = await getLocalStorage('lastSelectedVault');
+	if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
+		lastSelectedVault = loadedSettings.vaults[0];
+	}
+
+	let failedUrls: string[] = [];
+	let isRunning = false;
+
+	const textarea = document.getElementById('batch-url-list') as HTMLTextAreaElement;
+	const startButton = document.getElementById('batch-start-btn') as HTMLButtonElement;
+	const retryButton = document.getElementById('batch-retry-btn') as HTMLButtonElement;
+	const settingsButton = document.getElementById('batch-settings-btn') as HTMLButtonElement;
+	const alertModeSelect = document.getElementById('batch-alert-mode') as HTMLSelectElement;
+	const summary = document.getElementById('batch-summary') as HTMLElement;
+	const timer = document.getElementById('batch-timer') as HTMLElement;
+	const log = document.getElementById('batch-log') as HTMLOListElement;
+	const progressFill = document.getElementById('batch-progress-fill') as HTMLElement;
+
+	const savedAlertMode = await getLocalStorage('batchCompletionAlert') as BatchCompletionAlert | undefined;
+	alertModeSelect.value = savedAlertMode || 'none';
+	alertModeSelect.addEventListener('change', () => {
+		setLocalStorage('batchCompletionAlert', alertModeSelect.value);
+	});
+
+	settingsButton.addEventListener('click', () => {
+		browser.runtime.sendMessage({ action: "openOptionsPage" });
+	});
+
+	const startRun = async (rawUrls: string) => {
+		if (isRunning) return;
+		const { urls, rejected } = parseBatchUrls(rawUrls);
+		if (urls.length === 0) {
+			summary.textContent = rejected.length > 0
+				? getMessage('batchNoValidUrls', rejected.length.toString())
+				: getMessage('batchPasteAtLeastOneUrl');
+			return;
+		}
+
+		isRunning = true;
+		failedUrls = [];
+		log.textContent = '';
+		progressFill.style.width = '0%';
+		startButton.disabled = true;
+		retryButton.style.display = 'none';
+		textarea.disabled = true;
+
+		if (rejected.length > 0) {
+			appendBatchLog(log, getBatchInvalidUrlMessage(rejected.length));
+		}
+
+		let completed = 0;
+		let succeeded = 0;
+		let failed = 0;
+		const total = urls.length;
+		const completionAlertMode = await ensureBatchCompletionAlertPermission(
+			alertModeSelect.value as BatchCompletionAlert,
+			(message) => appendBatchLog(log, message)
+		);
+		const startedAt = Date.now();
+		let timerInterval: number | undefined;
+		const updateSummary = () => {
+			progressFill.style.width = `${Math.round((completed / total) * 100)}%`;
+			summary.textContent = getMessage('batchProgressSummary', [
+				completed.toString(),
+				total.toString(),
+				succeeded.toString(),
+				failed.toString()
+			]);
+			timer.textContent = getBatchTimerText(startedAt);
+		};
+		updateSummary();
+		timerInterval = window.setInterval(updateSummary, 1000);
+
+		await runBatchClip(urls, (message) => appendBatchLog(log, message), (result) => {
+			completed++;
+			if (result.success) {
+				succeeded++;
+			} else {
+				failed++;
+				failedUrls.push(result.url);
+			}
+			updateSummary();
+		});
+		if (timerInterval !== undefined) {
+			window.clearInterval(timerInterval);
+		}
+
+		isRunning = false;
+		startButton.disabled = false;
+		textarea.disabled = false;
+
+		if (failedUrls.length > 0) {
+			retryButton.style.display = 'inline-flex';
+			summary.textContent = getBatchFailureSummary(succeeded, total, failedUrls.length);
+		} else {
+			summary.textContent = getMessage('batchDone', [succeeded.toString(), total.toString()]);
+		}
+		timer.textContent = getMessage('batchFinishedIn', formatBatchDuration(Date.now() - startedAt));
+		await notifyBatchComplete(completionAlertMode, succeeded, failed, total);
+	};
+
+	startButton.addEventListener('click', () => startRun(textarea.value));
+	retryButton.addEventListener('click', () => {
+		textarea.value = failedUrls.join('\n');
+		startRun(textarea.value);
+	});
+}
+
+function appendBatchLog(log: HTMLOListElement, message: string) {
+	const item = document.createElement('li');
+	item.textContent = message;
+	log.prepend(item);
+	while (log.children.length > 200) {
+		log.lastElementChild?.remove();
+	}
+}
+
+function getBatchInvalidUrlMessage(count: number): string {
+	return count === 1
+		? getMessage('batchIgnoredInvalidOne')
+		: getMessage('batchIgnoredInvalid', count.toString());
+}
+
+function getBatchFailureSummary(succeeded: number, total: number, failed: number): string {
+	const substitutions = [succeeded.toString(), total.toString(), failed.toString()];
+	return failed === 1
+		? getMessage('batchFailedFinalOne', substitutions)
+		: getMessage('batchFailedFinal', substitutions);
+}
+
+function getBatchTimerText(startedAt: number): string {
+	const elapsedMs = Date.now() - startedAt;
+	return getMessage('batchElapsed', formatBatchDuration(elapsedMs));
+}
+
+async function ensureBatchCompletionAlertPermission(
+	mode: BatchCompletionAlert,
+	onLog: (message: string) => void
+): Promise<BatchCompletionAlert> {
+	if (mode !== 'notification' && mode !== 'both') {
+		return mode;
+	}
+
+	const permissions = (browser as typeof browser & {
+		permissions?: {
+			contains?: (permissions: { permissions: string[] }) => Promise<boolean>;
+			request?: (permissions: { permissions: string[] }) => Promise<boolean>;
+		};
+	}).permissions;
+
+	if (!permissions?.contains || !permissions.request) {
+		onLog(getMessage('batchNotificationPermissionUnavailable'));
+		return mode === 'both' ? 'sound' : 'none';
+	}
+
+	try {
+		const permission = { permissions: ['notifications'] };
+		const hasPermission = await permissions.contains(permission);
+		if (hasPermission) {
+			return mode;
+		}
+		const granted = await permissions.request(permission);
+		if (granted) {
+			return mode;
+		}
+		onLog(getMessage('batchNotificationPermissionDenied'));
+		return mode === 'both' ? 'sound' : 'none';
+	} catch (error) {
+		console.warn('Batch notification permission request failed:', error);
+		onLog(getMessage('batchNotificationPermissionUnavailable'));
+		return mode === 'both' ? 'sound' : 'none';
+	}
+}
+
+async function notifyBatchComplete(mode: BatchCompletionAlert, succeeded: number, failed: number, total: number): Promise<void> {
+	if (mode === 'sound' || mode === 'both') {
+		await playBatchCompleteSound();
+	}
+	if (mode === 'notification' || mode === 'both') {
+		await browser.runtime.sendMessage({
+			action: 'showBatchNotification',
+			title: getMessage('batchClipComplete'),
+			message: getMessage('batchCompletionMessage', [succeeded.toString(), total.toString(), failed.toString()])
+		}).catch((error) => {
+			console.warn('Batch notification failed:', error);
+		});
+	}
+}
+
+async function playBatchCompleteSound(): Promise<void> {
+	try {
+		const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+		if (!AudioContextClass) return;
+		const audioContext = new AudioContextClass();
+		const oscillator = audioContext.createOscillator();
+		const gain = audioContext.createGain();
+		oscillator.type = 'sine';
+		oscillator.frequency.value = 880;
+		gain.gain.setValueAtTime(0.001, audioContext.currentTime);
+		gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.02);
+		gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
+		oscillator.connect(gain);
+		gain.connect(audioContext.destination);
+		oscillator.start();
+		oscillator.stop(audioContext.currentTime + 0.38);
+		setTimeout(() => audioContext.close(), 500);
+	} catch (error) {
+		console.warn('Batch completion sound failed:', error);
+	}
+}
+
+async function runBatchClip(urls: string[], onLog: (message: string) => void, onResult: (result: BatchClipResult) => void): Promise<BatchClipResult[]> {
+	const results: BatchClipResult[] = new Array(urls.length);
+
+	for (let windowStart = 0; windowStart < urls.length; windowStart += BATCH_CONCURRENCY) {
+		const windowUrls = urls.slice(windowStart, windowStart + BATCH_CONCURRENCY);
+		const preparedItems = windowUrls.map((url, offset) => {
+			const currentIndex = windowStart + offset;
+			return prepareBatchUrl(url, currentIndex + 1, urls.length, onLog);
+		});
+
+		for (let offset = 0; offset < preparedItems.length; offset++) {
+			const currentIndex = windowStart + offset;
+			const preparedResult = await preparedItems[offset];
+			const result = preparedResult.success
+				? await savePreparedBatchClip(preparedResult.item, onLog)
+				: preparedResult.result;
+			results[currentIndex] = result;
+			onResult(result);
+		}
+	}
+
+	return results;
+}
+
+async function prepareBatchUrl(
+	url: string,
+	position: number,
+	total: number,
+	onLog: (message: string) => void
+): Promise<BatchPreparationResult> {
+	let tabId: number | undefined;
+	let stage = 'open';
+	const timings: BatchTimings = { startedAt: Date.now() };
+
+	try {
+		onLog(formatBatchLogLine(position, total, getMessage('batchOpening', url)));
+		const tab = await browser.tabs.create({ url, active: false });
+		tabId = tab.id;
+		if (!tabId) {
+			throw new Error(getMessage('batchErrorNoTabId'));
+		}
+
+		stage = 'load';
+		await waitForBatchTabComplete(tabId, BATCH_PAGE_TIMEOUT_MS);
+		timings.loadedAt = Date.now();
+		throwIfBatchTimedOut(timings.startedAt);
+
+		stage = 'lazy-load settling';
+		await settleBatchTabForClip(tabId, timings.startedAt, onLog, position, total);
+		timings.settledAt = Date.now();
+
+		stage = 'clip preparation';
+		const preparedClip = await prepareBatchClip(tabId);
+		timings.preparedAt = Date.now();
+		throwIfBatchTimedOut(timings.startedAt);
+
+		return {
+			success: true,
+			item: {
+				url,
+				position,
+				total,
+				tabId,
+				preparedClip,
+				timings
+			}
+		};
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		const debugDetails = await buildBatchDebugDetails({
+			stage,
+			inputUrl: url,
+			tabId,
+			error,
+			timings: {
+				...timings,
+				failedAt: Date.now()
+			}
+		});
+		onLog(formatBatchFailureLog(position, total, url, message, debugDetails));
+		return { success: false, result: { url, success: false, tabId, error: message, debugDetails } };
+	}
+}
+
+async function savePreparedBatchClip(item: PreparedBatchClipItem, onLog: (message: string) => void): Promise<BatchClipResult> {
+	const { url, position, total, tabId, preparedClip, timings } = item;
+	let saveDiagnostics: SaveToObsidianDiagnostics | undefined;
+	try {
+		timings.saveStartedAt = Date.now();
+		onLog(formatBatchLogLine(position, total, getMessage('batchSaving', preparedClip.title || preparedClip.url)));
+		await saveToObsidian(
+			preparedClip.fileContent,
+			preparedClip.noteName,
+			preparedClip.path,
+			preparedClip.vault,
+			preparedClip.behavior,
+			{
+				targetTabId: tabId,
+				silent: true,
+				maxUriLength: BATCH_MAX_URI_LENGTH,
+				onUrlReady: (diagnostics) => {
+					saveDiagnostics = diagnostics;
+				}
+			}
+		);
+		await incrementStat('addToObsidian', preparedClip.vault, preparedClip.path, preparedClip.url, preparedClip.title);
+		await delay(saveDiagnostics?.usesClipboard ? BATCH_CLIPBOARD_SAVE_SETTLE_MS : BATCH_SAVE_SETTLE_MS);
+		await browser.tabs.remove(tabId).catch(() => {});
+		timings.savedAt = Date.now();
+		onLog(formatBatchLogLine(position, total, getMessage('batchSaved', preparedClip.title || url)));
+		return { url, success: true, title: preparedClip.title };
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		const debugDetails = await buildBatchDebugDetails({
+			stage: 'save handoff',
+			inputUrl: url,
+			tabId,
+			preparedClip,
+			saveDiagnostics,
+			error,
+			timings: {
+				...timings,
+				failedAt: Date.now()
+			}
+		});
+		onLog(formatBatchFailureLog(position, total, url, message, debugDetails));
+		return { url, success: false, tabId, error: message, debugDetails };
+	}
+}
+
+async function buildBatchDebugDetails({
+	stage,
+	inputUrl,
+	tabId,
+	preparedClip,
+	saveDiagnostics,
+	error,
+	timings
+}: {
+	stage: string;
+	inputUrl: string;
+	tabId?: number;
+	preparedClip?: PreparedObsidianClip;
+	saveDiagnostics?: SaveToObsidianDiagnostics;
+	error: unknown;
+	timings: BatchTimings;
+}): Promise<BatchDebugDetails> {
+	const currentTab = tabId ? await browser.tabs.get(tabId).catch(() => undefined) : undefined;
+	const finalUrl = preparedClip?.url || (currentTab ? getBatchTabUrl(currentTab) : undefined);
+	const errorObject = error instanceof Error ? error : undefined;
+	return {
+		stage,
+		inputUrl,
+		finalUrl,
+		tabId,
+		title: preparedClip?.title || currentTab?.title,
+		templateName: preparedClip?.templateName,
+		behavior: preparedClip?.behavior,
+		vault: preparedClip?.vault,
+		path: preparedClip?.path,
+		noteName: preparedClip?.noteName,
+		contentLength: preparedClip?.contentLength,
+		uriLength: saveDiagnostics?.urlLength,
+		usesClipboard: saveDiagnostics?.usesClipboard,
+		usesUriContent: saveDiagnostics?.usesUriContent,
+		silent: saveDiagnostics?.silent,
+		fallbackReason: saveDiagnostics?.fallbackReason,
+		errorName: errorObject?.name,
+		errorStack: errorObject?.stack,
+		timings
+	};
+}
+
+function formatBatchFailureLog(
+	position: number,
+	total: number,
+	url: string,
+	message: string,
+	debugDetails: BatchDebugDetails
+): string {
+	return [
+		formatBatchLogLine(position, total, getMessage('batchNeedAttention', [url, message])),
+		getMessage('batchDebugDetails'),
+		...formatBatchDebugDetails(debugDetails)
+	].join('\n');
+}
+
+function formatBatchDebugDetails(details: BatchDebugDetails): string[] {
+	const rows = [
+		['Stage', details.stage],
+		['Input URL', details.inputUrl],
+		['Final URL', details.finalUrl],
+		['Title', details.title],
+		['Tab ID', details.tabId],
+		['Template', details.templateName],
+		['Behavior', details.behavior],
+		['Vault', details.vault],
+		['Path', details.path],
+		['Note name', details.noteName],
+		['Content characters', details.contentLength],
+		['Obsidian URI characters', details.uriLength],
+		['Clipboard handoff', typeof details.usesClipboard === 'boolean' ? String(details.usesClipboard) : undefined],
+		['URI content handoff', typeof details.usesUriContent === 'boolean' ? String(details.usesUriContent) : undefined],
+		['Silent handoff requested', typeof details.silent === 'boolean' ? String(details.silent) : undefined],
+		['Fallback reason', details.fallbackReason],
+		['Timings', formatBatchTimings(details.timings)],
+		['Error name', details.errorName],
+		['Error stack', details.errorStack]
+	];
+
+	return rows
+		.filter(([, value]) => value !== undefined && value !== null && value !== '')
+		.map(([label, value]) => `- ${label}: ${String(value)}`);
+}
+
+function formatBatchTimings(timings: BatchTimings): string {
+	const rows = [
+		['load', timings.loadedAt],
+		['settle', timings.settledAt],
+		['prepare', timings.preparedAt],
+		['save start', timings.saveStartedAt],
+		['failed', timings.failedAt],
+		['saved', timings.savedAt]
+	];
+	return rows
+		.filter(([, timestamp]) => typeof timestamp === 'number')
+		.map(([label, timestamp]) => `${label} +${formatBatchDuration((timestamp as number) - timings.startedAt)}`)
+		.join(', ');
+}
+
+function formatBatchLogLine(position: number, total: number, message: string): string {
+	return `[${position}/${total}] ${message}`;
+}
+
+async function settleBatchTabForClip(
+	tabId: number,
+	startedAt: number,
+	onLog: (message: string) => void,
+	position: number,
+	total: number
+): Promise<void> {
+	const settleTimeoutMs = Math.max(1000, Math.min(BATCH_SETTLE_TIMEOUT_MS, remainingBatchTime(startedAt) - 5000));
+	const runSettle = async () => browser.runtime.sendMessage({
+		action: "sendMessageToTab",
+		tabId,
+		message: {
+			action: "settlePageForBatchClip",
+			maxMs: settleTimeoutMs
+		}
+	}) as Promise<{ success?: boolean; error?: string } | undefined>;
+	const runSettleWithTimeout = () => withTimeout(
+		runSettle(),
+		settleTimeoutMs + 1000,
+		() => new BatchSettleTimeoutError(getMessage('batchErrorSettleTimeout'))
+	);
+
+	try {
+		const settleResponse = await runSettleWithTimeout();
+		if (settleResponse?.success !== false) {
+			return;
+		}
+		throw new Error(settleResponse.error || getMessage('batchErrorPageDidNotSettle'));
+	} catch (firstError) {
+		if (firstError instanceof BatchSettleTimeoutError) {
+			onLog(formatBatchLogLine(position, total, getMessage('batchLazyLoadSkipped', firstError.message)));
+			return;
+		}
+		try {
+			await browser.runtime.sendMessage({ action: "forceInjectContentScript", tabId });
+			await delay(500);
+			const retryResponse = await runSettleWithTimeout();
+			if (retryResponse?.success !== false) {
+				return;
+			}
+			throw new Error(retryResponse.error || getMessage('batchErrorPageDidNotSettle'));
+		} catch (retryError) {
+			const message = retryError instanceof Error
+				? retryError.message
+				: firstError instanceof Error
+					? firstError.message
+					: String(retryError || firstError);
+			onLog(formatBatchLogLine(position, total, getMessage('batchLazyLoadSkipped', message)));
+		}
+	}
+}
+
+async function waitForBatchTabComplete(tabId: number, timeoutMs: number): Promise<void> {
+	const isReady = (tab: browser.Tabs.Tab) => {
+		const url = tab.url;
+		return tab.status === 'complete' && !!url && isValidUrl(url) && !isBlankPage(url);
+	};
+
+	const initialTab = await browser.tabs.get(tabId);
+	if (isReady(initialTab)) return;
+
+	await new Promise<void>((resolve, reject) => {
+		const timeout = window.setTimeout(() => {
+			browser.tabs.onUpdated.removeListener(listener);
+			window.clearInterval(pollInterval);
+			reject(new Error(getMessage('batchErrorPageLoadTimeout')));
+		}, timeoutMs);
+
+		const finishIfReady = async () => {
+			try {
+				const tab = await browser.tabs.get(tabId);
+				if (isReady(tab)) {
+					window.clearTimeout(timeout);
+					window.clearInterval(pollInterval);
+					browser.tabs.onUpdated.removeListener(listener);
+					resolve();
+				}
+			} catch (error) {
+				window.clearTimeout(timeout);
+				window.clearInterval(pollInterval);
+				browser.tabs.onUpdated.removeListener(listener);
+				reject(error);
+			}
+		};
+
+		const pollInterval = window.setInterval(finishIfReady, 250);
+
+		const listener = (updatedTabId: number) => {
+			if (updatedTabId === tabId) {
+				finishIfReady();
+			}
+		};
+
+		browser.tabs.onUpdated.addListener(listener);
+		finishIfReady();
+	});
+}
+
+function getBatchTabUrl(tab: browser.Tabs.Tab): string | undefined {
+	const pendingUrl = (tab as browser.Tabs.Tab & { pendingUrl?: string }).pendingUrl;
+	return tab.url || pendingUrl;
+}
+
+async function getBatchTabInfo(tabId: number): Promise<{ id: number; url: string }> {
+	const tab = await browser.tabs.get(tabId);
+	const url = getBatchTabUrl(tab);
+	if (tab.id && url) {
+		return { id: tab.id, url };
+	}
+	return getTabInfo(tabId);
+}
+
+async function prepareBatchClip(tabId: number): Promise<PreparedObsidianClip> {
+	if (templates.length === 0) {
+		throw new Error(getMessage('batchErrorNoTemplates'));
+	}
+
+	const tab = await getBatchTabInfo(tabId);
+	if (!tab.url || isBlankPage(tab.url) || !isValidUrl(tab.url) || isRestrictedUrl(tab.url)) {
+		throw new Error(getMessage('batchErrorCannotClipPage', tab.url || getMessage('batchUnknownUrl')));
+	}
+
+	const extractedData = await extractPageContent(tabId);
+	if (!extractedData) {
+		throw new Error(getMessage('batchErrorUnableExtract'));
+	}
+	assertNotLikelyBlockedByIntervention(extractedData);
+
+	const matchedTemplate = await findMatchingTemplate(tab.url, async () => extractedData.schemaOrgData);
+	const template = matchedTemplate || templates[0];
+	if (generalSettings.interpreterEnabled && collectPromptVariables(template).length > 0) {
+		throw new Error(getMessage('batchErrorInterpreterTemplate'));
+	}
+
+	const initializedContent = await initializePageContent(
+		extractedData.content,
+		extractedData.selectedHtml,
+		extractedData.extractedContent,
+		tab.url,
+		extractedData.schemaOrgData,
+		extractedData.fullHtml,
+		extractedData.highlights || [],
+		extractedData.title,
+		extractedData.author,
+		extractedData.description,
+		extractedData.favicon,
+		extractedData.image,
+		extractedData.published,
+		extractedData.site,
+		extractedData.wordCount,
+		extractedData.language || '',
+		extractedData.metaTags
+	);
+	if (!initializedContent) {
+		throw new Error(getMessage('batchErrorUnableInitialize'));
+	}
+
+	const variables = initializedContent.currentVariables;
+	const properties: Property[] = await Promise.all(template.properties.map(async property => {
+		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
+		const compiledValue = await compileTemplate(tabId, unescapeValue(property.value), variables, tab.url);
+		return {
+			...property,
+			value: formatPropertyValue(compiledValue, propertyType, property.value)
+		};
+	}));
+	const [noteName, path, noteContent] = await Promise.all([
+		compileTemplate(tabId, template.noteNameFormat, variables, tab.url),
+		compileTemplate(tabId, template.path, variables, tab.url),
+		template.noteContentFormat ? compileTemplate(tabId, template.noteContentFormat, variables, tab.url) : Promise.resolve('')
+	]);
+
+	const frontmatter = await generateFrontmatter(properties);
+	const selectedVault = template.vault || lastSelectedVault || loadedSettings.vaults[0] || '';
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+
+	return {
+		fileContent: frontmatter + noteContent,
+		noteName: isDailyNote ? '' : noteName.trim(),
+		path: isDailyNote ? '' : path,
+		vault: selectedVault,
+		behavior: template.behavior,
+		title: extractedData.title,
+		url: tab.url,
+		contentLength: (frontmatter + noteContent).length,
+		templateName: template.name
+	};
+}
+
+function assertNotLikelyBlockedByIntervention(extractedData: Awaited<ReturnType<typeof extractPageContent>>) {
+	if (!extractedData) return;
+	const text = [
+		extractedData.title,
+		extractedData.description,
+		extractedData.content
+	].join(' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+	const blockerPattern = /\b(cookie|cookies|consent|privacy settings|accept all|reject all|subscribe to continue|sign in|log in|captcha|verify you are human|access denied|enable javascript)\b/i;
+	if ((extractedData.wordCount || 0) < 120 && blockerPattern.test(text)) {
+		throw new Error(getMessage('batchErrorIntervention'));
+	}
+}
+
+function remainingBatchTime(startedAt: number): number {
+	return Math.max(1000, BATCH_PAGE_TIMEOUT_MS - (Date.now() - startedAt));
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, createError: () => Error): Promise<T> {
+	return new Promise((resolve, reject) => {
+		const timeout = window.setTimeout(() => {
+			reject(createError());
+		}, timeoutMs);
+		promise.then(
+			value => {
+				window.clearTimeout(timeout);
+				resolve(value);
+			},
+			error => {
+				window.clearTimeout(timeout);
+				reject(error);
+			}
+		);
+	});
+}
+
+function throwIfBatchTimedOut(startedAt: number) {
+	if (Date.now() - startedAt > BATCH_PAGE_TIMEOUT_MS) {
+		throw new Error(getMessage('batchErrorPrepareTimeout'));
+	}
+}
+
+function delay(ms: number): Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function showError(messageKey: string): void {

@@ -392,6 +392,13 @@ declare global {
 		} else if (request.action === "getReaderModeState") {
 			sendResponse({ isActive: document.documentElement.classList.contains('obsidian-reader-active') });
 			return true;
+		} else if (request.action === "settlePageForBatchClip") {
+			settlePageForBatchClip(request.maxMs).then((result) => {
+				sendResponse({ success: true, ...result });
+			}).catch((error) => {
+				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+			});
+			return true;
 		}
 		return true;
 	});
@@ -403,6 +410,54 @@ declare global {
 	function updateHasHighlights() {
 		const hasHighlights = highlighter.getHighlights().length > 0;
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
+	}
+
+	async function settlePageForBatchClip(maxMs: number = 30000): Promise<{ scrolls: number; height: number; textLength: number }> {
+		const startedAt = Date.now();
+		const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+		let scrolls = 0;
+		let lastHeight = Math.max(
+			document.documentElement.scrollHeight,
+			document.body?.scrollHeight || 0
+		);
+		let stableHeightCount = 0;
+
+		await sleep(750);
+
+		while (Date.now() - startedAt < maxMs) {
+			const viewport = window.innerHeight || document.documentElement.clientHeight || 800;
+			const currentY = window.scrollY || window.pageYOffset;
+			const nextY = Math.min(currentY + Math.max(500, Math.floor(viewport * 0.8)), lastHeight);
+			window.scrollTo({ top: nextY, behavior: 'auto' });
+			scrolls++;
+			await sleep(650);
+
+			const newHeight = Math.max(
+				document.documentElement.scrollHeight,
+				document.body?.scrollHeight || 0
+			);
+			const atBottom = Math.ceil(window.scrollY + viewport) >= newHeight - 8;
+
+			if (newHeight === lastHeight) {
+				stableHeightCount++;
+			} else {
+				stableHeightCount = 0;
+				lastHeight = newHeight;
+			}
+
+			if (atBottom && stableHeightCount >= 2) {
+				break;
+			}
+		}
+
+		window.scrollTo({ top: 0, behavior: 'auto' });
+		await sleep(500);
+
+		return {
+			scrolls,
+			height: Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0),
+			textLength: document.body?.innerText?.trim().length || 0
+		};
 	}
 
 	let highlighterCSSPromise: Promise<void> | null = null;

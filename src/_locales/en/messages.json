@@ -59,6 +59,141 @@
 	"autoRunInterpreterDescription": {
 		"message": "Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually."
 	},
+	"batchAlertBoth": {
+		"message": "Notification and sound"
+	},
+	"batchAlertNone": {
+		"message": "Do nothing"
+	},
+	"batchAlertNotification": {
+		"message": "System notification"
+	},
+	"batchAlertSound": {
+		"message": "Sound"
+	},
+	"batchClipComplete": {
+		"message": "Batch clip complete"
+	},
+	"batchClipUrls": {
+		"message": "Batch clip URLs"
+	},
+	"batchClipUrlsDescription": {
+		"message": "Paste one URL per line. Pages are opened in background batches of $1, clipped with your default Web Clipper template, and closed after a successful Obsidian handoff."
+	},
+	"batchCompletionMessage": {
+		"message": "$1/$2 saved. $3 need attention."
+	},
+	"batchDebugDetails": {
+		"message": "Debug details:"
+	},
+	"batchDone": {
+		"message": "Done. Saved $1/$2 URLs."
+	},
+	"batchElapsed": {
+		"message": "Elapsed $1"
+	},
+	"batchErrorCannotClipPage": {
+		"message": "Page cannot be clipped. Current tab URL: $1"
+	},
+	"batchErrorIntervention": {
+		"message": "Possible cookie banner, login wall, or interstitial. Handle it in the open tab, then retry."
+	},
+	"batchErrorInterpreterTemplate": {
+		"message": "Batch clipping does not support templates with Interpreter prompt variables yet. Use a template without prompts or clip this page manually."
+	},
+	"batchErrorNoTabId": {
+		"message": "Browser did not return a tab ID."
+	},
+	"batchErrorNoTemplates": {
+		"message": "No templates available."
+	},
+	"batchErrorNoteTooLarge": {
+		"message": "Clipped note is too large to save safely in batch mode ($1 URL characters)."
+	},
+	"batchErrorPageDidNotSettle": {
+		"message": "Page did not settle before clipping."
+	},
+	"batchErrorPageLoadTimeout": {
+		"message": "Timed out waiting for page load."
+	},
+	"batchErrorPrepareTimeout": {
+		"message": "Timed out while preparing the page."
+	},
+	"batchErrorSettleTimeout": {
+		"message": "Timed out while settling lazy-loaded content."
+	},
+	"batchErrorUnableExtract": {
+		"message": "Unable to extract page content."
+	},
+	"batchErrorUnableInitialize": {
+		"message": "Unable to initialize page content."
+	},
+	"batchFailedFinal": {
+		"message": "$1/$2 saved. $3 tabs stayed open for cookie banners, logins, interstitials, or errors. Handle them, then retry."
+	},
+	"batchFailedFinalOne": {
+		"message": "$1/$2 saved. 1 tab stayed open for cookie banners, logins, interstitials, or errors. Handle it, then retry."
+	},
+	"batchFinishedIn": {
+		"message": "Finished in $1."
+	},
+	"batchIgnoredInvalid": {
+		"message": "Ignored $1 invalid entries."
+	},
+	"batchIgnoredInvalidOne": {
+		"message": "Ignored 1 invalid entry."
+	},
+	"batchLazyLoadSkipped": {
+		"message": "Lazy-load settling skipped; clipping anyway ($1)"
+	},
+	"batchNeedAttention": {
+		"message": "Needs attention: $1 ($2)"
+	},
+	"batchNotificationPermissionDenied": {
+		"message": "System notifications were not enabled for this run."
+	},
+	"batchNotificationPermissionUnavailable": {
+		"message": "System notifications are not available for this run."
+	},
+	"batchNoValidUrls": {
+		"message": "No valid URLs found. Rejected $1."
+	},
+	"batchOpening": {
+		"message": "Opening $1"
+	},
+	"batchPasteAtLeastOneUrl": {
+		"message": "Paste at least one URL."
+	},
+	"batchProgressSummary": {
+		"message": "$1/$2 done. $3 saved, $4 need attention."
+	},
+	"batchRetryFailedUrls": {
+		"message": "Retry failed URLs"
+	},
+	"batchSaved": {
+		"message": "Saved $1"
+	},
+	"batchSaving": {
+		"message": "Saving $1"
+	},
+	"batchStart": {
+		"message": "Start batch clip"
+	},
+	"batchUrlPlaceholder": {
+		"message": "https://example.com/article-1\nhttps://example.com/article-2"
+	},
+	"batchUrls": {
+		"message": "URLs"
+	},
+	"batchUnknownUrl": {
+		"message": "unknown"
+	},
+	"batchWaiting": {
+		"message": "Waiting for URLs."
+	},
+	"batchWhenFinished": {
+		"message": "When finished"
+	},
 	"behavior": {
 		"message": "Behavior"
 	},

@@ -333,7 +333,7 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; targetTabId?: number; text?: string; url?: string; section?: string; readerUrl?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -582,6 +582,44 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "openBatchClipper") {
+			try {
+				browser.tabs.create({
+					url: browser.runtime.getURL('batch.html')
+				}).then(() => {
+					sendResponse({ success: true });
+				}).catch((error) => {
+					console.error('Error opening batch clipper:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+				});
+			} catch (error) {
+				console.error('Error opening batch clipper:', error);
+				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "showBatchNotification") {
+			const title = (typedRequest as any).title || 'Batch clip complete';
+			const message = (typedRequest as any).message || '';
+			const notifications = (browser as any).notifications;
+			if (notifications?.create) {
+				notifications.create({
+					type: 'basic',
+					iconUrl: browser.runtime.getURL('icons/icon128.png'),
+					title,
+					message
+				}).then(() => {
+					sendResponse({ success: true });
+				}).catch((error: unknown) => {
+					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+				});
+			} else {
+				sendResponse({ success: false, error: 'Notifications are not available in this browser.' });
+			}
+			return true;
+		}
+
 		if (typedRequest.action === "openHighlights") {
 			const domain = (typedRequest as any).domain;
 			const query = domain ? `?domain=${encodeURIComponent(domain)}` : '';
@@ -690,6 +728,20 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		if (typedRequest.action === "openObsidianUrl") {
 			const url = (typedRequest as any).url;
 			if (url) {
+				const targetTabId = typedRequest.targetTabId;
+				if (targetTabId) {
+					browser.tabs.update(targetTabId, { url }).then(() => {
+						sendResponse({ success: true });
+					}).catch((error) => {
+						console.error('Error opening Obsidian URL in target tab:', error);
+						sendResponse({
+							success: false,
+							error: error instanceof Error ? error.message : String(error)
+						});
+					});
+					return true;
+				}
+
 				browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
 					const currentTab = tabs[0];
 					if (currentTab && currentTab.id) {
