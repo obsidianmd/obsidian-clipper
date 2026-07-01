@@ -76,20 +76,21 @@ export class GitRepoClient implements RemoteClient {
 		return response.status === 204 ? null : response.json();
 	}
 
-	private async getExistingFile(path: string): Promise<{ sha: string } | null> {
+	private async getExistingFile(path: string): Promise<{ sha: string; content: string } | null> {
 		try {
 			const result = await this.request('GET', `/repos/${this.owner}/${this.repo}/contents/${path}?ref=${this.branch}`);
-			return { sha: result.sha };
+			if (result && result.sha && result.content) {
+				return { sha: result.sha, content: result.content };
+			}
+			return null;
 		} catch (error) {
 			return null;
 		}
 	}
 
 	async upload(path: string, content: string, mode: UploadMode): Promise<void> {
-		const fullPath = path.startsWith('/') ? path : `${path}`;
-		const encodedPath = encodeURIComponent(fullPath);
+		const fullPath = path.startsWith('/') ? path.slice(1) : path;
 
-		// Encode content as base64
 		const encodedContent = btoa(unescape(encodeURIComponent(content)));
 
 		const existing = await this.getExistingFile(fullPath);
@@ -98,10 +99,8 @@ export class GitRepoClient implements RemoteClient {
 
 		if (existing && mode !== 'create') {
 			if (mode === 'overwrite') {
-				// Replace existing content
 			} else if (mode === 'append' || mode === 'prepend') {
-				// Decode existing content and merge
-				const existingContent = decodeURIComponent(escape(atob(existing.sha ? '' : '')));
+				const existingContent = decodeURIComponent(escape(atob(existing.content)));
 				if (mode === 'append') {
 					finalContent = btoa(unescape(encodeURIComponent(existingContent + '\n' + content)));
 				} else {
@@ -117,7 +116,7 @@ export class GitRepoClient implements RemoteClient {
 			...(existing ? { sha: existing.sha } : {})
 		};
 
-		await this.request('PUT', `/repos/${this.owner}/${this.repo}/contents/${encodedPath}`, body);
+		await this.request('PUT', `/repos/${this.owner}/${this.repo}/contents/${fullPath}`, body);
 	}
 
 	async ping(): Promise<void> {
