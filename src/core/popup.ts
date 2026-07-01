@@ -1292,6 +1292,7 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
 			break;
 		case 'saveFile':
 			mainButton.textContent = getMessage('saveFile');
@@ -1299,6 +1300,15 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
+			break;
+		case 'cloud':
+			mainButton.textContent = getMessage('saveToCloud');
+			mainButton.onclick = () => handleSaveToCloud();
+			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 			break;
 		default: // 'addToObsidian'
 			mainButton.textContent = getMessage('addToObsidian');
@@ -1306,6 +1316,7 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
 	}
 }
 
@@ -1395,6 +1406,7 @@ function getActionIcon(actionType: string): string {
 		case 'copyToClipboard': return 'copy';
 		case 'saveFile': return 'file-down';
 		case 'addToObsidian': return 'pen-line';
+		case 'saveToCloud': return 'cloud';
 		default: return 'plus';
 	}
 }
@@ -1406,6 +1418,56 @@ async function copyContent() {
 	const frontmatter = await generateFrontmatter(properties);
 	const fileContent = frontmatter + noteContentField.value;
 	await copyToClipboard(fileContent);
+}
+
+async function handleSaveToCloud(): Promise<void> {
+	if (!currentTemplate) return;
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	if (!noteContentField) return;
+
+	try {
+		// Collect fields
+		const properties = getPropertiesFromDOM();
+		const frontmatter = await generateFrontmatter(properties);
+		const content = frontmatter + noteContentField.value;
+		const title = noteNameField?.value || 'Untitled';
+
+		// Dynamic import cloud module
+		const { executeRemoteUpload } = await import('../ext/cloud/upload');
+
+		const result = await executeRemoteUpload({
+			template: currentTemplate,
+			title,
+			content
+		});
+
+		if (result.success) {
+			await incrementStat('cloud');
+			
+			// Change the main button text temporarily
+			const clipButton = document.getElementById('clip-btn');
+			if (clipButton) {
+				const originalText = clipButton.textContent || getMessage('addToObsidian');
+				clipButton.textContent = getMessage('cloudSaveSuccess') || 'Saved to cloud';
+				
+				// Reset the text after 1.5 seconds
+				setTimeout(() => {
+					clipButton.textContent = originalText;
+				}, 1500);
+			}
+
+			if (!isSidePanel) {
+				setTimeout(() => window.close(), 500);
+			}
+		} else {
+			showError(result.error || 'cloudSaveFailed');
+		}
+	} catch (error) {
+		console.error('Cloud save error:', error);
+		showError('cloudSaveFailed');
+	}
 }
 
 // Update the resize event listener to use the debounced version

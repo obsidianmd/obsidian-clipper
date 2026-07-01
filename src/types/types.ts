@@ -50,7 +50,7 @@ export interface Rating {
 	date: string;
 }
 
-export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'cloud';
 
 export interface ReaderSettings {
 	fontSize: number;
@@ -69,6 +69,50 @@ export interface ReaderSettings {
 	highlightActiveLine: boolean;
 	customCss: string;
 }
+
+// Cloud storage configuration types
+export interface GitRepoConfig {
+	type: 'gitRepo';
+	id: string;
+	name: string;
+	provider: 'github' | 'gitee';
+	owner: string;
+	repo: string;
+	branch: string;
+	defaultPath?: string;
+}
+
+export interface WebdavConfig {
+	type: 'webdav';
+	id: string;
+	name: string;
+	url: string;
+	username: string;
+	defaultPath?: string;
+}
+
+export interface S3Config {
+	type: 's3';
+	id: string;
+	name: string;
+	endpoint: string;
+	bucket: string;
+	region: string;
+	pathStyle?: boolean;
+	defaultPath?: string;
+}
+
+export interface FastNoteConfig {
+	type: 'fastNote';
+	id: string;
+	name: string;
+	endpoint: string;
+	username: string;
+	noteId?: string;
+	defaultPath?: string;
+}
+
+export type CloudTarget = GitRepoConfig | WebdavConfig | S3Config | FastNoteConfig;
 
 export interface Settings {
 	vaults: string[];
@@ -93,10 +137,20 @@ export interface Settings {
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
+		cloud?: number;
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
-	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	saveBehavior: SaveBehavior;
+	// Cloud storage configuration
+	gitRepos?: GitRepoConfig[];
+	activeGitRepoId?: string;
+	webdavs?: WebdavConfig[];
+	activeWebdavId?: string;
+	s3Targets?: S3Config[];
+	activeS3Id?: string;
+	fastNoteTargets?: FastNoteConfig[];
+	activeFastNoteId?: string;
 }
 
 export interface ModelConfig {
@@ -110,7 +164,7 @@ export interface ModelConfig {
 export interface HistoryEntry {
 	datetime: string;
 	url: string;
-	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share';
+	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share' | 'cloud';
 	title?: string;
 	vault?: string;
 	path?: string;

@@ -1068,5 +1068,137 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"cloud": {
+		"message": "Cloud"
+	},
+	"cloudSettings": {
+		"message": "Cloud Storage"
+	},
+	"cloudActiveTarget": {
+		"message": "Active cloud target"
+	},
+	"cloudActiveTargetDescription": {
+		"message": "Select the cloud storage target to use for saving notes."
+	},
+	"cloudAddTarget": {
+		"message": "+ Add cloud target"
+	},
+	"cloudEditorTitle": {
+		"message": "Cloud Target Editor"
+	},
+	"cloudType": {
+		"message": "Type"
+	},
+	"saveToCloud": {
+		"message": "Save to cloud"
+	},
+	"cloudSaveSuccess": {
+		"message": "Saved to cloud"
+	},
+	"cloudSaveFailed": {
+		"message": "Failed to save to cloud"
+	},
+	"cloudTest": {
+		"message": "Test connection"
+	},
+	"cloudTestSuccess": {
+		"message": "Connection successful"
+	},
+	"cloudTestFailed": {
+		"message": "Connection failed"
+	},
+	"cloudDeleteConfirm": {
+		"message": "Are you sure you want to delete this cloud target?"
+	},
+	"cloudTesting": {
+		"message": "Testing..."
+	},
+	"cloudTokenRequired": {
+		"message": "Token/Password required for testing"
+	},
+	"cloudNoActiveTarget": {
+		"message": "No active cloud target configured"
+	},
+	"cloudLabelName": {
+		"message": "Name"
+	},
+	"cloudLabelToken": {
+		"message": "Token / Password"
+	},
+	"cloudLabelUrl": {
+		"message": "URL"
+	},
+	"cloudLabelUsername": {
+		"message": "Username"
+	},
+	"cloudLabelEndpoint": {
+		"message": "Endpoint"
+	},
+	"cloudLabelBucket": {
+		"message": "Bucket"
+	},
+	"cloudLabelRegion": {
+		"message": "Region"
+	},
+	"cloudLabelPathStyle": {
+		"message": "Path-style URL"
+	},
+	"cloudLabelProvider": {
+		"message": "Provider"
+	},
+	"cloudLabelOwner": {
+		"message": "Owner"
+	},
+	"cloudLabelRepo": {
+		"message": "Repository"
+	},
+	"cloudLabelBranch": {
+		"message": "Branch"
+	},
+	"cloudLabelNoteId": {
+		"message": "Note ID"
+	},
+	"cloudLabelPath": {
+		"message": "Default path"
+	},
+	"cloudLabelAccessKey": {
+		"message": "Access Key"
+	},
+	"cloudLabelSecretKey": {
+		"message": "Secret Key"
+	},
+	"cloudGitRepoErrorProvider": {
+		"message": "Provider is required"
+	},
+	"cloudGitRepoErrorOwner": {
+		"message": "Owner is required"
+	},
+	"cloudGitRepoErrorRepo": {
+		"message": "Repository is required"
+	},
+	"cloudGitRepoErrorBranch": {
+		"message": "Branch is required"
+	},
+	"cloudWebdavErrorUrl": {
+		"message": "URL is required"
+	},
+	"cloudWebdavErrorUsername": {
+		"message": "Username is required"
+	},
+	"cloudS3ErrorEndpoint": {
+		"message": "Endpoint is required"
+	},
+	"cloudS3ErrorBucket": {
+		"message": "Bucket is required"
+	},
+	"cloudS3ErrorRegion": {
+		"message": "Region is required"
+	},
+	"cloudFastNoteErrorEndpoint": {
+		"message": "Endpoint is required"
+	},
+	"cloudFastNoteErrorUsername": {
+		"message": "Username is required"
 	}
 }

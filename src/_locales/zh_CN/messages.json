@@ -1068,5 +1068,137 @@
 	},
 	"version": {
 		"message": "版本"
+	},
+	"cloud": {
+		"message": "云存储"
+	},
+	"cloudSettings": {
+		"message": "云存储设置"
+	},
+	"cloudActiveTarget": {
+		"message": "当前云存储目标"
+	},
+	"cloudActiveTargetDescription": {
+		"message": "选择用于保存笔记的云存储目标。"
+	},
+	"cloudAddTarget": {
+		"message": "+ 添加云存储目标"
+	},
+	"cloudEditorTitle": {
+		"message": "云存储目标编辑器"
+	},
+	"cloudType": {
+		"message": "类型"
+	},
+	"saveToCloud": {
+		"message": "保存到云"
+	},
+	"cloudSaveSuccess": {
+		"message": "已保存到云"
+	},
+	"cloudSaveFailed": {
+		"message": "保存到云失败"
+	},
+	"cloudTest": {
+		"message": "测试连接"
+	},
+	"cloudTestSuccess": {
+		"message": "连接成功"
+	},
+	"cloudTestFailed": {
+		"message": "连接失败"
+	},
+	"cloudDeleteConfirm": {
+		"message": "确定要删除此云存储目标吗？"
+	},
+	"cloudTesting": {
+		"message": "测试中..."
+	},
+	"cloudTokenRequired": {
+		"message": "测试连接需要令牌/密码"
+	},
+	"cloudNoActiveTarget": {
+		"message": "未配置活跃的云存储目标"
+	},
+	"cloudLabelName": {
+		"message": "名称"
+	},
+	"cloudLabelToken": {
+		"message": "令牌 / 密码"
+	},
+	"cloudLabelUrl": {
+		"message": "URL"
+	},
+	"cloudLabelUsername": {
+		"message": "用户名"
+	},
+	"cloudLabelEndpoint": {
+		"message": "端点"
+	},
+	"cloudLabelBucket": {
+		"message": "存储桶"
+	},
+	"cloudLabelRegion": {
+		"message": "区域"
+	},
+	"cloudLabelPathStyle": {
+		"message": "路径样式 URL"
+	},
+	"cloudLabelProvider": {
+		"message": "提供商"
+	},
+	"cloudLabelOwner": {
+		"message": "所有者"
+	},
+	"cloudLabelRepo": {
+		"message": "仓库"
+	},
+	"cloudLabelBranch": {
+		"message": "分支"
+	},
+	"cloudLabelNoteId": {
+		"message": "笔记 ID"
+	},
+	"cloudLabelPath": {
+		"message": "默认路径"
+	},
+	"cloudLabelAccessKey": {
+		"message": "访问密钥"
+	},
+	"cloudLabelSecretKey": {
+		"message": "秘密密钥"
+	},
+	"cloudGitRepoErrorProvider": {
+		"message": "提供商是必需的"
+	},
+	"cloudGitRepoErrorOwner": {
+		"message": "所有者是必需的"
+	},
+	"cloudGitRepoErrorRepo": {
+		"message": "仓库是必需的"
+	},
+	"cloudGitRepoErrorBranch": {
+		"message": "分支是必需的"
+	},
+	"cloudWebdavErrorUrl": {
+		"message": "URL 是必需的"
+	},
+	"cloudWebdavErrorUsername": {
+		"message": "用户名是必需的"
+	},
+	"cloudS3ErrorEndpoint": {
+		"message": "端点是必需的"
+	},
+	"cloudS3ErrorBucket": {
+		"message": "存储桶是必需的"
+	},
+	"cloudS3ErrorRegion": {
+		"message": "区域是必需的"
+	},
+	"cloudFastNoteErrorEndpoint": {
+		"message": "端点是必需的"
+	},
+	"cloudFastNoteErrorUsername": {
+		"message": "用户名是必需的"
 	}
 }

@@ -18,6 +18,7 @@
 					</div>
 					<ul>
 						<li data-section="general"><div class="nav-item-icon"><i data-lucide="paperclip"></i></div><span data-i18n="general">General</span></li>
+						<li data-section="cloud"><div class="nav-item-icon"><i data-lucide="cloud"></i></div><span data-i18n="cloud">Cloud</span></li>
 						<li data-section="reader"><div class="nav-item-icon"><i data-lucide="book-open"></i></div><span data-i18n="reader">Reader</span></li>
 						<li data-section="highlighter"><div class="nav-item-icon"><i data-lucide="highlighter"></i></div><span data-i18n="highlighter">Highlighter</span></li>
 						<li data-section="interpreter"><div class="nav-item-icon"><i data-lucide="quote"></i></div><span data-i18n="interpreter">Interpreter</span></li>
@@ -158,6 +159,7 @@
 												<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
 												<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
 												<option value="saveFile" data-i18n="saveFile">Save file</option>
+												<option value="cloud" data-i18n="saveToCloud">Save to cloud</option>
 											</select>
 										</div>
 									</div>
@@ -248,6 +250,10 @@
 								</div>
 							</div>
 						</form>
+					</div>
+
+					<div id="cloud-section" class="settings-section" style="display: none;">
+						<!-- Content will be dynamically rendered by cloud-settings.ts -->
 					</div>
 
 					<div id="highlighter-section" class="settings-section">
@@ -910,5 +916,13 @@
 		
 
 		<script type="module" src="settings.js"></script>
+		<script type="module">
+			// Dynamic import for cloud settings
+			import('./ext/cloud/index.js').then(({ mountCloudSettings }) => {
+				mountCloudSettings();
+			}).catch(err => {
+				console.warn('Cloud settings module not loaded:', err);
+			});
+		</script>
 </body>
 </html>
