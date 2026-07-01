@@ -24,6 +24,7 @@ import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
 import { addMenuItemListener } from '../managers/menu';
 import { translatePage, getCurrentLanguage, setLanguage, getAvailableLanguages, getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { mountCloudSettings } from '../ext/cloud/ui/cloud-settings';
 
 declare global {
 	interface Window {
@@ -75,6 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 			initializeSidebar();
 			initializeAutoSave();
 			initializeMenu('more-actions-btn', 'template-actions-menu');
+
+			try {
+				mountCloudSettings();
+			} catch (error) {
+				console.error('Error mounting cloud settings:', error);
+			}
 
 			createIcons({ icons });
 
@@ -206,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	async function handleUrlParameters(): Promise<void> {
 		const { section, templateId } = getUrlParameters();
 
-		if (section === 'general' || section === 'interpreter' || section === 'properties' || section === 'highlighter' || section === 'reader') {
+		if (section === 'general' || section === 'interpreter' || section === 'properties' || section === 'highlighter' || section === 'reader' || section === 'cloud') {
 			showSettingsSection(section);
 		} else if (templateId) {
 			const template = findTemplateById(templateId);

@@ -18,8 +18,6 @@ export function mountCloudSettings(): void {
 	const container = document.getElementById('cloud-section');
 	if (!container) return;
 
-	container.style.display = 'block';
-
 	// Render section header
 	container.innerHTML = `
 		<div class="settings-section-header">

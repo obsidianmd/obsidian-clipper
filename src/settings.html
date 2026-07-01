@@ -252,7 +252,7 @@
 						</form>
 					</div>
 
-					<div id="cloud-section" class="settings-section" style="display: none;">
+					<div id="cloud-section" class="settings-section">
 						<!-- Content will be dynamically rendered by cloud-settings.ts -->
 					</div>
 
@@ -916,13 +916,5 @@
 		
 
 		<script type="module" src="settings.js"></script>
-		<script type="module">
-			// Dynamic import for cloud settings
-			import('./ext/cloud/index.js').then(({ mountCloudSettings }) => {
-				mountCloudSettings();
-			}).catch(err => {
-				console.warn('Cloud settings module not loaded:', err);
-			});
-		</script>
 </body>
 </html>
