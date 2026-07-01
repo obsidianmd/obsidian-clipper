@@ -1200,5 +1200,74 @@
 	},
 	"cloudFastNoteErrorUsername": {
 		"message": "用户名是必需的"
+	},
+	"cloudEditTarget": {
+		"message": "编辑云存储目标"
+	},
+	"cloudTypeDescription": {
+		"message": "选择云存储类型。"
+	},
+	"cloudNameDescription": {
+		"message": "此云存储目标的显示名称。"
+	},
+	"cloudProviderDescription": {
+		"message": "Git 托管提供商。"
+	},
+	"cloudOwnerDescription": {
+		"message": "用户名或组织名称。"
+	},
+	"cloudRepoDescription": {
+		"message": "仓库名称。"
+	},
+	"cloudBranchDescription": {
+		"message": "保存笔记的分支。"
+	},
+	"cloudPathDescription": {
+		"message": "保存笔记的默认目录。"
+	},
+	"cloudTokenDescription": {
+		"message": "具有仓库访问权限的个人访问令牌。"
+	},
+	"cloudUrlDescription": {
+		"message": "WebDAV 服务器 URL。"
+	},
+	"cloudUsernameDescription": {
+		"message": "WebDAV 用户名。"
+	},
+	"cloudPasswordDescription": {
+		"message": "WebDAV 密码。"
+	},
+	"cloudEndpointDescription": {
+		"message": "S3 兼容端点 URL。"
+	},
+	"cloudBucketDescription": {
+		"message": "S3 存储桶名称。"
+	},
+	"cloudRegionDescription": {
+		"message": "S3 区域。"
+	},
+	"cloudPathStyleDescription": {
+		"message": "使用路径样式 URL 而不是虚拟主机样式。"
+	},
+	"cloudAccessKeyDescription": {
+		"message": "S3 访问密钥 ID。"
+	},
+	"cloudSecretKeyDescription": {
+		"message": "S3 秘密访问密钥。"
+	},
+	"cloudNoteIdDescription": {
+		"message": "目标笔记 ID（可选）。"
+	},
+	"cloudNameRequired": {
+		"message": "名称是必需的"
+	},
+	"cloudOwnerRepoRequired": {
+		"message": "所有者和仓库是必需的"
+	},
+	"cloudUrlRequired": {
+		"message": "URL 是必需的"
+	},
+	"cloudEndpointBucketRequired": {
+		"message": "端点和存储桶是必需的"
 	}
 }

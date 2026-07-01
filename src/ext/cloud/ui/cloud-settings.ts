@@ -5,70 +5,28 @@
 
 import { getMessage } from '../../../utils/i18n';
 import { initializeIcons } from '../../../icons/icons';
-import { createElementWithClass } from '../../../utils/dom-utils';
 import { ALL_TARGETS } from '../upload';
 import { CloudTarget, CloudTargetType } from '../types';
-import { setActiveTargetId, generateId, setSecret } from '../adapters/base';
+import { setActiveTargetId } from '../adapters/base';
 import { openCloudEditorModal } from './cloud-modal';
 
 /**
  * Mount cloud settings section into DOM
  */
 export function mountCloudSettings(): void {
-	const container = document.getElementById('cloud-section');
-	if (!container) return;
-
-	// Render section header
-	container.innerHTML = `
-		<div class="settings-section-header">
-			<h2 data-i18n="cloudSettings">Cloud Storage</h2>
-		</div>
-		<div class="setting-group">
-			<div class="setting-items">
-				<div class="setting-item mod-horizontal">
-					<div class="setting-item-info">
-						<label for="cloud-active-target" data-i18n="cloudActiveTarget">Active cloud target</label>
-						<div class="setting-item-description" data-i18n="cloudActiveTargetDescription">
-							Select the cloud storage target to use for saving notes.
-						</div>
-					</div>
-					<div class="setting-item-control">
-						<select id="cloud-active-target" class="dropdown">
-							<option value="">—</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div id="cloud-target-list"></div>
-			<button type="button" id="add-cloud-target-btn" class="mod-cta">
-				<span data-i18n="cloudAddTarget">+ Add cloud target</span>
-			</button>
-		</div>
-	`;
-
-	// Event binding
-	bindCloudEvents();
-	renderCloudTargetList();
-	initializeIcons(container);
-}
-
-/**
- * Bind cloud settings events
- */
-function bindCloudEvents(): void {
 	const addBtn = document.getElementById('add-cloud-target-btn');
+	const activeTargetSelect = document.getElementById('cloud-active-target') as HTMLSelectElement;
+
 	if (addBtn) {
 		addBtn.addEventListener('click', () => {
 			openCloudEditorModal();
 		});
 	}
 
-	const activeTargetSelect = document.getElementById('cloud-active-target') as HTMLSelectElement;
 	if (activeTargetSelect) {
 		activeTargetSelect.addEventListener('change', async () => {
 			const value = activeTargetSelect.value;
 			if (!value) {
-				// Clear all active IDs
 				for (const adapter of ALL_TARGETS) {
 					await setActiveTargetId(adapter.activeIdKey, null);
 				}
@@ -77,7 +35,6 @@ function bindCloudEvents(): void {
 				const adapter = ALL_TARGETS.find(a => a.type === type);
 				if (adapter) {
 					await setActiveTargetId(adapter.activeIdKey, id);
-					// Clear other active IDs
 					for (const otherAdapter of ALL_TARGETS) {
 						if (otherAdapter.type !== type) {
 							await setActiveTargetId(otherAdapter.activeIdKey, null);
@@ -87,6 +44,8 @@ function bindCloudEvents(): void {
 			}
 		});
 	}
+
+	renderCloudTargetList();
 }
 
 /**
@@ -98,7 +57,6 @@ export async function renderCloudTargetList(): Promise<void> {
 
 	listContainer.textContent = '';
 
-	// Collect all targets
 	const allTargets: { target: CloudTarget; adapter: typeof ALL_TARGETS[0] }[] = [];
 
 	for (const adapter of ALL_TARGETS) {
@@ -108,7 +66,6 @@ export async function renderCloudTargetList(): Promise<void> {
 		}
 	}
 
-	// Update active target dropdown
 	const activeTargetSelect = document.getElementById('cloud-active-target') as HTMLSelectElement;
 	if (activeTargetSelect) {
 		activeTargetSelect.textContent = '';
@@ -124,7 +81,6 @@ export async function renderCloudTargetList(): Promise<void> {
 			activeTargetSelect.appendChild(option);
 		}
 
-		// Set current active
 		for (const adapter of ALL_TARGETS) {
 			const activeId = await adapter.getActiveId();
 			if (activeId) {
@@ -134,46 +90,89 @@ export async function renderCloudTargetList(): Promise<void> {
 		}
 	}
 
-	// Render list items
-	for (const { target, adapter } of allTargets) {
-		const item = createElementWithClass('div', 'setting-item mod-horizontal');
+	const sortedTargets = [...allTargets].sort((a, b) =>
+		a.target.name.toLowerCase().localeCompare(b.target.name.toLowerCase())
+	);
 
-		item.innerHTML = `
-			<div class="setting-item-info">
-				<label>${target.name}</label>
-				<div class="setting-item-description">${adapter.typeLabel}</div>
-			</div>
-			<div class="setting-item-control">
-				<button class="cloud-edit-btn" data-id="${target.id}" data-type="${adapter.type}">
-					<span data-i18n="edit">Edit</span>
-				</button>
-				<button class="cloud-delete-btn mod-warning" data-id="${target.id}" data-type="${adapter.type}">
-					<span data-i18n="delete">Delete</span>
-				</button>
-			</div>
-		`;
-
-		// Edit button
-		const editBtn = item.querySelector('.cloud-edit-btn');
-		if (editBtn) {
-			editBtn.addEventListener('click', () => {
-				openCloudEditorModal(adapter.type as CloudTargetType, target);
-			});
-		}
-
-		// Delete button
-		const deleteBtn = item.querySelector('.cloud-delete-btn');
-		if (deleteBtn) {
-			deleteBtn.addEventListener('click', async () => {
-				if (confirm(getMessage('cloudDeleteConfirm'))) {
-					await adapter.delete(target.id);
-					await renderCloudTargetList();
-				}
-			});
-		}
-
+	for (const { target, adapter } of sortedTargets) {
+		const item = createCloudTargetListItem(target, adapter);
 		listContainer.appendChild(item);
 	}
 
 	initializeIcons(listContainer);
+}
+
+/**
+ * Create a cloud target list item (styled like provider-list-item)
+ */
+function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARGETS[0]): HTMLElement {
+	const item = document.createElement('div');
+	item.className = 'cloud-target-list-item';
+	item.dataset.targetId = target.id;
+	item.dataset.targetType = adapter.type;
+
+	const itemInfo = document.createElement('div');
+	itemInfo.className = 'cloud-target-list-item-info';
+
+	const targetName = document.createElement('div');
+	targetName.className = 'cloud-target-name';
+
+	const iconContainer = document.createElement('div');
+	iconContainer.className = 'cloud-target-icon-container';
+	const iconSpan = document.createElement('span');
+	iconSpan.className = `cloud-target-icon icon-${adapter.type}`;
+	iconContainer.appendChild(iconSpan);
+
+	const nameText = document.createElement('div');
+	nameText.className = 'cloud-target-name-text';
+	nameText.textContent = target.name;
+
+	targetName.appendChild(iconContainer);
+	targetName.appendChild(nameText);
+	itemInfo.appendChild(targetName);
+
+	const typeLabel = document.createElement('div');
+	typeLabel.className = 'cloud-target-type mh';
+	typeLabel.textContent = adapter.typeLabel;
+	itemInfo.appendChild(typeLabel);
+
+	const itemActions = document.createElement('div');
+	itemActions.className = 'cloud-target-list-item-actions';
+
+	const editBtn = document.createElement('button');
+	editBtn.className = 'edit-cloud-target-btn clickable-icon';
+	editBtn.setAttribute('aria-label', 'Edit cloud target');
+	const editIcon = document.createElement('i');
+	editIcon.setAttribute('data-lucide', 'pen-line');
+	editBtn.appendChild(editIcon);
+
+	const deleteBtn = document.createElement('button');
+	deleteBtn.className = 'delete-cloud-target-btn clickable-icon';
+	deleteBtn.setAttribute('aria-label', 'Delete cloud target');
+	const deleteIcon = document.createElement('i');
+	deleteIcon.setAttribute('data-lucide', 'trash-2');
+	deleteBtn.appendChild(deleteIcon);
+
+	itemActions.appendChild(editBtn);
+	itemActions.appendChild(deleteBtn);
+
+	item.appendChild(itemInfo);
+	item.appendChild(itemActions);
+
+	editBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		openCloudEditorModal(adapter.type as CloudTargetType, target);
+	});
+
+	deleteBtn.addEventListener('click', async (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (confirm(getMessage('cloudDeleteConfirm'))) {
+			await adapter.delete(target.id);
+			await renderCloudTargetList();
+		}
+	});
+
+	return item;
 }
