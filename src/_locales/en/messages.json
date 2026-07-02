@@ -1269,5 +1269,8 @@
 	},
 	"cloudEndpointBucketRequired": {
 		"message": "Endpoint and bucket are required"
+	},
+	"cloudTargets": {
+		"message": "Cloud Targets"
 	}
 }

@@ -1,6 +1,7 @@
 /**
  * Cloud Settings UI
  * Renders cloud storage section in Settings page
+ * Styled to match the AI provider settings page
  */
 
 import { getMessage } from '../../../utils/i18n';
@@ -103,7 +104,8 @@ export async function renderCloudTargetList(): Promise<void> {
 }
 
 /**
- * Create a cloud target list item (styled like provider-list-item)
+ * Create a cloud target list item
+ * Structured identically to provider-list-item
  */
 function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARGETS[0]): HTMLElement {
 	const item = document.createElement('div');
@@ -111,18 +113,22 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	item.dataset.targetId = target.id;
 	item.dataset.targetType = adapter.type;
 
+	// Create list item info container (matches provider-list-item-info)
 	const itemInfo = document.createElement('div');
 	itemInfo.className = 'cloud-target-list-item-info';
 
+	// Create name container (matches provider-name)
 	const targetName = document.createElement('div');
 	targetName.className = 'cloud-target-name';
 
+	// Create icon container (matches provider-icon-container)
 	const iconContainer = document.createElement('div');
 	iconContainer.className = 'cloud-target-icon-container';
 	const iconSpan = document.createElement('span');
 	iconSpan.className = `cloud-target-icon icon-${adapter.type}`;
 	iconContainer.appendChild(iconSpan);
 
+	// Create name text (matches provider-name-text)
 	const nameText = document.createElement('div');
 	nameText.className = 'cloud-target-name-text';
 	nameText.textContent = target.name;
@@ -131,14 +137,17 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	targetName.appendChild(nameText);
 	itemInfo.appendChild(targetName);
 
-	const typeLabel = document.createElement('div');
+	// Create type label (matches provider-no-key style - inline, smaller)
+	const typeLabel = document.createElement('span');
 	typeLabel.className = 'cloud-target-type mh';
 	typeLabel.textContent = adapter.typeLabel;
 	itemInfo.appendChild(typeLabel);
 
+	// Create actions container (matches provider-list-item-actions)
 	const itemActions = document.createElement('div');
 	itemActions.className = 'cloud-target-list-item-actions';
 
+	// Create edit button (matches edit-provider-btn)
 	const editBtn = document.createElement('button');
 	editBtn.className = 'edit-cloud-target-btn clickable-icon';
 	editBtn.setAttribute('aria-label', 'Edit cloud target');
@@ -146,6 +155,7 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	editIcon.setAttribute('data-lucide', 'pen-line');
 	editBtn.appendChild(editIcon);
 
+	// Create delete button (matches delete-provider-btn)
 	const deleteBtn = document.createElement('button');
 	deleteBtn.className = 'delete-cloud-target-btn clickable-icon';
 	deleteBtn.setAttribute('aria-label', 'Delete cloud target');
@@ -156,9 +166,11 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	itemActions.appendChild(editBtn);
 	itemActions.appendChild(deleteBtn);
 
+	// Assemble item
 	item.appendChild(itemInfo);
 	item.appendChild(itemActions);
 
+	// Event listeners
 	editBtn.addEventListener('click', (e) => {
 		e.preventDefault();
 		e.stopPropagation();
