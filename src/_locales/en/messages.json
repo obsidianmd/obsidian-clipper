@@ -1258,6 +1258,33 @@
 	"cloudNoteIdDescription": {
 		"message": "Target note ID (optional)."
 	},
+	"cloudLabelNotebook": {
+		"message": "Notebook"
+	},
+	"cloudNotebookDescription": {
+		"message": "SiYuan notebook name or ID."
+	},
+	"cloudSiyuanEndpointDescription": {
+		"message": "SiYuan API endpoint, e.g. http://127.0.0.1:6806"
+	},
+	"cloudSiyuanTokenDescription": {
+		"message": "SiYuan API token from Settings → About."
+	},
+	"cloudSiyuanErrorEndpoint": {
+		"message": "Endpoint is required"
+	},
+	"cloudSiyuanErrorToken": {
+		"message": "Token is required"
+	},
+	"cloudSiyuanErrorNotebook": {
+		"message": "Notebook is required"
+	},
+	"cloudEndpointRequired": {
+		"message": "Endpoint is required"
+	},
+	"cloudNotebookRequired": {
+		"message": "Notebook is required"
+	},
 	"cloudNameRequired": {
 		"message": "Name is required"
 	},

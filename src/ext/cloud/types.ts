@@ -45,8 +45,17 @@ export interface FastNoteConfig {
 	defaultPath?: string;
 }
 
+export interface SiyuanConfig {
+	type: 'siyuan';
+	id: string;
+	name: string;
+	endpoint: string;
+	notebook: string;
+	defaultPath?: string;
+}
+
 // Union type for all cloud target configurations
-export type CloudTarget = GitRepoConfig | WebdavConfig | S3Config | FastNoteConfig;
+export type CloudTarget = GitRepoConfig | WebdavConfig | S3Config | FastNoteConfig | SiyuanConfig;
 export type CloudTargetType = CloudTarget['type'];
 
 // Template behavior mapping to upload mode

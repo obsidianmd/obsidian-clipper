@@ -8,6 +8,7 @@ import { gitRepoTarget } from './adapters/git-repo';
 import { webdavTarget } from './adapters/webdav';
 import { s3Target } from './adapters/s3';
 import { fastNoteTarget } from './adapters/fast-note';
+import { siyuanTarget } from './adapters/siyuan';
 import { getSecret } from './adapters/base';
 import { sanitizeFileName } from '../../utils/string-utils';
 
@@ -16,7 +17,8 @@ export const ALL_TARGETS: RemoteTarget[] = [
 	gitRepoTarget,
 	webdavTarget,
 	s3Target,
-	fastNoteTarget
+	fastNoteTarget,
+	siyuanTarget
 ];
 
 /**

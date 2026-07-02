@@ -1258,6 +1258,33 @@
 	"cloudNoteIdDescription": {
 		"message": "目标笔记 ID（可选）。"
 	},
+	"cloudLabelNotebook": {
+		"message": "笔记本"
+	},
+	"cloudNotebookDescription": {
+		"message": "思源笔记本名称或 ID。"
+	},
+	"cloudSiyuanEndpointDescription": {
+		"message": "思源 API 端点，例如 http://127.0.0.1:6806"
+	},
+	"cloudSiyuanTokenDescription": {
+		"message": "思源 API 令牌，在「设置 → 关于」中查看。"
+	},
+	"cloudSiyuanErrorEndpoint": {
+		"message": "端点是必需的"
+	},
+	"cloudSiyuanErrorToken": {
+		"message": "令牌是必需的"
+	},
+	"cloudSiyuanErrorNotebook": {
+		"message": "笔记本是必需的"
+	},
+	"cloudEndpointRequired": {
+		"message": "端点是必需的"
+	},
+	"cloudNotebookRequired": {
+		"message": "笔记本是必需的"
+	},
 	"cloudNameRequired": {
 		"message": "名称是必需的"
 	},

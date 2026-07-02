@@ -314,6 +314,47 @@ function renderTypeFields(type: CloudTargetType, existingConfig?: CloudTarget): 
 				</div>
 			`;
 			break;
+
+		case 'siyuan':
+			container.innerHTML = `
+				<div class="setting-item">
+					<div class="setting-item-info">
+						<label for="cloud-endpoint" data-i18n="cloudLabelEndpoint">Endpoint</label>
+						<div class="setting-item-description" data-i18n="cloudSiyuanEndpointDescription">SiYuan API endpoint.</div>
+					</div>
+					<div class="setting-item-control">
+						<input type="text" id="cloud-endpoint" value="${config.endpoint || ''}" placeholder="http://127.0.0.1:6806" />
+					</div>
+				</div>
+				<div class="setting-item">
+					<div class="setting-item-info">
+						<label for="cloud-token" data-i18n="cloudLabelToken">Token</label>
+						<div class="setting-item-description" data-i18n="cloudSiyuanTokenDescription">SiYuan API token from Settings → About.</div>
+					</div>
+					<div class="setting-item-control">
+						<input type="password" id="cloud-token" placeholder="${isEditing ? '(unchanged)' : 'API token'}" />
+					</div>
+				</div>
+				<div class="setting-item">
+					<div class="setting-item-info">
+						<label for="cloud-notebook" data-i18n="cloudLabelNotebook">Notebook</label>
+						<div class="setting-item-description" data-i18n="cloudNotebookDescription">SiYuan notebook name or ID.</div>
+					</div>
+					<div class="setting-item-control">
+						<input type="text" id="cloud-notebook" value="${config.notebook || ''}" placeholder="My Notebook" />
+					</div>
+				</div>
+				<div class="setting-item">
+					<div class="setting-item-info">
+						<label for="cloud-path" data-i18n="cloudLabelPath">Default path</label>
+						<div class="setting-item-description" data-i18n="cloudPathDescription">Default directory for saved notes.</div>
+					</div>
+					<div class="setting-item-control">
+						<input type="text" id="cloud-path" value="${config.defaultPath || ''}" placeholder="/WebClipper" />
+					</div>
+				</div>
+			`;
+			break;
 	}
 
 	translatePage();
@@ -447,6 +488,32 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 				defaultPath
 			};
 			secret = fnTokenInput?.value || '';
+			break;
+
+		case 'siyuan':
+			const syEndpointInput = document.getElementById('cloud-endpoint') as HTMLInputElement;
+			const syNotebookInput = document.getElementById('cloud-notebook') as HTMLInputElement;
+			const syTokenInput = document.getElementById('cloud-token') as HTMLInputElement;
+
+			const syEndpoint = syEndpointInput?.value?.trim();
+			const syNotebook = syNotebookInput?.value?.trim();
+
+			if (!syEndpoint) {
+				return { config: null, secret: '', error: getMessage('cloudEndpointRequired') || 'Endpoint is required' };
+			}
+			if (!syNotebook) {
+				return { config: null, secret: '', error: getMessage('cloudNotebookRequired') || 'Notebook is required' };
+			}
+
+			config = {
+				type: 'siyuan',
+				id,
+				name,
+				endpoint: syEndpoint,
+				notebook: syNotebook,
+				defaultPath
+			};
+			secret = syTokenInput?.value || '';
 			break;
 	}
 
