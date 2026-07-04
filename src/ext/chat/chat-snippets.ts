@@ -1,6 +1,6 @@
-import { initializeIcons } from '../icons/icons';
-import { Property } from '../types/types';
-import { unescapeValue } from './string-utils';
+import { initializeIcons } from '../../icons/icons';
+import { Property } from '../../types/types';
+import { unescapeValue } from '../../utils/string-utils';
 
 export interface ChatSnippet {
 	raw: string;

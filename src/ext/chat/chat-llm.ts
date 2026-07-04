@@ -1,6 +1,6 @@
-import { generalSettings } from './storage-utils';
-import { ModelConfig, Provider } from '../types/types';
-import { debugLog } from './debug';
+import { generalSettings } from '../../utils/storage-utils';
+import { ModelConfig, Provider } from '../../types/types';
+import { debugLog } from '../../utils/debug';
 
 export interface ChatMessage {
 	role: 'system' | 'user' | 'assistant';

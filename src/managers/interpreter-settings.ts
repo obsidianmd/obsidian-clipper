@@ -201,7 +201,10 @@ export async function initializeInterpreterSettings(): Promise<void> {
 			generalSettings.providers = [];
 		}
 
-		// Initialize lists and UI immediately so the page is interactive
+		cachedPresetProviders = await getPresetProviders();
+		debugLog('Interpreter', 'Fetched preset providers:', cachedPresetProviders);
+
+		// Initialize lists with error handling
 		try {
 			initializeProviderList();
 		} catch (error) {
@@ -217,19 +220,6 @@ export async function initializeInterpreterSettings(): Promise<void> {
 		}
 
 		initializeInterpreterToggles();
-
-		// Fetch preset providers in the background and refresh the provider list
-		getPresetProviders().then(presets => {
-			cachedPresetProviders = presets;
-			debugLog('Interpreter', 'Fetched preset providers:', cachedPresetProviders);
-			try {
-				initializeProviderList();
-			} catch (error) {
-				console.error('Error refreshing provider list after fetching presets:', error);
-			}
-		}).catch(error => {
-			console.error('Error fetching preset providers:', error);
-		});
 
 		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 		if (defaultPromptContextInput) {

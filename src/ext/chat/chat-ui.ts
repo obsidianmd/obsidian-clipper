@@ -1,9 +1,9 @@
-import { ChatEngine, ChatState, ChatTurn } from './chat';
-import { formatDuration } from './string-utils';
-import { getMessage } from './i18n';
-import { initializeIcons } from '../icons/icons';
-import { debugLog } from './debug';
-import { ModelConfig } from '../types/types';
+import { ChatEngine, ChatState, ChatTurn } from './chat-engine';
+import { formatDuration } from '../../utils/string-utils';
+import { t } from './chat-i18n';
+import { initializeIcons } from '../../icons/icons';
+import { debugLog } from '../../utils/debug';
+import { ModelConfig } from '../../types/types';
 import { ChatSnippet, SnippetPicker } from './chat-snippets';
 
 function renderMarkdown(text: string): string {
@@ -375,7 +375,7 @@ export class ChatUI {
 	private renderMessages(turns: ChatTurn[], status: string, error?: string): void {
 		if (!this.messagesEl) return;
 
-		const emptyText = getMessage('chatEmpty') || 'Ask AI about the current page';
+		const emptyText = t('chatEmpty') || 'Ask AI about the current page';
 		this.messagesEl.setAttribute('data-empty-text', emptyText);
 
 		const html = turns.map((turn) => {
@@ -442,14 +442,14 @@ export class ChatUI {
 			this.sendBtn.classList.remove('is-stopping', 'is-error');
 			if (sending) {
 				this.sendBtn.classList.add('is-stopping');
-				this.sendBtn.textContent = getMessage('thinking') || 'Thinking';
+				this.sendBtn.textContent = t('thinking') || 'Thinking';
 				this.sendBtn.disabled = false;
 			} else if (isError) {
 				this.sendBtn.classList.add('is-error');
-				this.sendBtn.textContent = getMessage('retry') || 'Retry';
+				this.sendBtn.textContent = t('retry') || 'Retry';
 				this.sendBtn.disabled = false;
 			} else {
-				this.sendBtn.textContent = getMessage('send') || 'Send';
+				this.sendBtn.textContent = t('send') || 'Send';
 				this.sendBtn.disabled = false;
 			}
 		}
@@ -499,7 +499,7 @@ export class ChatUI {
 		let remaining = parseInt(rateLimitMatch[1], 10);
 		if (isNaN(remaining) || remaining <= 0) return;
 
-		const originalText = getMessage('retry') || 'Retry';
+		const originalText = t('retry') || 'Retry';
 		const updateBtn = () => {
 			if (!this.sendBtn) return;
 			if (remaining > 0) {

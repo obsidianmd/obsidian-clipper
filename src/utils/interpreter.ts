@@ -7,7 +7,7 @@ import { adjustNoteNameHeight } from './ui-utils';
 import { debugLog } from './debug';
 import { getMessage } from './i18n';
 import { updateTokenCount } from './token-counter';
-import { chatComplete } from './llm';
+import { chatComplete } from '../ext/chat/chat-llm';
 
 const INTERPRETER_SYSTEM_PROMPT =
 	'You are a helpful assistant. Please respond with one JSON object named `prompts_responses` — no explanatory text before or after. Use the keys provided, e.g. `prompt_1`, `prompt_2`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\\n- bullet 2\\n- bullet3"}}';

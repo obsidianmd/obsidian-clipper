@@ -118,19 +118,6 @@
 		.vault-path-container {
 			gap:calc(var(--popup-padding) / 2);
 		}
-
-		&.has-chat {
-			position: relative;
-			will-change: unset;
-			max-height: 65vh;
-			overflow-y: auto;
-			overflow-x: hidden;
-			transition: none;
-
-			#chat {
-				max-height: 35vh;
-			}
-		}
 	}
 	&:not(.is-embedded) #embedded-mode {
 		display: none;

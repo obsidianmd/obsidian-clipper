@@ -18,7 +18,6 @@
 					</div>
 					<ul>
 						<li data-section="general"><div class="nav-item-icon"><i data-lucide="paperclip"></i></div><span data-i18n="general">General</span></li>
-						<li data-section="cloud"><div class="nav-item-icon"><i data-lucide="cloud"></i></div><span data-i18n="cloud">Cloud</span></li>
 						<li data-section="reader"><div class="nav-item-icon"><i data-lucide="book-open"></i></div><span data-i18n="reader">Reader</span></li>
 						<li data-section="highlighter"><div class="nav-item-icon"><i data-lucide="highlighter"></i></div><span data-i18n="highlighter">Highlighter</span></li>
 						<li data-section="interpreter"><div class="nav-item-icon"><i data-lucide="quote"></i></div><span data-i18n="interpreter">Interpreter</span></li>
@@ -159,7 +158,6 @@
 												<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
 												<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
 												<option value="saveFile" data-i18n="saveFile">Save file</option>
-												<option value="cloud" data-i18n="saveToCloud">Save to cloud</option>
 											</select>
 										</div>
 									</div>
@@ -245,43 +243,6 @@
 										</div>
 										<div class="setting-item-control">
 											<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-
-					<div id="cloud-section" class="settings-section">
-						<div class="settings-section-header">
-							<h2 data-i18n="cloudSettings">Cloud Storage</h2>
-						</div>
-						<form id="cloud-settings-form">
-							<div class="setting-group">
-								<div class="setting-items">
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="cloud-active-target" data-i18n="cloudActiveTarget">Active cloud target</label>
-											<div class="setting-item-description" data-i18n="cloudActiveTargetDescription">
-												Select the cloud storage target to use for saving notes.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<select id="cloud-active-target" class="dropdown">
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="setting-group">
-								<div class="setting-item setting-item-heading">
-									<h3 data-i18n="cloudTargets">Cloud Targets</h3>
-								</div>
-								<div class="setting-items">
-									<div class="cloud-target-list-container">
-										<div id="cloud-target-list"></div>
-										<div class="add-btn">
-											<a id="add-cloud-target-btn" data-i18n="cloudAddTarget">+ Add cloud target</a>
 										</div>
 									</div>
 								</div>
@@ -926,44 +887,6 @@
 				<div class="modal-button-container">
 					<button class="provider-confirm-btn mod-cta" data-i18n="save">Save</button>
 					<button class="provider-cancel-btn" data-i18n="cancel">Cancel</button>
-				</div>
-			</div>
-		</div>
-
-		<div id="cloud-modal" class="modal-container">
-			<div class="modal-bg"></div>
-			<div class="modal">
-				<div class="modal-header">
-					<div class="modal-title" data-i18n="cloudEditorTitle">Cloud Target Editor</div>
-				</div>
-				<div class="modal-content">
-					<form id="cloud-editor-form">
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="cloud-type" data-i18n="cloudType">Type</label>
-								<div class="setting-item-description" data-i18n="cloudTypeDescription">Select the cloud storage type.</div>
-							</div>
-							<div class="setting-item-control">
-								<select id="cloud-type" name="type" class="dropdown">
-								</select>
-							</div>
-						</div>
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="cloud-name" data-i18n="cloudLabelName">Name</label>
-								<div class="setting-item-description" data-i18n="cloudNameDescription">Display name for this cloud target.</div>
-							</div>
-							<div class="setting-item-control">
-								<input type="text" id="cloud-name" name="name" placeholder="My Cloud Storage" required>
-							</div>
-						</div>
-						<div id="cloud-type-fields"></div>
-					</form>
-				</div>
-				<div class="modal-button-container">
-					<button class="cloud-test-btn" data-i18n="cloudTest">Test connection</button>
-					<button class="cloud-cancel-btn" data-i18n="cancel">Cancel</button>
-					<button class="cloud-save-btn mod-cta" data-i18n="save">Save</button>
 				</div>
 			</div>
 		</div>

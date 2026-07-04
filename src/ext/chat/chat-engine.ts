@@ -1,6 +1,6 @@
-import { ModelConfig } from '../types/types';
-import { chatComplete, ChatMessage } from './llm';
-import { debugLog } from './debug';
+import { ModelConfig } from '../../types/types';
+import { chatComplete, ChatMessage } from './chat-llm';
+import { debugLog } from '../../utils/debug';
 
 export type ChatStatus = 'idle' | 'sending' | 'error' | 'done';
 

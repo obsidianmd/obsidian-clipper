@@ -13,8 +13,8 @@ import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
-import { initChat, shouldShowChat, stripChat, stripChatFromProperty, ChatController } from '../utils/chat-bootstrap';
-import { ChatTurn } from '../utils/chat';
+import { getPopupPlugins, PopupPluginContext } from './plugin-system';
+import { initExtensions } from '../ext/index';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
@@ -37,7 +37,6 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
-let chatController: ChatController | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -289,6 +288,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 	loadedSettings = await loadSettings();
 	if (isIframe) {
 		document.documentElement.classList.add('is-embedded');
+	}
+
+	// Initialize extension plugins (chat, cloud, etc.) and run their init hooks.
+	initExtensions();
+	const initCtx: PopupPluginContext = {};
+	for (const plugin of getPopupPlugins()) {
+		if (plugin.init) {
+			try {
+				await plugin.init(initCtx);
+			} catch (e) {
+				console.error(`Plugin ${plugin.id} init failed:`, e);
+			}
+		}
 	}
 
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
@@ -972,17 +984,20 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 		}
 	}
 
-	chatController = await initChat({
-		template,
-		variables,
-		tabId: currentTabId!,
-		host: {
-			getCurrentUrl: async () => currentUrl,
-			writeVariables: writeChatVariables,
-			refreshFields: refreshChatDependentFields,
-			onCollapse: handleChatCollapse
+	const pluginCtx: PopupPluginContext = {
+		tabId: currentTabId,
+		currentUrl: currentUrl,
+		variables: variables
+	};
+	for (const plugin of getPopupPlugins()) {
+		if (plugin.onTemplateChange) {
+			try {
+				await plugin.onTemplateChange(template, variables, pluginCtx);
+			} catch (e) {
+				console.error(`Plugin ${plugin.id} onTemplateChange failed:`, e);
+			}
 		}
-	});
+	}
 
 	const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentUrl);
 	debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
@@ -1005,54 +1020,6 @@ function setupMetadataToggle() {
 				updateMetadataToggleState(isCollapsed);
 			}
 		});
-	}
-}
-
-function writeChatVariables(turns: ChatTurn[] | null): void {
-	const chatTurns = turns || [];
-	const visibleTurns = chatTurns.filter(t => t.role === 'assistant' ? t.content : true);
-	(currentVariables as any)['chat'] = visibleTurns;
-	(currentVariables as any)['{{chat}}'] = visibleTurns;
-}
-
-async function refreshChatDependentFields(): Promise<void> {
-	if (!currentTemplate) return;
-	const currentUrl = currentTabId ? (await getTabInfo(currentTabId)).url || '' : '';
-
-	const cleanNoteContent = stripChat(currentTemplate.noteContentFormat || '');
-	const cleanProperties = currentTemplate.properties.map(p => ({ ...p, value: stripChatFromProperty(p.value) }));
-
-	const [compiledContent, ...compiledProperties] = await Promise.all([
-		cleanNoteContent ? memoizedCompileTemplate(currentTabId!, cleanNoteContent, currentVariables, currentUrl) : Promise.resolve(''),
-		...cleanProperties.map(p => memoizedCompileTemplate(currentTabId!, unescapeValue(p.value), currentVariables, currentUrl))
-	]);
-
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	if (noteContentField && currentTemplate.noteContentFormat) {
-		noteContentField.value = compiledContent;
-	}
-
-	for (let i = 0; i < cleanProperties.length; i++) {
-		const property = cleanProperties[i];
-		const inputElement = document.getElementById(property.name) as HTMLInputElement;
-		if (!inputElement) continue;
-
-		let value = compiledProperties[i];
-		const propertyType = inputElement.getAttribute('data-type') || 'text';
-		value = formatPropertyValue(value, propertyType, property.value);
-
-		if (propertyType === 'checkbox') {
-			inputElement.checked = value === 'true';
-		} else {
-			inputElement.value = value;
-		}
-	}
-}
-
-function handleChatCollapse(collapsed: boolean): void {
-	const footer = document.querySelector('.clipper-footer');
-	if (footer) {
-		footer.classList.toggle('chat-collapsed', collapsed);
 	}
 }
 
@@ -1357,7 +1324,6 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
-			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
 			break;
 		case 'saveFile':
 			mainButton.textContent = getMessage('saveFile');
@@ -1365,15 +1331,6 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
-			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
-			break;
-		case 'cloud':
-			mainButton.textContent = getMessage('saveToCloud');
-			mainButton.onclick = () => handleSaveToCloud();
-			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
-			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
-			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 			break;
 		default: // 'addToObsidian'
 			mainButton.textContent = getMessage('addToObsidian');
@@ -1381,7 +1338,6 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
-			addSecondaryAction(secondaryActions, 'saveToCloud', handleSaveToCloud);
 	}
 }
 
@@ -1410,12 +1366,14 @@ async function handleClipObsidian(): Promise<void> {
 				}
 			}
 
-			// Wait for any in-flight chat request to complete before clipping
-			if (chatController) {
-				try {
-					await chatController.waitUntilIdle();
-				} catch (e) {
-					console.warn('Chat request failed before clipping:', e);
+			// Let plugins finish in-flight work before clipping
+			for (const plugin of getPopupPlugins()) {
+				if (plugin.beforeClip) {
+					try {
+						await plugin.beforeClip();
+					} catch (e) {
+						console.warn(`Plugin ${plugin.id} beforeClip failed:`, e);
+					}
 				}
 			}
 
@@ -1480,7 +1438,6 @@ function getActionIcon(actionType: string): string {
 		case 'copyToClipboard': return 'copy';
 		case 'saveFile': return 'file-down';
 		case 'addToObsidian': return 'pen-line';
-		case 'saveToCloud': return 'cloud';
 		default: return 'plus';
 	}
 }
@@ -1492,56 +1449,6 @@ async function copyContent() {
 	const frontmatter = await generateFrontmatter(properties);
 	const fileContent = frontmatter + noteContentField.value;
 	await copyToClipboard(fileContent);
-}
-
-async function handleSaveToCloud(): Promise<void> {
-	if (!currentTemplate) return;
-
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-	if (!noteContentField) return;
-
-	try {
-		// Collect fields
-		const properties = getPropertiesFromDOM();
-		const frontmatter = await generateFrontmatter(properties);
-		const content = frontmatter + noteContentField.value;
-		const title = noteNameField?.value || 'Untitled';
-
-		// Dynamic import cloud module
-		const { executeRemoteUpload } = await import('../ext/cloud/upload');
-
-		const result = await executeRemoteUpload({
-			template: currentTemplate,
-			title,
-			content
-		});
-
-		if (result.success) {
-			await incrementStat('cloud');
-			
-			// Change the main button text temporarily
-			const clipButton = document.getElementById('clip-btn');
-			if (clipButton) {
-				const originalText = clipButton.textContent || getMessage('addToObsidian');
-				clipButton.textContent = getMessage('cloudSaveSuccess') || 'Saved to cloud';
-				
-				// Reset the text after 1.5 seconds
-				setTimeout(() => {
-					clipButton.textContent = originalText;
-				}, 1500);
-			}
-
-			if (!isSidePanel) {
-				setTimeout(() => window.close(), 500);
-			}
-		} else {
-			showError(result.error || 'cloudSaveFailed');
-		}
-	} catch (error) {
-		console.error('Cloud save error:', error);
-		showError('cloudSaveFailed');
-	}
 }
 
 // Update the resize event listener to use the debounced version

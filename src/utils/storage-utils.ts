@@ -43,8 +43,7 @@ export let generalSettings: Settings = {
 		addToObsidian: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
-		share: 0,
-		cloud: 0
+		share: 0
 	},
 	history: [],
 	ratings: [],
@@ -66,7 +65,7 @@ interface StorageData {
 		legacyMode?: boolean;
 		silentOpen?: boolean;
 		openBehavior?: boolean | 'popup' | 'embedded';
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile' | 'cloud';
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -105,7 +104,6 @@ interface StorageData {
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
-		cloud?: number;
 	};
 	history?: HistoryEntry[];
 	ratings?: Rating[];
@@ -157,8 +155,7 @@ export async function loadSettings(): Promise<Settings> {
 			addToObsidian: 0,
 			saveFile: 0,
 			copyToClipboard: 0,
-			share: 0,
-			cloud: 0
+			share: 0
 		},
 		history: [],
 		ratings: [],
