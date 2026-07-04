@@ -530,13 +530,23 @@ async function handleSave(): Promise<void> {
 	const adapter = ALL_TARGETS.find(a => a.type === config.type);
 	if (!adapter) return;
 
-	await adapter.save(config);
+	try {
+		await adapter.save(config);
 
-	if (secret) {
-		await setSecret(adapter.secretPrefix, config.id, secret);
+		if (secret) {
+			await setSecret(adapter.secretPrefix, config.id, secret);
+		}
+	} catch (e) {
+		console.error('Failed to save cloud target:', e);
+		alert(getMessage('cloudSaveFailed') || 'Failed to save. Please try again.');
+		return;
 	}
 
-	await renderCloudTargetList();
+	try {
+		await renderCloudTargetList();
+	} catch (e) {
+		console.error('Failed to render cloud target list:', e);
+	}
 
 	const modal = document.getElementById('cloud-modal');
 	if (modal) hideModal(modal);

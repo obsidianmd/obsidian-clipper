@@ -60,8 +60,10 @@ export async function executeRemoteUpload(request: UploadRequest): Promise<Uploa
 		// Create client
 		const client = adapter.createClient(target, secret);
 
-		// Build path
-		const basePath = target.defaultPath || '';
+		// Build path - concatenate cloud target default path with template path
+		const cloudPath = target.defaultPath || '';
+		const templatePath = request.template.path || '';
+		const basePath = cloudPath && templatePath ? `${cloudPath}/${templatePath}` : cloudPath || templatePath;
 		const fileName = sanitizeFileName(request.title) + '.md';
 		const path = basePath ? `${basePath}/${fileName}` : fileName;
 

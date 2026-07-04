@@ -13,6 +13,8 @@ import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
+import { initChat, shouldShowChat, stripChat, stripChatFromProperty, ChatController } from '../utils/chat-bootstrap';
+import { ChatTurn } from '../utils/chat';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
@@ -35,6 +37,7 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let chatController: ChatController | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -342,6 +345,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Connect to the background script for communication
 		browser.runtime.connect({ name: 'popup' });
 
+		// Initialize all Lucide icons in the popup
+		initializeIcons();
+
 		// Setup event listeners for popup buttons
 		const refreshButton = document.getElementById('refresh-pane');
 		if (refreshButton) {
@@ -365,7 +371,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 					console.error('Error opening options page:', error);
 				}
 			});
-			initializeIcons(settingsButton);
 		}
 
 		// Initialize the rest of the popup
@@ -967,6 +972,18 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 		}
 	}
 
+	chatController = await initChat({
+		template,
+		variables,
+		tabId: currentTabId!,
+		host: {
+			getCurrentUrl: async () => currentUrl,
+			writeVariables: writeChatVariables,
+			refreshFields: refreshChatDependentFields,
+			onCollapse: handleChatCollapse
+		}
+	});
+
 	const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentUrl);
 	debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 }
@@ -988,6 +1005,54 @@ function setupMetadataToggle() {
 				updateMetadataToggleState(isCollapsed);
 			}
 		});
+	}
+}
+
+function writeChatVariables(turns: ChatTurn[] | null): void {
+	const chatTurns = turns || [];
+	const visibleTurns = chatTurns.filter(t => t.role === 'assistant' ? t.content : true);
+	(currentVariables as any)['chat'] = visibleTurns;
+	(currentVariables as any)['{{chat}}'] = visibleTurns;
+}
+
+async function refreshChatDependentFields(): Promise<void> {
+	if (!currentTemplate) return;
+	const currentUrl = currentTabId ? (await getTabInfo(currentTabId)).url || '' : '';
+
+	const cleanNoteContent = stripChat(currentTemplate.noteContentFormat || '');
+	const cleanProperties = currentTemplate.properties.map(p => ({ ...p, value: stripChatFromProperty(p.value) }));
+
+	const [compiledContent, ...compiledProperties] = await Promise.all([
+		cleanNoteContent ? memoizedCompileTemplate(currentTabId!, cleanNoteContent, currentVariables, currentUrl) : Promise.resolve(''),
+		...cleanProperties.map(p => memoizedCompileTemplate(currentTabId!, unescapeValue(p.value), currentVariables, currentUrl))
+	]);
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField && currentTemplate.noteContentFormat) {
+		noteContentField.value = compiledContent;
+	}
+
+	for (let i = 0; i < cleanProperties.length; i++) {
+		const property = cleanProperties[i];
+		const inputElement = document.getElementById(property.name) as HTMLInputElement;
+		if (!inputElement) continue;
+
+		let value = compiledProperties[i];
+		const propertyType = inputElement.getAttribute('data-type') || 'text';
+		value = formatPropertyValue(value, propertyType, property.value);
+
+		if (propertyType === 'checkbox') {
+			inputElement.checked = value === 'true';
+		} else {
+			inputElement.value = value;
+		}
+	}
+}
+
+function handleChatCollapse(collapsed: boolean): void {
+	const footer = document.querySelector('.clipper-footer');
+	if (footer) {
+		footer.classList.toggle('chat-collapsed', collapsed);
 	}
 }
 
@@ -1335,17 +1400,26 @@ async function handleClipObsidian(): Promise<void> {
 	}
 
 	try {
-		// Handle interpreter if needed
-		if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
-			if (interpretBtn.classList.contains('processing')) {
-				await waitForInterpreter(interpretBtn);
-			} else if (!interpretBtn.classList.contains('done')) {
-				interpretBtn.click();
-				await waitForInterpreter(interpretBtn);
+			// Handle interpreter if needed
+			if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
+				if (interpretBtn.classList.contains('processing')) {
+					await waitForInterpreter(interpretBtn);
+				} else if (!interpretBtn.classList.contains('done')) {
+					interpretBtn.click();
+					await waitForInterpreter(interpretBtn);
+				}
 			}
-		}
 
-		// Gather content
+			// Wait for any in-flight chat request to complete before clipping
+			if (chatController) {
+				try {
+					await chatController.waitUntilIdle();
+				} catch (e) {
+					console.warn('Chat request failed before clipping:', e);
+				}
+			}
+
+			// Gather content
 		const properties = getPropertiesFromDOM();
 
 		const frontmatter = await generateFrontmatter(properties);

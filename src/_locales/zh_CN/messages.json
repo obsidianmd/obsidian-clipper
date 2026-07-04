@@ -1299,5 +1299,38 @@
 	},
 	"cloudTargets": {
 		"message": "云存储目标"
+	},
+	"chatTitle": {
+		"message": "对话"
+	},
+	"chatClear": {
+		"message": "清空"
+	},
+	"chatCollapse": {
+		"message": "折叠"
+	},
+	"chatEmpty": {
+		"message": "询问 AI 关于当前页面的内容"
+	},
+	"chatInputPlaceholder": {
+		"message": "询问 AI..."
+	},
+	"chatThinking": {
+		"message": "思考中"
+	},
+	"chatContext": {
+		"message": "对话上下文"
+	},
+	"chatContextDescription": {
+		"message": "用于对话消息的上下文。覆盖解释器设置中定义的默认上下文。此处可以使用变量。"
+	},
+	"defaultChatContext": {
+		"message": "默认对话上下文"
+	},
+	"defaultChatContextDescription": {
+		"message": "模型将使用此上下文来处理对话消息。可以在此处使用变量和过滤器。"
+	},
+	"chatStop": {
+		"message": "停止"
 	}
 }

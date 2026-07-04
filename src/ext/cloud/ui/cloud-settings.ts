@@ -70,10 +70,6 @@ export async function renderCloudTargetList(): Promise<void> {
 	const activeTargetSelect = document.getElementById('cloud-active-target') as HTMLSelectElement;
 	if (activeTargetSelect) {
 		activeTargetSelect.textContent = '';
-		const emptyOption = document.createElement('option');
-		emptyOption.value = '';
-		emptyOption.textContent = '—';
-		activeTargetSelect.appendChild(emptyOption);
 
 		for (const { target, adapter } of allTargets) {
 			const option = document.createElement('option');
@@ -91,9 +87,11 @@ export async function renderCloudTargetList(): Promise<void> {
 		}
 	}
 
-	const sortedTargets = [...allTargets].sort((a, b) =>
-		a.target.name.toLowerCase().localeCompare(b.target.name.toLowerCase())
-	);
+	const sortedTargets = [...allTargets].sort((a, b) => {
+		const nameA = a.target.name || '';
+		const nameB = b.target.name || '';
+		return nameA.toLowerCase().localeCompare(nameB.toLowerCase());
+	});
 
 	for (const { target, adapter } of sortedTargets) {
 		const item = createCloudTargetListItem(target, adapter);
@@ -131,7 +129,7 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	// Create name text (matches provider-name-text)
 	const nameText = document.createElement('div');
 	nameText.className = 'cloud-target-name-text';
-	nameText.textContent = target.name;
+	nameText.textContent = target.name || '(unnamed)';
 
 	targetName.appendChild(iconContainer);
 	targetName.appendChild(nameText);
