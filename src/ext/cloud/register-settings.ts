@@ -25,6 +25,7 @@
 import { Cloud } from 'lucide';
 import { SettingsPluginContext, injectStyles } from '../../core/plugin-system';
 import { icons, initializeIcons } from '../../icons/icons';
+import { updateUrl } from '../../utils/routing';
 import { cloudStyles } from './cloud-styles';
 import {
 	cloudSettingsSectionTemplate,
@@ -101,7 +102,42 @@ function injectCloudSidebarNav(): HTMLElement | null {
 	} else {
 		sidebarList.appendChild(node);
 	}
+
+	// Bind click handler for the cloud section.
+	// The original initializeSidebar() uses event delegation on #sidebar but
+	// only handles a hardcoded list of sections ('general', 'properties', etc.).
+	// 'cloud' is not in that list, so we need our own handler.
+	node.addEventListener('click', (event) => {
+		event.stopPropagation();
+		showCloudSection();
+
+		// Close the sidebar on mobile, matching the original behavior.
+		const settingsContainer = document.getElementById('settings');
+		const hamburgerMenu = document.getElementById('hamburger-menu');
+		if (settingsContainer) {
+			settingsContainer.classList.remove('sidebar-open');
+		}
+		if (hamburgerMenu) {
+			hamburgerMenu.classList.remove('is-active');
+		}
+	});
+
 	return node;
+}
+
+function showCloudSection(): void {
+	// Toggle active state for all sections and sidebar items, matching the
+	// pattern used by showSettingsSection() in settings-section-ui.ts.
+	document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+	document.querySelectorAll('#sidebar li[data-section]').forEach(item => item.classList.remove('active'));
+
+	const cloudSection = document.getElementById('cloud-section');
+	const cloudNavItem = document.querySelector('#sidebar li[data-section="cloud"]');
+	if (cloudSection) cloudSection.classList.add('active');
+	if (cloudNavItem) cloudNavItem.classList.add('active');
+
+	// Update URL without reloading.
+	try { updateUrl('cloud'); } catch { /* ignore */ }
 }
 
 /**
@@ -183,5 +219,12 @@ export async function initCloudSettingsPlugin(ctx?: SettingsPluginContext): Prom
 	const modal = document.getElementById('cloud-modal');
 	if (modal) {
 		watchModalForTranslations(modal);
+	}
+
+	// 9. Handle ?section=cloud URL parameter. The original handleUrlParameters
+	//    only knows about built-in sections, so we handle 'cloud' ourselves.
+	const url = new URL(window.location.href);
+	if (url.searchParams.get('section') === 'cloud') {
+		showCloudSection();
 	}
 }

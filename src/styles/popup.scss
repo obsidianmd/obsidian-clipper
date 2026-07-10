@@ -127,13 +127,18 @@
 	#note-content-container {
 		border-top: 1px solid var(--divider-color);
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
+		min-height: 0;
+		overflow: hidden;
 		#note-content-field {
 			background-color: transparent;
 			border-radius: 0;
 			border: none;
 			padding: 10px var(--popup-padding);
 			resize: none;
+			flex: 1 1 auto;
+			min-height: 0;
 			&:active,
 			&:focus {
 				box-shadow: none;
@@ -149,6 +154,7 @@
 		padding: 0.625rem;
 		border-top: 1px solid var(--divider-color);
 		background-color: var(--background-primary);
+		overflow: hidden;
 		button {
 			font-weight: var(--clipper-button-font-weight);
 			font-size: var(--clipper-button-font-size);

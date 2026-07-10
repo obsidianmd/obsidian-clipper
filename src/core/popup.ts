@@ -401,6 +401,22 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 				determineMainAction();
 
+				// Update saveToCloud button label with translation from cloud plugin
+				if (loadedSettings.saveBehavior === 'saveToCloud') {
+					const cloudPlugin = getPopupPlugins().find(p => p.id === 'cloud');
+					if (cloudPlugin?.getSaveToCloudAction) {
+						try {
+							const action = await cloudPlugin.getSaveToCloudAction();
+							if (action) {
+								const mainButton = document.getElementById('clip-btn');
+								if (mainButton) mainButton.textContent = action.label;
+							}
+						} catch (e) {
+							console.warn('Failed to get cloud action label:', e);
+						}
+					}
+				}
+
 				const showMoreActionsButton = document.getElementById('show-variables');
 				if (showMoreActionsButton) {
 					showMoreActionsButton.addEventListener('click', (e) => {
@@ -1307,6 +1323,20 @@ async function handleSaveToDownloads() {
 	}
 }
 
+async function handleSaveToCloud(): Promise<void> {
+	const cloudPlugin = getPopupPlugins().find(p => p.id === 'cloud');
+	if (cloudPlugin?.getSaveToCloudAction) {
+		try {
+			const action = await cloudPlugin.getSaveToCloudAction();
+			if (action) {
+				await action.handler();
+			}
+		} catch (error) {
+			console.error('Failed to save to cloud:', error);
+		}
+	}
+}
+
 function determineMainAction() {
 	const mainButton = document.getElementById('clip-btn');
 	const moreDropdown = document.getElementById('more-dropdown');
@@ -1331,6 +1361,14 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			break;
+		case 'saveToCloud':
+			mainButton.textContent = 'Save to cloud';
+			mainButton.onclick = () => handleSaveToCloud();
+			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 			break;
 		default: // 'addToObsidian'
 			mainButton.textContent = getMessage('addToObsidian');

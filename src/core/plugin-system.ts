@@ -26,6 +26,8 @@ export interface PopupPlugin {
 	beforeClip?: () => Promise<void>;
 	/** Cleanup when popup unloads. */
 	dispose?: () => void;
+	/** Return the main action handler for saveToCloud behavior. */
+	getSaveToCloudAction?: () => Promise<{ label: string; handler: () => void | Promise<void> } | null>;
 }
 
 export interface SettingsPluginContext {

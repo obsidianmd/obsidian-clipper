@@ -4,12 +4,12 @@
  * Styled to match the AI provider settings page
  */
 
-import { getMessage } from '../../../utils/i18n';
 import { initializeIcons } from '../../../icons/icons';
 import { ALL_TARGETS } from '../upload';
 import { CloudTarget, CloudTargetType } from '../types';
 import { setActiveTargetId } from '../adapters/base';
 import { openCloudEditorModal } from './cloud-modal';
+import { t } from '../cloud-i18n';
 
 /**
  * Mount cloud settings section into DOM
@@ -178,7 +178,7 @@ function createCloudTargetListItem(target: CloudTarget, adapter: typeof ALL_TARG
 	deleteBtn.addEventListener('click', async (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		if (confirm(getMessage('cloudDeleteConfirm'))) {
+		if (confirm(t('cloudDeleteConfirm'))) {
 			await adapter.delete(target.id);
 			await renderCloudTargetList();
 		}

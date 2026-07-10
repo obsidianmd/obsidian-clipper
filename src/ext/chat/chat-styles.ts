@@ -12,14 +12,10 @@ export const chatStyles = `
 	--chat-border: hsla(var(--color-accent-hsl), 0.15);
 	--chat-text: var(--text-accent);
 	--chat-muted: var(--text-muted);
-	--chat-max-height: calc(100vh - 4rem);
-	--chat-min-height: 4rem;
 
 	display: none;
 	flex-direction: column;
 	flex: 1 1 auto;
-	min-height: var(--chat-min-height);
-	max-height: var(--chat-max-height);
 	border-radius: 4px;
 	background-color: var(--chat-bg);
 	border: 1px solid var(--chat-border);
@@ -334,17 +330,15 @@ export const chatStyles = `
 }
 
 .clipper .chat-snippet-menu {
-	position: absolute;
-	bottom: calc(100% + 4px);
-	left: 0.5rem;
-	right: 0.5rem;
+	position: fixed;
 	max-height: 200px;
 	overflow-y: auto;
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
-	box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
-	z-index: 100;
+	box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
+	z-index: 1000;
+	display: none;
 }
 
 .clipper .chat-snippet-menu .chat-snippet-item {
@@ -500,29 +494,12 @@ export const chatStyles = `
 	}
 }
 
-/* === Popup layout adjustments when chat is present === */
-
-/* When chat is expanded, hide note content & properties to maximize chat area */
-.clipper:has(.clipper-footer.has-chat:not(.chat-collapsed)) #note-name-field,
-.clipper:has(.clipper-footer.has-chat:not(.chat-collapsed)) .metadata-properties-header,
-.clipper:has(.clipper-footer.has-chat:not(.chat-collapsed)) .metadata-properties,
-.clipper:has(.clipper-footer.has-chat:not(.chat-collapsed)) #note-content-container {
+/* === Layout: chat expanded → hide note content & properties, maximize chat === */
+.clipper.has-chat:not(.chat-collapsed) #note-name-field,
+.clipper.has-chat:not(.chat-collapsed) .metadata-properties-header,
+.clipper.has-chat:not(.chat-collapsed) .metadata-properties,
+.clipper.has-chat:not(.chat-collapsed) #note-content-container {
 	display: none !important;
-}
-
-.clipper #note-content-container {
-	flex-direction: column;
-	min-height: 0;
-	overflow: hidden;
-}
-
-.clipper #note-content-container #note-content-field {
-	flex: 1 1 auto;
-	min-height: 0;
-}
-
-.clipper .clipper-footer {
-	overflow: hidden;
 }
 
 .clipper .clipper-footer.has-chat:not(.chat-collapsed) {
@@ -530,19 +507,17 @@ export const chatStyles = `
 	min-height: 0;
 }
 
-/* === Mobile layout adjustments for chat === */
-@media (max-width: 600px) {
-	.clipper .clipper-footer.has-chat {
-		position: relative;
-		will-change: unset;
-		max-height: 65vh;
-		overflow-y: auto;
-		overflow-x: hidden;
-		transition: none;
-	}
+/* === Layout: mobile non-embedded → footer becomes relative when chat present === */
+.is-mobile:not(.is-embedded) .clipper .clipper-footer.has-chat {
+	position: relative;
+	will-change: unset;
+	max-height: 65vh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	transition: none;
+}
 
-	.clipper .clipper-footer.has-chat #chat {
-		max-height: 35vh;
-	}
+.is-mobile:not(.is-embedded) .clipper .clipper-footer.has-chat #chat {
+	max-height: 35vh;
 }
 `;

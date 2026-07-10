@@ -367,7 +367,7 @@ function initializeSaveBehaviorDropdown(): void {
 
     dropdown.value = generalSettings.saveBehavior;
     dropdown.addEventListener('change', () => {
-        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile' | 'saveToCloud';
         saveSettings({ saveBehavior: newValue });
     });
 }

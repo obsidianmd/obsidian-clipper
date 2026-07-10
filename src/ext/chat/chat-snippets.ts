@@ -213,7 +213,7 @@ export class SnippetPicker {
 		this.snippets = snippets;
 		this.inputEl = inputEl;
 		this.onSelect = onSelect;
-		this.menuEl = inputEl.parentElement?.querySelector('#chat-snippet-menu') || null;
+		this.menuEl = document.getElementById('chat-snippet-menu');
 		this.filtered = snippets;
 	}
 
@@ -305,7 +305,29 @@ export class SnippetPicker {
 		this.selectedIndex = 0;
 		if (this.menuEl) {
 			this.menuEl.style.display = 'block';
+			this.positionMenu();
 			this.renderMenu();
+		}
+	}
+
+	private positionMenu(): void {
+		if (!this.menuEl || !this.inputEl) return;
+		const inputRect = this.inputEl.getBoundingClientRect();
+		const menuHeight = Math.min(200, this.filtered.length * 36 + 8);
+		const spaceAbove = inputRect.top;
+		const spaceBelow = window.innerHeight - inputRect.bottom;
+
+		this.menuEl.style.position = 'fixed';
+		this.menuEl.style.left = inputRect.left + 'px';
+		this.menuEl.style.width = inputRect.width + 'px';
+		this.menuEl.style.maxHeight = '200px';
+
+		if (spaceAbove >= menuHeight || spaceAbove > spaceBelow) {
+			this.menuEl.style.bottom = (window.innerHeight - inputRect.top + 4) + 'px';
+			this.menuEl.style.top = 'auto';
+		} else {
+			this.menuEl.style.top = (inputRect.bottom + 4) + 'px';
+			this.menuEl.style.bottom = 'auto';
 		}
 	}
 

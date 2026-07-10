@@ -198,26 +198,78 @@ export function t(key: string): string {
 
 /** Apply data-i18n / data-i18n-title attributes within a subtree. */
 export function applyCloudTranslations(root: HTMLElement | Document = document): void {
-	root.querySelectorAll('[data-i18n]').forEach(element => {
+	let applying = false;
+	let scheduled = false;
+
+	const applyToElement = (element: Element): void => {
 		const key = element.getAttribute('data-i18n');
 		if (!key) return;
-		// Only translate keys this module owns. Shared keys (save/cancel) are
-		// also translated so the cloud modal renders correctly without the
-		// global locale files being modified.
 		const translation = t(key);
 		if (translation === key) return;
 		if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-			element.placeholder = translation;
+			if (element.placeholder !== translation) {
+				element.placeholder = translation;
+			}
 		} else {
-			element.textContent = translation;
+			if (element.textContent !== translation) {
+				applying = true;
+				element.textContent = translation;
+				applying = false;
+			}
 		}
-	});
+	};
 
-	root.querySelectorAll('[data-i18n-title]').forEach(element => {
+	const applyTitleToElement = (element: Element): void => {
 		const key = element.getAttribute('data-i18n-title');
 		if (!key) return;
 		const translation = t(key);
 		if (translation === key) return;
-		element.setAttribute('title', translation);
+		if (element.getAttribute('title') !== translation) {
+			element.setAttribute('title', translation);
+		}
+	};
+
+	const applyAll = (scope: ParentNode): void => {
+		scope.querySelectorAll('[data-i18n]').forEach(applyToElement);
+		scope.querySelectorAll('[data-i18n-title]').forEach(applyTitleToElement);
+	};
+
+	applyAll(root);
+
+	const target = root instanceof Document ? root.documentElement : root;
+
+	const scheduleReapply = (): void => {
+		if (scheduled) return;
+		scheduled = true;
+		setTimeout(() => {
+			scheduled = false;
+			if (!applying) {
+				applyAll(root);
+			}
+		}, 0);
+	};
+
+	const observer = new MutationObserver((mutations) => {
+		if (applying) return;
+		for (const mutation of mutations) {
+			if (mutation.type === 'childList') {
+				scheduleReapply();
+			} else if (mutation.type === 'attributes') {
+				const el = mutation.target as Element;
+				if (el.hasAttribute('data-i18n')) applyToElement(el);
+				if (el.hasAttribute('data-i18n-title')) applyTitleToElement(el);
+			} else if (mutation.type === 'characterData') {
+				const el = mutation.target.parentElement;
+				if (el && el.hasAttribute('data-i18n')) applyToElement(el);
+				if (el && el.hasAttribute('data-i18n-title')) applyTitleToElement(el);
+			}
+		}
+	});
+	observer.observe(target, {
+		subtree: true,
+		childList: true,
+		attributes: true,
+		characterData: true,
+		attributeFilter: ['data-i18n', 'data-i18n-title', 'placeholder', 'title']
 	});
 }

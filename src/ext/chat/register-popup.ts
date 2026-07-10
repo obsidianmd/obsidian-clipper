@@ -119,16 +119,22 @@ function injectChatDom(): HTMLElement | null {
 
 	const template = document.createElement('template');
 	template.innerHTML = chatTemplate.trim();
-	const chatNode = template.content.firstElementChild as HTMLElement | null;
-	if (!chatNode) return null;
+	const fragment = template.content;
 
 	const actionButtons = clipperFooter.querySelector('.action-buttons');
 	if (actionButtons) {
-		clipperFooter.insertBefore(chatNode, actionButtons);
+		const nodes: Node[] = [];
+		while (fragment.firstChild) {
+			nodes.push(fragment.firstChild);
+			fragment.removeChild(fragment.firstChild);
+		}
+		for (const node of nodes) {
+			clipperFooter.insertBefore(node, actionButtons);
+		}
 	} else {
-		clipperFooter.appendChild(chatNode);
+		clipperFooter.appendChild(fragment);
 	}
-	return chatNode;
+	return document.getElementById('chat');
 }
 
 /**
@@ -185,7 +191,7 @@ export async function onTemplateChange(
 	const modelId = generalSettings.interpreterModel || enabledModels[0]?.id || '';
 	const modelConfig = generalSettings.models.find(m => m.id === modelId) || enabledModels[0];
 
-	const defaultContext =
+	const defaultContext = generalSettings.defaultPromptContext ||
 `Title: {{title}}
 URL: {{url}}
 Author: {{author}}

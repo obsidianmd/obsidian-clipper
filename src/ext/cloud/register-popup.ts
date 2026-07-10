@@ -83,7 +83,11 @@ function translateCloudError(error: string | undefined): string {
  * Build and execute the cloud upload from the current popup DOM state.
  * Mirrors the original `handleSaveToCloud()` in `src/core/popup.ts`.
  */
-async function handleSaveToCloud(): Promise<void> {
+export function getCloudActionLabel(): string {
+	return t(CLOUD_ACTION_ID);
+}
+
+export async function handleSaveToCloud(): Promise<void> {
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement | null;
 	if (!noteContentField) return;
 
@@ -157,7 +161,6 @@ function createCloudMenuItem(): HTMLElement {
 
 	const menuItemTitle = document.createElement('div');
 	menuItemTitle.className = 'menu-item-title';
-	menuItemTitle.setAttribute('data-i18n', CLOUD_ACTION_ID);
 	menuItemTitle.textContent = t(CLOUD_ACTION_ID);
 
 	menuItem.appendChild(menuItemIcon);

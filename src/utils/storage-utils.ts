@@ -65,7 +65,7 @@ interface StorageData {
 		legacyMode?: boolean;
 		silentOpen?: boolean;
 		openBehavior?: boolean | 'popup' | 'embedded';
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile' | 'saveToCloud';
 	};
 	vaults?: string[];
 	highlighter_settings?: {

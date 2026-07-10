@@ -19,11 +19,11 @@ export const chatTemplate = `
 	</div>
 	<div id="chat-messages" class="chat-messages"></div>
 	<textarea id="chat-input" rows="2" data-i18n="chatInputPlaceholder" placeholder="Ask AI..."></textarea>
-	<div id="chat-snippet-menu" class="chat-snippet-menu" style="display: none;"></div>
 	<div class="chat-controls">
 		<select id="chat-model-select" style="display: none;"></select>
 		<button id="chat-send-btn" type="button" class="chat-send-btn" data-i18n="send"></button>
 		<span id="chat-timer" class="chat-status" style="display: none;"></span>
 	</div>
 </div>
+<div id="chat-snippet-menu" class="chat-snippet-menu" style="display: none;"></div>
 `;

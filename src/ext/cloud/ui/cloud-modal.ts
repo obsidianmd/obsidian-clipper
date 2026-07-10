@@ -3,13 +3,13 @@
  * Modal for editing cloud target configurations
  */
 
-import { getMessage, translatePage } from '../../../utils/i18n';
 import { showModal, hideModal } from '../../../utils/modal-utils';
 import { initializeIcons } from '../../../icons/icons';
 import { CloudTarget, CloudTargetType } from '../types';
 import { ALL_TARGETS, testCloudConnection } from '../upload';
 import { generateId, setSecret } from '../adapters/base';
 import { renderCloudTargetList } from './cloud-settings';
+import { t } from '../cloud-i18n';
 
 let editingTarget: CloudTarget | null = null;
 let isEditing = false;
@@ -88,7 +88,6 @@ export function openCloudEditorModal(targetType?: CloudTargetType, existingConfi
 		hideModal(modal);
 	});
 
-	translatePage();
 	initializeIcons(modal);
 	showModal(modal);
 }
@@ -357,7 +356,6 @@ function renderTypeFields(type: CloudTargetType, existingConfig?: CloudTarget): 
 			break;
 	}
 
-	translatePage();
 	initializeIcons(container);
 }
 
@@ -368,7 +366,7 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 	const name = nameInput?.value?.trim();
 
 	if (!name) {
-		return { config: null, secret: '', error: getMessage('cloudNameRequired') || 'Name is required' };
+		return { config: null, secret: '', error: t('cloudNameRequired') };
 	}
 
 	const id = editingTarget?.id || generateId();
@@ -392,7 +390,7 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 			const branch = branchInput?.value?.trim() || 'main';
 
 			if (!owner || !repo) {
-				return { config: null, secret: '', error: getMessage('cloudOwnerRepoRequired') || 'Owner and repository are required' };
+				return { config: null, secret: '', error: t('cloudOwnerRepoRequired') };
 			}
 
 			config = {
@@ -417,7 +415,7 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 			const username = usernameInput?.value?.trim();
 
 			if (!url) {
-				return { config: null, secret: '', error: getMessage('cloudUrlRequired') || 'URL is required' };
+				return { config: null, secret: '', error: t('cloudUrlRequired') };
 			}
 
 			config = {
@@ -445,7 +443,7 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 			const pathStyle = pathStyleInput?.checked ?? true;
 
 			if (!endpoint || !bucket) {
-				return { config: null, secret: '', error: getMessage('cloudEndpointBucketRequired') || 'Endpoint and bucket are required' };
+				return { config: null, secret: '', error: t('cloudEndpointBucketRequired') };
 			}
 
 			config = {
@@ -475,7 +473,7 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 			const noteId = noteIdInput?.value?.trim() || undefined;
 
 			if (!fnEndpoint) {
-				return { config: null, secret: '', error: getMessage('cloudUrlRequired') || 'URL is required' };
+				return { config: null, secret: '', error: t('cloudUrlRequired') };
 			}
 
 			config = {
@@ -499,10 +497,10 @@ function collectFormData(): { config: CloudTarget | null; secret: string; error:
 			const syNotebook = syNotebookInput?.value?.trim();
 
 			if (!syEndpoint) {
-				return { config: null, secret: '', error: getMessage('cloudEndpointRequired') || 'Endpoint is required' };
+				return { config: null, secret: '', error: t('cloudEndpointRequired') };
 			}
 			if (!syNotebook) {
-				return { config: null, secret: '', error: getMessage('cloudNotebookRequired') || 'Notebook is required' };
+				return { config: null, secret: '', error: t('cloudNotebookRequired') };
 			}
 
 			config = {
@@ -538,7 +536,7 @@ async function handleSave(): Promise<void> {
 		}
 	} catch (e) {
 		console.error('Failed to save cloud target:', e);
-		alert(getMessage('cloudSaveFailed') || 'Failed to save. Please try again.');
+		alert(t('cloudSaveFailed'));
 		return;
 	}
 
@@ -565,7 +563,7 @@ async function handleTest(): Promise<void> {
 	const testBtn = document.querySelector('.cloud-test-btn') as HTMLButtonElement;
 	const originalText = testBtn?.textContent;
 	if (testBtn) {
-		testBtn.textContent = getMessage('cloudTesting') || 'Testing...';
+		testBtn.textContent = t('cloudTesting');
 		testBtn.disabled = true;
 	}
 
@@ -585,8 +583,8 @@ async function handleTest(): Promise<void> {
 	}
 
 	if (success) {
-		alert(getMessage('cloudTestSuccess') || 'Connection successful');
+		alert(t('cloudTestSuccess'));
 	} else {
-		alert(getMessage('cloudTestFailed') || 'Connection failed');
+		alert(t('cloudTestFailed'));
 	}
 }

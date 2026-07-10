@@ -569,10 +569,13 @@ export class ChatUI {
 
 export function hasChatVariable(templateContent: string, properties?: { name: string; value: string }[]): boolean {
 	const chatRegex = /\{\{\s*chat[^\}]*\}\}/;
+	const chatTagRegex = /\{%\s*(for|if|elseif)\s+[^\}]*\bchat\b/;
 	if (chatRegex.test(templateContent)) return true;
+	if (chatTagRegex.test(templateContent)) return true;
 	if (properties) {
 		for (const prop of properties) {
 			if (chatRegex.test(prop.value)) return true;
+			if (chatTagRegex.test(prop.value)) return true;
 		}
 	}
 	return false;

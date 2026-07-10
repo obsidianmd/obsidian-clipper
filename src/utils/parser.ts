@@ -1478,6 +1478,9 @@ const SPECIAL_PREFIXES = [
 	'selector:',
 	'selectorHtml:',
 	'meta:',
+	'chat.system:',
+	'chat.context:',
+	'chat.snip:',
 ];
 
 /**

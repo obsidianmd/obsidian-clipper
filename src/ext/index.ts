@@ -43,6 +43,13 @@ export function initExtensions(): void {
 		init: async () => {
 			const { initCloudPopupPlugin } = await import('./cloud/register-popup');
 			await initCloudPopupPlugin();
+		},
+		getSaveToCloudAction: async () => {
+			const { handleSaveToCloud, getCloudActionLabel } = await import('./cloud/register-popup');
+			return {
+				label: getCloudActionLabel(),
+				handler: handleSaveToCloud
+			};
 		}
 	});
 
