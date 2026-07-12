@@ -358,7 +358,7 @@ Divides a string into an array of substrings.
 - `"a,b,c"|split:","` returns `["a","b","c"]`.
 - `"hello world"|split:" "` returns `["hello","world"]`.
 - If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
-- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
+- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c",""]`, or `"a  b 2c 3 "|split:[\\s()]` returns `["a","","b","2c","3",""]`.
 
 ### `template`
 
