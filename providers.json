@@ -1,5 +1,16 @@
 {
 	"version": "2026.12.08",
+	"apple-intelligence": {
+		"id": "apple-intelligence",
+		"name": "Apple Intelligence",
+		"providerType": "apple-intelligence",
+		"baseUrl": "",
+		"apiKeyRequired": false,
+		"popularModels": [
+			{ "id": "on-device", "name": "On-Device Model", "recommended": true },
+			{ "id": "private-cloud", "name": "Private Compute Cloud" }
+		]
+	},
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",

@@ -144,19 +144,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 let response = try await session.respond(to: userMessage)
                 responseData = ["success": true, "content": response.content]
             } catch {
-                // Map known FoundationModels error patterns to stable codes the JS side can handle.
-                // TODO: LanguageModelError is only available in macOS 27 / iOS 27+.
-                // Once minimum deployment target is raised, replace with typed case matching.
-                let desc = error.localizedDescription.lowercased()
-                let code: String
-                if desc.contains("context") || desc.contains("too long") || desc.contains("token") {
-                    code = "contextWindowExceeded"
-                } else if desc.contains("guardrail") || desc.contains("policy") {
-                    code = "guardrailsViolation"
-                } else {
-                    code = "languageModelError"
-                }
-                responseData = ["success": false, "error": code, "detail": error.localizedDescription]
+                responseData = mapError(error)
             }
             semaphore.signal()
         }
@@ -167,18 +155,64 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
     @available(iOS 27.0, macOS 27.0, *)
     private func handleWithPCC(context: NSExtensionContext, systemPrompt: String, userMessage: String) {
-        // TODO: PrivateCloudComputeLanguageModel is not available in the macOS 26 SDK.
-        // Replace this stub with the full implementation once the macOS 27 SDK ships:
-        //
-        //   let model = PrivateCloudComputeLanguageModel()
-        //   if model.quotaUsage.isLimitReached { ... }
-        //   let session = LanguageModelSession(model: model, instructions: systemPrompt)
-        //   let response = try await session.respond(to: userMessage)
-        //   // include quotaWarning flag if model.quotaUsage.status isApproachingLimit
-        //
-        sendResponse(context: context, data: [
-            "success": false, "error": "unavailable", "reason": "pccNotYetImplemented"
-        ])
+        let model = PrivateCloudComputeLanguageModel()
+
+        if model.quotaUsage.isLimitReached {
+            sendResponse(context: context, data: ["success": false, "error": "quotaExceeded"])
+            return
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var responseData: [String: Any] = ["success": false, "error": "Timeout"]
+
+        Task {
+            do {
+                let session = LanguageModelSession(model: model, instructions: systemPrompt)
+                let response = try await session.respond(to: userMessage)
+
+                var data: [String: Any] = ["success": true, "content": response.content]
+                if case .belowLimit(let info) = model.quotaUsage.status, info.isApproachingLimit {
+                    data["quotaWarning"] = true
+                }
+                responseData = data
+            } catch {
+                responseData = mapError(error)
+            }
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        sendResponse(context: context, data: responseData)
+    }
+
+    // Maps FoundationModels errors to stable string codes for the JS side.
+    // Uses typed LanguageModelError on macOS/iOS 27+; falls back to description
+    // matching on macOS/iOS 26 where the type is unavailable.
+    @available(iOS 26.0, macOS 26.0, *)
+    private func mapError(_ error: Error) -> [String: Any] {
+        if #available(iOS 27.0, macOS 27.0, *),
+           let lmError = error as? LanguageModelError {
+            let code: String
+            switch lmError {
+            case .contextSizeExceeded:  code = "contextWindowExceeded"
+            case .guardrailViolation:   code = "guardrailsViolation"
+            case .refusal:              code = "refusal"
+            case .rateLimited:          code = "rateLimited"
+            default:                    code = "languageModelError"
+            }
+            return ["success": false, "error": code, "detail": lmError.localizedDescription]
+        }
+        // Fallback for macOS 26 where LanguageModelError is unavailable
+        let desc = error.localizedDescription.lowercased()
+        let code: String
+        if desc.contains("context") || desc.contains("too long") || desc.contains("token") {
+            code = "contextWindowExceeded"
+        } else if desc.contains("guardrail") || desc.contains("policy") {
+            code = "guardrailsViolation"
+        } else {
+            code = "languageModelError"
+        }
+        return ["success": false, "error": code, "detail": error.localizedDescription]
     }
 
     private func sendResponse(context: NSExtensionContext, data: [String: Any]) {

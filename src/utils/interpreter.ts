@@ -283,6 +283,12 @@ async function sendToAppleIntelligence(
 		if (error === 'guardrailsViolation') {
 			throw new Error('Apple Intelligence declined to process this content.');
 		}
+		if (error === 'refusal') {
+			throw new Error('Apple Intelligence declined to answer this prompt.');
+		}
+		if (error === 'rateLimited') {
+			throw new Error('Apple Intelligence is rate limited. Please wait a moment and try again.');
+		}
 		if (error === 'languageModelError') {
 			const detail = (result as any).detail;
 			throw new Error(`Apple Intelligence model error${detail ? `: ${detail}` : '.'}`);
