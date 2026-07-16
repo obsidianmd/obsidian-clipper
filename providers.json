@@ -8,7 +8,7 @@
 		"apiKeyRequired": false,
 		"popularModels": [
 			{ "id": "on-device", "name": "On-Device Model", "recommended": true },
-			{ "id": "private-cloud", "name": "Private Compute Cloud" }
+			{ "id": "private-cloud", "name": "Private Cloud Compute" }
 		]
 	},
 	"anthropic": {
