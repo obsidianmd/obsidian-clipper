@@ -6,6 +6,7 @@
 //
 
 import SafariServices
+import FoundationModels
 import os.log
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
@@ -38,6 +39,14 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         switch type {
         case "fetchRequest":
             handleFetchRequest(context: context, message: messageDict)
+        case "appleIntelligencePrompt":
+            if #available(iOS 26.0, macOS 26.0, *) {
+                handleAppleIntelligencePrompt(context: context, message: messageDict)
+            } else {
+                sendResponse(context: context, data: [
+                    "success": false, "error": "unavailable", "reason": "osVersionTooOld"
+                ])
+            }
         default:
             // Echo back for any other message type (original behavior)
             sendResponse(context: context, data: ["echo": message as Any])
@@ -88,6 +97,122 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         semaphore.wait()
 
         sendResponse(context: context, data: responseData)
+    }
+
+    @available(iOS 26.0, macOS 26.0, *)
+    private func handleAppleIntelligencePrompt(context: NSExtensionContext, message: [String: Any]) {
+        guard let systemPrompt = message["systemPrompt"] as? String,
+              let userMessage = message["userMessage"] as? String else {
+            sendResponse(context: context, data: ["success": false, "error": "Invalid parameters"])
+            return
+        }
+
+        let modelId = message["model"] as? String ?? "on-device"
+
+        if modelId == "private-cloud" {
+            if #available(iOS 27.0, macOS 27.0, *) {
+                handleWithPCC(context: context, systemPrompt: systemPrompt, userMessage: userMessage)
+            } else {
+                sendResponse(context: context, data: [
+                    "success": false, "error": "unavailable", "reason": "pccRequiresNewerOS"
+                ])
+            }
+            return
+        }
+
+        if case .unavailable(let reason) = SystemLanguageModel.default.availability {
+            let reasonString: String
+            switch reason {
+            case .deviceNotEligible:           reasonString = "deviceNotEligible"
+            case .appleIntelligenceNotEnabled: reasonString = "appleIntelligenceNotEnabled"
+            default:                           reasonString = "unknown"
+            }
+            sendResponse(context: context, data: [
+                "success": false, "error": "unavailable", "reason": reasonString
+            ])
+            return
+        }
+
+        // Bridge async FoundationModels call to synchronous extension context,
+        // matching the pattern used in handleFetchRequest.
+        let semaphore = DispatchSemaphore(value: 0)
+        var responseData: [String: Any] = ["success": false, "error": "Timeout"]
+
+        Task {
+            do {
+                let session = LanguageModelSession(instructions: systemPrompt)
+                let response = try await session.respond(to: userMessage)
+                responseData = ["success": true, "content": response.content]
+            } catch {
+                responseData = mapError(error)
+            }
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        sendResponse(context: context, data: responseData)
+    }
+
+    @available(iOS 27.0, macOS 27.0, *)
+    private func handleWithPCC(context: NSExtensionContext, systemPrompt: String, userMessage: String) {
+        let model = PrivateCloudComputeLanguageModel()
+
+        if model.quotaUsage.isLimitReached {
+            sendResponse(context: context, data: ["success": false, "error": "quotaExceeded"])
+            return
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var responseData: [String: Any] = ["success": false, "error": "Timeout"]
+
+        Task {
+            do {
+                let session = LanguageModelSession(model: model, instructions: systemPrompt)
+                let response = try await session.respond(to: userMessage)
+
+                var data: [String: Any] = ["success": true, "content": response.content]
+                if case .belowLimit(let info) = model.quotaUsage.status, info.isApproachingLimit {
+                    data["quotaWarning"] = true
+                }
+                responseData = data
+            } catch {
+                responseData = mapError(error)
+            }
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        sendResponse(context: context, data: responseData)
+    }
+
+    // Maps FoundationModels errors to stable string codes for the JS side.
+    // Uses typed LanguageModelError on macOS/iOS 27+; falls back to description
+    // matching on macOS/iOS 26 where the type is unavailable.
+    @available(iOS 26.0, macOS 26.0, *)
+    private func mapError(_ error: Error) -> [String: Any] {
+        if #available(iOS 27.0, macOS 27.0, *),
+           let lmError = error as? LanguageModelError {
+            let code: String
+            switch lmError {
+            case .contextSizeExceeded:  code = "contextWindowExceeded"
+            case .guardrailViolation:   code = "guardrailsViolation"
+            case .refusal:              code = "refusal"
+            case .rateLimited:          code = "rateLimited"
+            default:                    code = "languageModelError"
+            }
+            return ["success": false, "error": code, "detail": lmError.localizedDescription]
+        }
+        // Fallback for macOS 26 where LanguageModelError is unavailable
+        let desc = error.localizedDescription.lowercased()
+        let code: String
+        if desc.contains("context") || desc.contains("too long") || desc.contains("token") {
+            code = "contextWindowExceeded"
+        } else if desc.contains("guardrail") || desc.contains("policy") {
+            code = "guardrailsViolation"
+        } else {
+            code = "languageModelError"
+        }
+        return ["success": false, "error": code, "detail": error.localizedDescription]
     }
 
     private func sendResponse(context: NSExtensionContext, data: [String: Any]) {

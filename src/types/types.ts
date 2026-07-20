@@ -36,6 +36,8 @@ export interface PropertyType {
 	defaultValue?: string;
 }
 
+export type ProviderType = 'http' | 'apple-intelligence';
+
 export interface Provider {
 	id: string;
 	name: string;
@@ -43,6 +45,7 @@ export interface Provider {
 	apiKey: string;
 	apiKeyRequired?: boolean;
 	presetId?: string;
+	providerType?: ProviderType;
 }
 
 export interface Rating {

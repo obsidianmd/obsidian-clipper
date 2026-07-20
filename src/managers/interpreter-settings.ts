@@ -1,5 +1,5 @@
 import { initializeToggles, initializeSettingToggle } from '../utils/ui-utils';
-import { ModelConfig, Provider } from '../types/types';
+import { ModelConfig, Provider, ProviderType } from '../types/types';
 import { generalSettings, loadSettings, saveSettings, getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
@@ -12,6 +12,7 @@ export interface PresetProvider {
 	baseUrl: string;
 	apiKeyUrl?: string;
 	apiKeyRequired?: boolean;
+	providerType?: ProviderType;
 	modelsList?: string;
 	popularModels?: Array<{
 		id: string;
@@ -470,13 +471,20 @@ async function showProviderModal(provider: Provider, index?: number) {
 		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
 		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
 		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
+		const baseUrlContainer = baseUrlInput.closest('.setting-item') as HTMLElement;
 		const apiKeyContainer = apiKeyInput.closest('.setting-item') as HTMLElement;
 		const apiKeyDescription = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
 
-		if (!apiKeyContainer || !apiKeyDescription || !nameContainer || !presetSelect || !nameInput || !baseUrlInput || !apiKeyInput) {
+		if (!apiKeyContainer || !baseUrlContainer || !apiKeyDescription || !nameContainer || !presetSelect || !nameInput || !baseUrlInput || !apiKeyInput) {
 			console.error('Required provider modal elements not found');
 			return;
 		}
+
+		const appleIntelligenceNote = document.createElement('p');
+		appleIntelligenceNote.className = 'setting-item-description';
+		appleIntelligenceNote.textContent = 'Requires Safari on iOS or macOS 26+ on a supported device with Apple Intelligence enabled.';
+		appleIntelligenceNote.style.display = 'none';
+		baseUrlContainer.insertAdjacentElement('beforebegin', appleIntelligenceNote);
 
 		// Clear and populate preset select
 		presetSelect.textContent = '';
@@ -525,15 +533,24 @@ async function showProviderModal(provider: Provider, index?: number) {
 			const selectedPreset = selectedPresetId ? (cachedPresetProviders || {})[selectedPresetId] : null;
 
 			nameContainer.style.display = selectedPreset ? 'none' : 'block';
-			
+
 			if (selectedPreset) {
 				nameInput.value = selectedPreset.name;
-				
-				const editingOriginalPreset = index !== undefined && selectedPresetId === currentPresetId;
-				baseUrlInput.value = editingOriginalPreset ? provider.baseUrl : selectedPreset.baseUrl;
-				apiKeyInput.value = editingOriginalPreset ? provider.apiKey : '';
 
-				apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
+				const isAppleIntelligence = selectedPreset.providerType === 'apple-intelligence';
+
+				appleIntelligenceNote.style.display = isAppleIntelligence ? 'block' : 'none';
+				baseUrlContainer.style.display = isAppleIntelligence ? 'none' : 'block';
+				apiKeyContainer.style.display = (isAppleIntelligence || selectedPreset.apiKeyRequired === false) ? 'none' : 'block';
+
+				if (isAppleIntelligence) {
+					baseUrlInput.value = '';
+					apiKeyInput.value = '';
+				} else {
+					const editingOriginalPreset = index !== undefined && selectedPresetId === currentPresetId;
+					baseUrlInput.value = editingOriginalPreset ? provider.baseUrl : selectedPreset.baseUrl;
+					apiKeyInput.value = editingOriginalPreset ? provider.apiKey : '';
+				}
 
 				if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
 					const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
@@ -557,6 +574,8 @@ async function showProviderModal(provider: Provider, index?: number) {
 					apiKeyInput.value = provider.apiKey;
 				}
 				
+				appleIntelligenceNote.style.display = 'none';
+				baseUrlContainer.style.display = 'block';
 				apiKeyContainer.style.display = 'block';
 				apiKeyDescription.textContent = getMessage('providerApiKeyDescription');
 			}
@@ -595,20 +614,26 @@ async function showProviderModal(provider: Provider, index?: number) {
 
 		debugLog('Providers', 'Saving provider:', updatedProvider);
 
-		if (!updatedProvider.name || !updatedProvider.baseUrl) {
+		const selectedPresetForSave = presetId && cachedPresetProviders ? cachedPresetProviders[presetId] : null;
+		const isAppleIntelligencePreset = selectedPresetForSave?.providerType === 'apple-intelligence';
+
+		if (!updatedProvider.name || (!updatedProvider.baseUrl && !isAppleIntelligencePreset)) {
 			alert(getMessage('providerRequiredFields'));
 			return;
 		}
 
-		if (presetId && cachedPresetProviders && cachedPresetProviders[presetId]) {
-			const providerPreset = cachedPresetProviders[presetId];
-			
+		if (selectedPresetForSave) {
+			const providerPreset = selectedPresetForSave;
+
 			updatedProvider.name = providerPreset.name;
-			
+
 			const providerPresetBaseUrl = providerPreset.baseUrl;
 			// Use the user-provided baseUrl if it's different from the preset baseUrl
 			updatedProvider.baseUrl = baseUrl !== providerPresetBaseUrl ? baseUrl : providerPresetBaseUrl;
 			updatedProvider.apiKeyRequired = providerPreset.apiKeyRequired !== false;
+			if (providerPreset.providerType) {
+				updatedProvider.providerType = providerPreset.providerType;
+			}
 		}
 
 		if (index !== undefined) {
