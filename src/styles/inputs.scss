@@ -194,7 +194,7 @@ input[type=checkbox] {
 		gap: 8px;
 		cursor: pointer;
 		font-weight: 500;
-		margin: 0;
+		margin: 0 !important;
 		font-size: var(--font-ui-smaller);
 	}
 }
