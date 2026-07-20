@@ -91,7 +91,6 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.5,
 				system: systemContent
 			};
 			headers = {
@@ -111,8 +110,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 						"${promptContext}"
 						"${JSON.stringify(promptContent)}"`
 					}
-				],
-				temperature: 0.3
+				]
 			};
 			headers = {
 				...headers,
@@ -131,7 +129,6 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				],
 				format: 'json',
 				num_ctx: 120000,
-				temperature: 0.5,
 				stream: false
 			};
 		} else {

@@ -85,8 +85,7 @@ Example response:
 				},
 				body: JSON.stringify({
 					model: "gpt-5.2",
-					messages: messages,
-					temperature: 0.3
+					messages: messages
 				})
 			});
 
