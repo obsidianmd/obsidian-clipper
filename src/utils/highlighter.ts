@@ -233,7 +233,39 @@ export interface StoredData {
 	title?: string;
 }
 
-type HighlightsStorage = Record<string, StoredData>;
+export type HighlightsStorage = Record<string, StoredData>;
+
+// Highlights saved before URLs were normalized sit under the raw key until their
+// page is next opened. Fold that entry into the normalized one, matching on
+// content and keeping whichever copy still has an xpath.
+export function reconcileLegacyUrlKey(all: HighlightsStorage, rawUrl: string): void {
+	const url = normalizeUrl(rawUrl);
+	const legacy = all[rawUrl];
+	if (url === rawUrl || !legacy) return;
+
+	const existing = all[url];
+	if (!existing) {
+		all[url] = { ...legacy, url };
+		delete all[rawUrl];
+		return;
+	}
+
+	const positionByContent = new Map<string, number>();
+	existing.highlights.forEach((highlight, index) => {
+		if (!positionByContent.has(highlight.content)) positionByContent.set(highlight.content, index);
+	});
+	for (const highlight of legacy.highlights) {
+		const at = positionByContent.get(highlight.content);
+		if (at === undefined) {
+			positionByContent.set(highlight.content, existing.highlights.length);
+			existing.highlights.push(highlight);
+		} else if (!existing.highlights[at].xpath && highlight.xpath) {
+			existing.highlights[at] = highlight;
+		}
+	}
+	existing.title = existing.title ?? legacy.title;
+	delete all[rawUrl];
+}
 
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
@@ -1137,6 +1169,39 @@ export function collapseGroupsForExport(
 		if (mergedNotes.length > 0) entry.notes = mergedNotes;
 		return entry;
 	});
+}
+
+// Inverse of collapseGroupsForExport, for files written before exports carried
+// full records. A group arrives as one entry with its members joined by a blank
+// line, so split them apart and regroup. Ids come from the entry timestamp, with
+// later members offset to keep their order.
+export function expandExportedEntries(
+	entries: { text: string; timestamp?: string; notes?: string[] }[],
+): TextHighlightData[] {
+	const records: TextHighlightData[] = [];
+
+	entries.forEach((entry, entryIndex) => {
+		const parsed = entry.timestamp ? dayjs(entry.timestamp) : null;
+		const baseMs = parsed && parsed.isValid() ? parsed.valueOf() : Date.now();
+		const parts = entry.text.split('\n\n').filter(part => part.length > 0);
+		const groupId = parts.length > 1 ? `import-${baseMs}-${entryIndex}` : undefined;
+
+		parts.forEach((part, index) => {
+			records.push({
+				id: String(baseMs + index),
+				type: 'text',
+				xpath: '',
+				startOffset: 0,
+				endOffset: 0,
+				content: part,
+				...(groupId ? { groupId } : {}),
+				// Notes merge across a group on export, so they go back on the first.
+				...(index === 0 && entry.notes?.length ? { notes: entry.notes } : {}),
+			});
+		});
+	});
+
+	return records;
 }
 
 export interface ExportedPage {
