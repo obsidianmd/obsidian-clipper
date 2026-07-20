@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "हाइलाइट्स"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 हाइलाइट्स आयात किए गए।",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "लेख में हाइलाइट्स नहीं मिले"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import fail. Details ke liye console check karein."
+	},
+	"importHighlights": {
+		"message": "हाइलाइट्स आयात करें"
+	},
+	"importHighlightsDescription": {
+		"message": "फ़ाइल से हाइलाइट्स आयात करें। मौजूदा हाइलाइट्स रखे जाते हैं।"
 	},
 	"importModalTitle": {
 		"message": "Import"

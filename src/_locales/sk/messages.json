@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Zvýraznenia"
 	},
+	"highlightsImportSuccess": {
+		"message": "Importovaných zvýraznení: $1.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "V článku sa nenašli zvýraznenia"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import zlyhal. Ďalšie podrobnosti nájdete v konzole."
+	},
+	"importHighlights": {
+		"message": "Importovať zvýraznenia"
+	},
+	"importHighlightsDescription": {
+		"message": "Importujte zvýraznenia zo súboru. Existujúce zvýraznenia sa zachovajú."
 	},
 	"importModalTitle": {
 		"message": "Importovať"

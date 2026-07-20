@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Highlights"
 	},
+	"highlightsImportSuccess": {
+		"message": "Imported $1 highlights.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Highlights not found in article"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import failed. Please check the console for more details."
+	},
+	"importHighlights": {
+		"message": "Import highlights"
+	},
+	"importHighlightsDescription": {
+		"message": "Import highlights from a file. Existing highlights are kept."
 	},
 	"importModalTitle": {
 		"message": "Import"

@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "ការរំលេច"
 	},
+	"highlightsImportSuccess": {
+		"message": "បាននាំចូលការរំលេច $1។",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "រកមិនឃើញការរំលេចនៅក្នុងអត្ថបទ"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "ការនាំចូលបានបរាជ័យ។ សូមពិនិត្យ console សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។"
+	},
+	"importHighlights": {
+		"message": "នាំចូលការរំលេច"
+	},
+	"importHighlightsDescription": {
+		"message": "នាំចូលការរំលេចពីឯកសារ។ ការរំលេចដែលមានស្រាប់នឹងត្រូវរក្សាទុក។"
 	},
 	"importModalTitle": {
 		"message": "នាំចូល"

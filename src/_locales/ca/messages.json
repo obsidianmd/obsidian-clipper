@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Ressaltats"
 	},
+	"highlightsImportSuccess": {
+		"message": "S'han importat $1 destacats.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "No s'han trobat ressaltats a l'article"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "La importació ha fallat. Consulti la consola per obtenir més detalls."
+	},
+	"importHighlights": {
+		"message": "Importa destacats"
+	},
+	"importHighlightsDescription": {
+		"message": "Importa destacats des d'un fitxer. Es conserven els destacats existents."
 	},
 	"importModalTitle": {
 		"message": "Importar"

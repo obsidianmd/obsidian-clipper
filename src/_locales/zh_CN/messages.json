@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "高亮"
 	},
+	"highlightsImportSuccess": {
+		"message": "已导入 $1 条高亮。",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "文章中未找到高亮"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "导入失败。请检查控制台以获取更多详细信息。"
+	},
+	"importHighlights": {
+		"message": "导入高亮"
+	},
+	"importHighlightsDescription": {
+		"message": "从文件导入高亮。将保留现有高亮。"
 	},
 	"importModalTitle": {
 		"message": "导入"

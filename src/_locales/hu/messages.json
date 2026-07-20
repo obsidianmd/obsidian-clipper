@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Kiemelések"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 kiemelés importálva.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Nem találhatók kiemelések a cikkben"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Az importálás sikertelen. További részletekért ellenőrizd a konzolt."
+	},
+	"importHighlights": {
+		"message": "Kiemelések importálása"
+	},
+	"importHighlightsDescription": {
+		"message": "Kiemelések importálása fájlból. A meglévő kiemelések megmaradnak."
 	},
 	"importModalTitle": {
 		"message": "Importálás"

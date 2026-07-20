@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Uthevinger"
 	},
+	"highlightsImportSuccess": {
+		"message": "Importerte $1 markeringer.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Fant ingen uthevinger i artikkelen"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import mislyktes. Sjekk konsollen for detaljer."
+	},
+	"importHighlights": {
+		"message": "Importer markeringer"
+	},
+	"importHighlightsDescription": {
+		"message": "Importer markeringer fra en fil. Eksisterende markeringer beholdes."
 	},
 	"importModalTitle": {
 		"message": "Importer"

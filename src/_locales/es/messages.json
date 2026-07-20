@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Resaltados"
 	},
+	"highlightsImportSuccess": {
+		"message": "Se importaron $1 resaltados.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "No se encontraron resaltados en el artículo"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "La importación falló. Por favor, consulte la consola para más detalles."
+	},
+	"importHighlights": {
+		"message": "Importar resaltados"
+	},
+	"importHighlightsDescription": {
+		"message": "Importa resaltados desde un archivo. Los resaltados existentes se conservan."
 	},
 	"importModalTitle": {
 		"message": "Importar"

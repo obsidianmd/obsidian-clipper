@@ -9,7 +9,7 @@ import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../ma
 import { updateTemplateList, showTemplateEditor } from '../managers/template-ui';
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Settings, Template } from '../types/types';
-import { exportHighlights } from './highlights-manager';
+import { exportHighlights, importHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
 import browser from '../utils/browser-polyfill';
@@ -408,6 +408,11 @@ function initializeExportHighlightsButton(): void {
 	const exportHighlightsBtn = document.getElementById('export-highlights');
 	if (exportHighlightsBtn) {
 		exportHighlightsBtn.addEventListener('click', exportHighlights);
+	}
+
+	const importHighlightsBtn = document.getElementById('import-highlights');
+	if (importHighlightsBtn) {
+		importHighlightsBtn.addEventListener('click', importHighlights);
 	}
 }
 

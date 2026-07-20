@@ -1,5 +1,5 @@
 import browser from '../utils/browser-polyfill';
-import { AnyHighlightData, StoredData, DomainSettings, collapseGroupsForExport, normalizeUrl } from '../utils/highlighter';
+import { AnyHighlightData, StoredData, DomainSettings, buildExportedPage, normalizeUrl } from '../utils/highlighter';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import DOMPurify from 'dompurify';
@@ -957,16 +957,14 @@ async function exportCurrentContext() {
 	if (entries.length === 0) return;
 
 	// Group by URL to match the existing export format
-	const byUrl = new Map<string, HighlightEntry[]>();
-	for (const { entry, pageUrl } of entries) {
-		if (!byUrl.has(pageUrl)) byUrl.set(pageUrl, []);
-		byUrl.get(pageUrl)!.push(entry);
+	const byUrl = new Map<string, { highlights: HighlightEntry[]; title?: string }>();
+	for (const { entry, pageUrl, title } of entries) {
+		if (!byUrl.has(pageUrl)) byUrl.set(pageUrl, { highlights: [], title });
+		byUrl.get(pageUrl)!.highlights.push(entry);
 	}
 
-	const exportData = Array.from(byUrl.entries()).map(([url, highlights]) => ({
-		url,
-		highlights: collapseGroupsForExport(highlights.map(h => h.data)),
-	}));
+	const exportData = Array.from(byUrl.entries()).map(([url, page]) =>
+		buildExportedPage(url, page.highlights.map(h => h.data), page.title));
 
 	const jsonContent = JSON.stringify(exportData, null, 2);
 	const blob = new Blob([jsonContent], { type: 'application/json' });

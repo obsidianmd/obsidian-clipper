@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Επισημάνσεις"
 	},
+	"highlightsImportSuccess": {
+		"message": "Εισήχθησαν $1 επισημάνσεις.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Δεν βρέθηκαν επισημάνσεις στο άρθρο"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Η εισαγωγή απέτυχε. Ελέγξτε την κονσόλα για περισσότερες πληροφορίες."
+	},
+	"importHighlights": {
+		"message": "Εισαγωγή επισημάνσεων"
+	},
+	"importHighlightsDescription": {
+		"message": "Εισαγωγή επισημάνσεων από αρχείο. Οι υπάρχουσες επισημάνσεις διατηρούνται."
 	},
 	"importModalTitle": {
 		"message": "Εισαγωγή"

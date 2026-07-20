@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Evidenziazioni"
 	},
+	"highlightsImportSuccess": {
+		"message": "Importati $1 evidenziazioni.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Evidenziazioni non trovate nell’articolo"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Importazione fallita. Controlla la console per maggiori dettagli."
+	},
+	"importHighlights": {
+		"message": "Importa evidenziazioni"
+	},
+	"importHighlightsDescription": {
+		"message": "Importa evidenziazioni da un file. Le evidenziazioni esistenti vengono mantenute."
 	},
 	"importModalTitle": {
 		"message": "Importa"

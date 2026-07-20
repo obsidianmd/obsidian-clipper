@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Wyróżnienia"
 	},
+	"highlightsImportSuccess": {
+		"message": "Zaimportowano $1 wyróżnień.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Nie znaleziono wyróżnień w artykule"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej informacji."
+	},
+	"importHighlights": {
+		"message": "Importuj wyróżnienia"
+	},
+	"importHighlightsDescription": {
+		"message": "Importuj wyróżnienia z pliku. Istniejące wyróżnienia zostaną zachowane."
 	},
 	"importModalTitle": {
 		"message": "Importuj"
