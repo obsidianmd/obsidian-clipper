@@ -1,11 +1,18 @@
 // @vitest-environment jsdom
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import browser from '../utils/browser-polyfill';
-import { AnyHighlightData, StoredData, collapseGroupsForExport } from '../utils/highlighter';
+import { AnyHighlightData, StoredData, TextHighlightData, buildExportedPage, collapseGroupsForExport } from '../utils/highlighter';
 import { importHighlightsFromJson } from './highlights-manager';
 
-// Mirrors what exportHighlights writes, so a round-trip can be asserted.
+// What the exports write today, full records included.
 function exportedFile(): string {
+	return JSON.stringify(
+		Object.entries(stored).map(([url, data]) => buildExportedPage(url, data.highlights, data.title)),
+	);
+}
+
+// The format as it was before it carried `data`, which imports must still take.
+function legacyExportedFile(): string {
 	return JSON.stringify(
 		Object.entries(stored).map(([url, data]) => ({
 			url,
@@ -60,7 +67,6 @@ describe('importHighlightsFromJson', () => {
 		await importHighlightsFromJson(file([{ text: 'added', timestamp: '2026-01-01T00:00:00.000Z' }]));
 
 		expect(highlightsFor('https://example.com/page').map(h => h.content)).toEqual(['kept', 'added']);
-		// An untouched page keeps its title — the export format doesn't carry one.
 		expect(stored['https://example.com/page'].title).toBe('Existing title');
 	});
 
@@ -103,19 +109,17 @@ describe('importHighlightsFromJson', () => {
 		expect(highlightsFor('https://example.com/page')[0].id).toBe(String(Date.parse(timestamp)));
 	});
 
+	const mixedPage = (): AnyHighlightData[] => [
+		textHighlight('100', 'a plain highlight'),
+		// Content with a blank line, not to be mistaken for a group separator.
+		textHighlight('200', 'first line\n\nsecond line'),
+		// A real group, which the readable view collapses into one entry.
+		textHighlight('300', 'group part one', 'g1'),
+		textHighlight('400', 'group part two', 'g1'),
+	];
+
 	test('re-importing an unmodified export is a no-op', async () => {
-		stored['https://example.com/page'] = {
-			url: 'https://example.com/page',
-			highlights: [
-				textHighlight('100', 'a plain highlight'),
-				// A single highlight whose own content contains a blank line — this
-				// must not be mistaken for a group separator and re-split on import.
-				textHighlight('200', 'first line\n\nsecond line'),
-				// A real group, which the export collapses into one entry.
-				textHighlight('300', 'group part one', 'g1'),
-				textHighlight('400', 'group part two', 'g1'),
-			],
-		};
+		stored['https://example.com/page'] = { url: 'https://example.com/page', highlights: mixedPage() };
 
 		await importHighlightsFromJson(exportedFile());
 
@@ -125,6 +129,72 @@ describe('importHighlightsFromJson', () => {
 			'group part one',
 			'group part two',
 		]);
+	});
+
+	test('re-importing an export written before the data field is a no-op', async () => {
+		stored['https://example.com/page'] = { url: 'https://example.com/page', highlights: mixedPage() };
+
+		await importHighlightsFromJson(legacyExportedFile());
+
+		expect(highlightsFor('https://example.com/page').map(h => h.content)).toEqual([
+			'a plain highlight',
+			'first line\n\nsecond line',
+			'group part one',
+			'group part two',
+		]);
+	});
+
+	test('restores an element highlight instead of flattening it to text', async () => {
+		// Element highlights render only via xpath, so without the full record an
+		// image highlight would vanish on import.
+		stored['https://example.com/page'] = {
+			url: 'https://example.com/page',
+			title: 'A page',
+			highlights: [{ id: '100', type: 'element', xpath: '/figure[1]/img[1]', content: '<img src="x.png">' }],
+		};
+		const json = exportedFile();
+		stored = {};
+
+		await importHighlightsFromJson(json);
+
+		const highlights = highlightsFor('https://example.com/page');
+		expect(highlights).toHaveLength(1);
+		expect(highlights[0].type).toBe('element');
+		expect(highlights[0].xpath).toBe('/figure[1]/img[1]');
+		expect(stored['https://example.com/page'].title).toBe('A page');
+	});
+
+	test('restores group structure and anchors rather than re-deriving them', async () => {
+		stored['https://example.com/page'] = {
+			url: 'https://example.com/page',
+			highlights: [
+				{ id: '300', type: 'text', xpath: '/p[3]', startOffset: 4, endOffset: 18, content: 'group part one', groupId: 'g1', textQuote: { prefix: 'before ', suffix: ' after' } },
+				textHighlight('400', 'group part two', 'g1'),
+			],
+		};
+		const json = exportedFile();
+		stored = {};
+
+		await importHighlightsFromJson(json);
+
+		const highlights = highlightsFor('https://example.com/page') as TextHighlightData[];
+		expect(highlights.map(h => h.content)).toEqual(['group part one', 'group part two']);
+		// Grouping survives as recorded, not inferred from blank-line splitting.
+		expect(highlights.map(h => h.groupId)).toEqual(['g1', 'g1']);
+		expect(highlights[0].xpath).toBe('/p[3]');
+		expect(highlights[0].startOffset).toBe(4);
+		expect(highlights[0].textQuote).toEqual({ prefix: 'before ', suffix: ' after' });
+	});
+
+	test('rejects a malformed record in the data field', async () => {
+		const withBadRecord = JSON.stringify([{
+			url: 'https://example.com/page',
+			highlights: [{ text: 'one', timestamp: '2026-01-01T00:00:00.000Z' }],
+			data: [{ id: '100', type: 'sideways', xpath: '/p[1]', content: 'one' }],
+		}]);
+
+		await expect(importHighlightsFromJson(withBadRecord)).rejects.toThrow();
+		expect(stored).toEqual({});
 	});
 
 	test('folds in highlights still stored under a pre-normalization url', async () => {

@@ -1139,6 +1139,29 @@ export function collapseGroupsForExport(
 	});
 }
 
+export interface ExportedPage {
+	url: string;
+	title?: string;
+	highlights: ExportedHighlight[];
+	data: AnyHighlightData[];
+}
+
+// One page of a highlights export file. `highlights` is the readable view and
+// must keep the same shape as the {{highlights}} template variable, so DOM
+// internals go in `data`, which lets an import restore the page exactly.
+export function buildExportedPage(
+	url: string,
+	highlights: AnyHighlightData[],
+	title?: string,
+): ExportedPage {
+	return {
+		url,
+		...(title ? { title } : {}),
+		highlights: collapseGroupsForExport(highlights),
+		data: highlights,
+	};
+}
+
 // Cross-tab sync: when another tab/extension page (e.g. highlights.html)
 // deletes or modifies highlights for this URL, pick up the change.
 // The bridge check ensures only the owning module instance acts: if the

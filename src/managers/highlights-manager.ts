@@ -1,6 +1,6 @@
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
-import { AnyHighlightData, StoredData, TextHighlightData, collapseGroupsForExport, normalizeUrl } from '../utils/highlighter';
+import { AnyHighlightData, StoredData, TextHighlightData, TextQuoteAnchor, buildExportedPage, collapseGroupsForExport, normalizeUrl } from '../utils/highlighter';
 import { showImportModal } from '../utils/import-modal';
 import dayjs from 'dayjs';
 import { getMessage } from '../utils/i18n';
@@ -9,13 +9,11 @@ type HighlightsStorage = Record<string, StoredData>;
 
 export async function exportHighlights(): Promise<void> {
 	try {
-		const result = await browser.storage.local.get('highlights');
-		const allHighlights = result.highlights || {};
+		const result = await browser.storage.local.get('highlights') as { highlights?: HighlightsStorage };
+		const allHighlights: HighlightsStorage = result.highlights || {};
 
-		const exportData = Object.entries(allHighlights).map(([url, data]) => ({
-			url,
-			highlights: collapseGroupsForExport(data.highlights as AnyHighlightData[]),
-		}));
+		const exportData = Object.entries(allHighlights).map(([url, data]) =>
+			buildExportedPage(url, data.highlights, data.title));
 
 		const jsonContent = JSON.stringify(exportData, null, 2);
 		const blob = new Blob([jsonContent], { type: 'application/json' });
@@ -64,7 +62,57 @@ interface ImportedHighlight {
 
 interface ImportedPage {
 	url: string;
+	title?: string;
 	highlights: ImportedHighlight[];
+	data?: AnyHighlightData[];
+}
+
+// Validated field by field rather than trusted, since this lands in storage and
+// is later fed straight to the renderer.
+function parseHighlightRecords(value: unknown, pageIndex: number): AnyHighlightData[] | undefined {
+	if (value === undefined) return undefined;
+	if (!Array.isArray(value)) {
+		throw new Error(`Entry ${pageIndex} has an invalid data array`);
+	}
+
+	return value.map((record: unknown, index: number): AnyHighlightData => {
+		const where = `Record ${index} of entry ${pageIndex}`;
+		if (!record || typeof record !== 'object') {
+			throw new Error(`${where} is not an object`);
+		}
+		const { id, type, xpath, content, notes, groupId } = record as Record<string, unknown>;
+		if (typeof id !== 'string' || !id) throw new Error(`${where} is missing an id`);
+		if (type !== 'text' && type !== 'element') throw new Error(`${where} has an unknown type`);
+		if (typeof xpath !== 'string') throw new Error(`${where} is missing an xpath`);
+		if (typeof content !== 'string' || !content) throw new Error(`${where} is missing content`);
+		if (notes !== undefined && (!Array.isArray(notes) || notes.some(note => typeof note !== 'string'))) {
+			throw new Error(`${where} has invalid notes`);
+		}
+		if (groupId !== undefined && typeof groupId !== 'string') {
+			throw new Error(`${where} has an invalid groupId`);
+		}
+
+		const base = { id, xpath, content, ...(notes ? { notes } : {}), ...(groupId ? { groupId } : {}) };
+		if (type === 'element') return { ...base, type };
+
+		const { startOffset, endOffset, textQuote } = record as Record<string, unknown>;
+		if (typeof startOffset !== 'number' || typeof endOffset !== 'number') {
+			throw new Error(`${where} is missing text offsets`);
+		}
+		return {
+			...base,
+			type,
+			startOffset,
+			endOffset,
+			...(isTextQuoteAnchor(textQuote) ? { textQuote } : {}),
+		};
+	});
+}
+
+function isTextQuoteAnchor(value: unknown): value is TextQuoteAnchor {
+	if (!value || typeof value !== 'object') return false;
+	const { prefix, suffix } = value as Record<string, unknown>;
+	return typeof prefix === 'string' && typeof suffix === 'string';
 }
 
 // Validate up front and throw on the first problem, so a malformed file is
@@ -79,9 +127,12 @@ function parseImportedHighlights(json: string): ImportedPage[] {
 		if (!page || typeof page !== 'object') {
 			throw new Error(`Entry ${pageIndex} is not an object`);
 		}
-		const { url, highlights } = page as Partial<ImportedPage>;
+		const { url, title, highlights, data } = page as Partial<ImportedPage>;
 		if (typeof url !== 'string' || !url.trim()) {
 			throw new Error(`Entry ${pageIndex} is missing a url`);
+		}
+		if (title !== undefined && typeof title !== 'string') {
+			throw new Error(`Entry ${pageIndex} has an invalid title`);
 		}
 		if (!Array.isArray(highlights)) {
 			throw new Error(`Entry ${pageIndex} is missing a highlights array`);
@@ -89,6 +140,8 @@ function parseImportedHighlights(json: string): ImportedPage[] {
 
 		return {
 			url,
+			title,
+			data: parseHighlightRecords(data, pageIndex),
 			highlights: highlights.map((highlight: unknown, index: number): ImportedHighlight => {
 				if (!highlight || typeof highlight !== 'object') {
 					throw new Error(`Highlight ${index} of entry ${pageIndex} is not an object`);
@@ -109,9 +162,8 @@ function parseImportedHighlights(json: string): ImportedPage[] {
 	});
 }
 
-// Highlight ids double as their creation time, so the exported timestamp maps
-// straight back to one. A file written by hand may omit it, in which case the
-// highlight is treated as new.
+// Highlight ids double as their creation time, so a timestamp maps back to one.
+// A hand written file may omit it, in which case the highlight counts as new.
 function timestampToMs(timestamp: string | undefined): number {
 	const parsed = timestamp ? dayjs(timestamp) : null;
 	return parsed && parsed.isValid() ? parsed.valueOf() : Date.now();
@@ -128,14 +180,7 @@ function reserveId(ms: number, usedIds: Set<string>): string {
 	return id;
 }
 
-// Merge imported highlights into what's already stored — an import never
-// removes existing highlights.
-//
-// The export format is lossy: it keeps text, timestamp and notes but drops the
-// xpath and character offsets that anchor a highlight to the DOM. That is
-// recoverable, because renderTextHighlight re-anchors by text whenever the
-// xpath fails to resolve, so imported highlights are stored with an empty xpath
-// and find their place the next time the page is opened.
+// Merge imported highlights into what's already stored, never removing any.
 export async function importHighlightsFromJson(json: string): Promise<void> {
 	const pages = parseImportedHighlights(json);
 
@@ -146,17 +191,14 @@ export async function importHighlightsFromJson(json: string): Promise<void> {
 	for (const page of pages) {
 		const url = normalizeUrl(page.url);
 		const existing = allHighlights[url];
-		// Highlights saved before URLs were normalized still sit under the raw URL
-		// until their page is next opened, and the export writes that raw key
-		// verbatim. Fold such an entry in here, or re-importing an export of those
-		// highlights would miss them all and duplicate the page under two keys.
+		// Highlights saved before URLs were normalized sit under the raw key until
+		// their page is next opened, and exports write that key verbatim. Fold such
+		// an entry in, or re-importing would miss it and split the page across two
+		// keys. The same highlight can appear under both, so match on content and
+		// keep whichever copy still has an xpath.
 		const legacy = page.url !== url ? allHighlights[page.url] : undefined;
 		const merged: AnyHighlightData[] = [...(existing?.highlights ?? [])];
 
-		// Fold the pre-normalization entry in. A highlight can legitimately appear
-		// under both keys, so match on content rather than stacking them up, and
-		// keep whichever copy still has a real xpath — an imported copy has none
-		// and would have to re-anchor by text.
 		const positionByContent = new Map<string, number>();
 		merged.forEach((highlight, index) => {
 			if (!positionByContent.has(highlight.content)) positionByContent.set(highlight.content, index);
@@ -172,26 +214,43 @@ export async function importHighlightsFromJson(json: string): Promise<void> {
 		}
 
 		// Dedupe on content so re-importing the same file is a no-op. This also
-		// collapses two highlights of identical text on the same page, which is
-		// the better trade for keeping repeat imports from stacking up.
+		// collapses two highlights of identical text on one page.
 		const seenContent = new Set(merged.map(highlight => highlight.content));
 		const usedIds = new Set(merged.map(highlight => highlight.id));
-		// A highlight's own content can contain a blank line, which would survive
-		// the export and be mistaken for a group separator below. Comparing against
-		// what these highlights would themselves export as catches that case, and
-		// makes "re-importing an unmodified export changes nothing" true by
-		// construction rather than by coincidence.
+		// Content can itself contain a blank line, which the text fallback below
+		// would mistake for a group separator. Comparing against what these
+		// highlights would export as catches that.
 		const seenEntries = new Set(collapseGroupsForExport(merged).map(entry => entry.text));
+
+		const writePage = () => {
+			if (merged.length === 0) return;
+			// A title already on record wins. The imported one only fills an empty title.
+			allHighlights[url] = { highlights: merged, url, title: existing?.title ?? legacy?.title ?? page.title };
+			if (legacy) delete allHighlights[page.url];
+		};
+
+		// Full records restore the page exactly. Files written before the format
+		// carried `data` fall through to re-anchoring by text below.
+		if (page.data) {
+			for (const record of page.data) {
+				if (seenContent.has(record.content)) continue;
+				seenContent.add(record.content);
+				merged.push({ ...record, id: reserveId(Number(record.id) || Date.now(), usedIds) });
+				importedCount++;
+			}
+
+			writePage();
+			continue;
+		}
 
 		for (const entry of page.highlights) {
 			if (seenEntries.has(entry.text)) continue;
 
-			// A group of highlights is exported as a single entry with its members
-			// joined by a blank line. Split them back apart so each part re-anchors
-			// independently, and keep them grouped via a shared groupId.
+			// A group exports as one entry with its members joined by a blank line.
+			// Split them apart so each re-anchors on its own, still grouped. One
+			// timestamp covers the group, so later members offset from it to keep
+			// their order.
 			const parts = entry.text.split('\n\n').filter(part => part.length > 0);
-			// The export records one timestamp per group, so later members are
-			// offset from it to keep the group in its original order.
 			const baseMs = timestampToMs(entry.timestamp);
 			const ids = parts.map((_, index) => reserveId(baseMs + index, usedIds));
 			const groupId = parts.length > 1 ? `import-${ids[0]}` : undefined;
@@ -208,8 +267,7 @@ export async function importHighlightsFromJson(json: string): Promise<void> {
 					endOffset: 0,
 					content: part,
 					...(groupId ? { groupId } : {}),
-					// Notes are merged across a group on export, so they go back on
-					// the first member.
+					// Notes merge across a group on export, so they go back on the first.
 					...(index === 0 && entry.notes?.length ? { notes: entry.notes } : {}),
 				};
 
@@ -218,12 +276,7 @@ export async function importHighlightsFromJson(json: string): Promise<void> {
 			});
 		}
 
-		if (merged.length > 0) {
-			allHighlights[url] = { highlights: merged, url, title: existing?.title ?? legacy?.title };
-			// Having folded the pre-normalization entry in, retire its key the same
-			// way loadHighlights would have.
-			if (legacy) delete allHighlights[page.url];
-		}
+		writePage();
 	}
 
 	await browser.storage.local.set({ highlights: allHighlights });
