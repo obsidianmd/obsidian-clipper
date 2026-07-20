@@ -1,6 +1,6 @@
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
-import { AnyHighlightData, HighlightsStorage, TextQuoteAnchor, buildExportedPage, collapseGroupsForExport, expandExportedEntries, normalizeUrl, reconcileLegacyUrlKey } from '../utils/highlighter';
+import { AnyHighlightData, ElementHighlightData, HighlightsStorage, TextHighlightData, TextQuoteAnchor, buildExportedPage, collapseGroupsForExport, expandExportedEntries, normalizeUrl, reconcileLegacyUrlKey } from '../utils/highlighter';
 import { showImportModal } from '../utils/import-modal';
 import dayjs from 'dayjs';
 import { getMessage } from '../utils/i18n';
@@ -72,6 +72,17 @@ function parseNotes(value: unknown, where: string): string[] | undefined {
 	}
 	return value as string[];
 }
+
+// parseHighlightRecords below rebuilds each record from an allowlist, so a field
+// added to the highlight types would be dropped on import without these. They
+// fail to compile until the new field is handled there as well.
+const _textFieldsAreImported: Record<keyof TextHighlightData, true> = {
+	id: true, type: true, xpath: true, content: true, notes: true,
+	groupId: true, startOffset: true, endOffset: true, textQuote: true,
+};
+const _elementFieldsAreImported: Record<keyof ElementHighlightData, true> = {
+	id: true, type: true, xpath: true, content: true, notes: true, groupId: true,
+};
 
 // Validated field by field rather than trusted, since this lands in storage and
 // is later fed straight to the renderer.
