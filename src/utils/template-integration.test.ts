@@ -10,7 +10,7 @@ import { parseHTML } from 'linkedom';
 import DefuddleClass from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { buildVariables, generateFrontmatter, formatPropertyValue } from './shared';
-import { compileTemplate } from './template-compiler';
+import { compileTemplate, restoreBraces } from './template-compiler';
 import { createAsyncResolver, createSelectorProcessor } from '../api';
 
 // ---------------------------------------------------------------------------
@@ -85,8 +85,9 @@ async function runFixture(html: string, url: string, template: FixtureTemplate):
 
 	const frontmatter = generateFrontmatter(compiledProperties, typeMap);
 	const compiledContent = await compileFn(template.noteContentFormat);
+	const finalOutput = frontmatter ? frontmatter + compiledContent : compiledContent;
 
-	return frontmatter ? frontmatter + compiledContent : compiledContent;
+	return restoreBraces(finalOutput);
 }
 
 // ---------------------------------------------------------------------------

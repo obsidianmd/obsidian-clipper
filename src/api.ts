@@ -4,7 +4,7 @@
 
 import DefuddleClass from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
-import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
+import { compileTemplate, restoreBraces, SelectorProcessor } from './utils/template-compiler';
 import { AsyncResolver, RenderContext } from './utils/renderer';
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
@@ -248,12 +248,13 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 
 	// Assemble full content
 	const fullContent = frontmatter ? frontmatter + content : content;
+	const finalOutput = restoreBraces(fullContent);
 
 	return {
 		noteName,
 		frontmatter,
 		content,
-		fullContent,
+		fullContent: finalOutput,
 		properties: compiledProperties,
 		variables,
 	};
