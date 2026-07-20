@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Markeringer"
 	},
+	"highlightsImportSuccess": {
+		"message": "Importerede $1 fremhævninger.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Markeringer blev ikke fundet i artiklen"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import mislykkedes. Tjek konsollen for detaljer."
+	},
+	"importHighlights": {
+		"message": "Importér fremhævninger"
+	},
+	"importHighlightsDescription": {
+		"message": "Importér fremhævninger fra en fil. Eksisterende fremhævninger bevares."
 	},
 	"importModalTitle": {
 		"message": "Importér"

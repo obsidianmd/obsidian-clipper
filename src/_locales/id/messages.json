@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Sorotan"
 	},
+	"highlightsImportSuccess": {
+		"message": "Berhasil mengimpor $1 sorotan.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Sorotan tidak ditemukan dalam artikel"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Impor gagal. Silakan periksa konsol untuk detail lebih lanjut."
+	},
+	"importHighlights": {
+		"message": "Impor sorotan"
+	},
+	"importHighlightsDescription": {
+		"message": "Impor sorotan dari file. Sorotan yang sudah ada akan tetap disimpan."
 	},
 	"importModalTitle": {
 		"message": "Impor"

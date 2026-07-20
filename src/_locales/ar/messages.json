@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "التمييزات"
 	},
+	"highlightsImportSuccess": {
+		"message": "تم استيراد $1 من التمييزات.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "لم يتم العثور على تمييزات في المقالة"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "فشل الاستيراد. يرجى التحقق من وحدة التحكم لمزيد من التفاصيل."
+	},
+	"importHighlights": {
+		"message": "استيراد التمييزات"
+	},
+	"importHighlightsDescription": {
+		"message": "استورد التمييزات من ملف. سيتم الاحتفاظ بالتمييزات الحالية."
 	},
 	"importModalTitle": {
 		"message": "استيراد"

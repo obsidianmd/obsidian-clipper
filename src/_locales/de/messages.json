@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Hervorhebungen"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 Highlights importiert.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Keine Hervorhebungen im Artikel gefunden"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import fehlgeschlagen. Bitte überprüfe die Konsole für weitere Details."
+	},
+	"importHighlights": {
+		"message": "Highlights importieren"
+	},
+	"importHighlightsDescription": {
+		"message": "Highlights aus einer Datei importieren. Vorhandene Highlights bleiben erhalten."
 	},
 	"importModalTitle": {
 		"message": "Importieren"

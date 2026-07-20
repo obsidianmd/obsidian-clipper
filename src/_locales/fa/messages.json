@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "هایلایت‌ها"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 هایلایت وارد شد.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "هایلایت‌ها در مقاله پیدا نشدند"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "وارد کردن با شکست مواجه شد. لطفا برای جزئیات بیشتر، کنسول را بررسی کنید."
+	},
+	"importHighlights": {
+		"message": "وارد کردن هایلایت‌ها"
+	},
+	"importHighlightsDescription": {
+		"message": "هایلایت‌ها را از یک فایل وارد کنید. هایلایت‌های موجود حفظ می‌شوند."
 	},
 	"importModalTitle": {
 		"message": "وارد کردن"

@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Destaques"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 destaques importados.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Destaques não encontrados no artigo"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Importação falhou. Por favor, verifique o console para mais detalhes."
+	},
+	"importHighlights": {
+		"message": "Importar destaques"
+	},
+	"importHighlightsDescription": {
+		"message": "Importe destaques de um arquivo. Os destaques existentes são mantidos."
 	},
 	"importModalTitle": {
 		"message": "Importar"

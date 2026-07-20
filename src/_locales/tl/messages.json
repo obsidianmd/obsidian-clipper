@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Mga highlight"
 	},
+	"highlightsImportSuccess": {
+		"message": "Na-import ang $1 highlight.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Walang nakitang mga highlight sa artikulo"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Nabigo ang pag-import. Tingnan ang console para sa mga detalye."
+	},
+	"importHighlights": {
+		"message": "Mag-import ng mga highlight"
+	},
+	"importHighlightsDescription": {
+		"message": "Mag-import ng mga highlight mula sa isang file. Pinananatili ang mga umiiral na highlight."
 	},
 	"importModalTitle": {
 		"message": "I-import"

@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Markeringen"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 highlights geïmporteerd.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Geen markeringen gevonden in artikel"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Importeren mislukt. Controleer de console voor meer details."
+	},
+	"importHighlights": {
+		"message": "Highlights importeren"
+	},
+	"importHighlightsDescription": {
+		"message": "Importeer highlights uit een bestand. Bestaande highlights blijven behouden."
 	},
 	"importModalTitle": {
 		"message": "Importeren"

@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Vurgular"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 vurgu içe aktarıldı.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Makalede vurgular bulunamadı"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "İçe aktarma başarısız. Daha fazla ayrıntı için konsolu kontrol edin."
+	},
+	"importHighlights": {
+		"message": "Vurguları içe aktar"
+	},
+	"importHighlightsDescription": {
+		"message": "Bir dosyadan vurguları içe aktarın. Mevcut vurgular korunur."
 	},
 	"importModalTitle": {
 		"message": "İçe aktar"

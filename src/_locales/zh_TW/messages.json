@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "螢光標記"
 	},
+	"highlightsImportSuccess": {
+		"message": "已匯入 $1 則螢光標記。",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "文章中找不到螢光標記"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "匯入失敗。請檢查控制台以獲得更多詳細資訊。"
+	},
+	"importHighlights": {
+		"message": "匯入螢光標記"
+	},
+	"importHighlightsDescription": {
+		"message": "從檔案匯入螢光標記。現有的螢光標記會保留。"
 	},
 	"importModalTitle": {
 		"message": "匯入"

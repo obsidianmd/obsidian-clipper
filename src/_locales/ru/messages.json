@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Выделения"
 	},
+	"highlightsImportSuccess": {
+		"message": "Импортировано $1 выделений.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "В статье не найдены выделения"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Импорт не удался. Пожалуйста, проверьте консоль для получения дополнительной информации."
+	},
+	"importHighlights": {
+		"message": "Импортировать выделения"
+	},
+	"importHighlightsDescription": {
+		"message": "Импортируйте выделения из файла. Существующие выделения сохраняются."
 	},
 	"importModalTitle": {
 		"message": "Импорт"

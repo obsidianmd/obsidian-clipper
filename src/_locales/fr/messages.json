@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Surlignages"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1 surlignages importés.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Surlignages introuvables dans l’article"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "L'importation a échoué. Veuillez vérifier la console pour plus de détails."
+	},
+	"importHighlights": {
+		"message": "Importer des surlignages"
+	},
+	"importHighlightsDescription": {
+		"message": "Importer des surlignages depuis un fichier. Les surlignages existants sont conservés."
 	},
 	"importModalTitle": {
 		"message": "Importer"

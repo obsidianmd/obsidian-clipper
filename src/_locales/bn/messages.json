@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "হাইলাইট"
 	},
+	"highlightsImportSuccess": {
+		"message": "$1টি হাইলাইট আমদানি করা হয়েছে।",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "আর্টিকেলে হাইলাইট পাওয়া যায়নি"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "ইম্পোর্ট ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি চেক করুন।"
+	},
+	"importHighlights": {
+		"message": "হাইলাইট আমদানি করুন"
+	},
+	"importHighlightsDescription": {
+		"message": "একটি ফাইল থেকে হাইলাইট আমদানি করুন। বিদ্যমান হাইলাইটগুলো রাখা হবে।"
 	},
 	"importModalTitle": {
 		"message": "ইম্পোর্ট"

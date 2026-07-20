@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "הדגשות"
 	},
+	"highlightsImportSuccess": {
+		"message": "יובאו $1 הדגשות.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "לא נמצאו הדגשות במאמר"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "הייבוא נכשל. בדוק את המסוף למידע נוסף."
+	},
+	"importHighlights": {
+		"message": "ייבוא הדגשות"
+	},
+	"importHighlightsDescription": {
+		"message": "ייבוא הדגשות מקובץ. הדגשות קיימות יישמרו."
 	},
 	"importModalTitle": {
 		"message": "ייבא"

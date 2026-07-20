@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Zvýrazněné pasáže"
 	},
+	"highlightsImportSuccess": {
+		"message": "Importováno $1 zvýraznění.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "V článku nebyly nalezeny žádné zvýrazněné pasáže"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Import selhal. Zkontrolujte konzoli pro více informací."
+	},
+	"importHighlights": {
+		"message": "Importovat zvýraznění"
+	},
+	"importHighlightsDescription": {
+		"message": "Importujte zvýraznění ze souboru. Existující zvýraznění se zachovají."
 	},
 	"importModalTitle": {
 		"message": "Importovat"

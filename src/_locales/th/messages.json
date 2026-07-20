@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "ไฮไลต์"
 	},
+	"highlightsImportSuccess": {
+		"message": "นำเข้าไฮไลต์แล้ว $1 รายการ",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "ไม่พบไฮไลต์ในบทความ"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "การนำเข้าล้มเหลว ตรวจสอบคอนโซลสำหรับข้อมูลเพิ่มเติม"
+	},
+	"importHighlights": {
+		"message": "นำเข้าไฮไลต์"
+	},
+	"importHighlightsDescription": {
+		"message": "นำเข้าไฮไลต์จากไฟล์ ไฮไลต์ที่มีอยู่จะถูกเก็บไว้"
 	},
 	"importModalTitle": {
 		"message": "นำเข้า"

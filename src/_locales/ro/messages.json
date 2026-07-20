@@ -381,6 +381,14 @@
 	"highlights": {
 		"message": "Evidențieri"
 	},
+	"highlightsImportSuccess": {
+		"message": "S-au importat $1 evidențieri.",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"highlightsNotFound": {
 		"message": "Evidențierile nu au fost găsite în articol"
 	},
@@ -401,6 +409,12 @@
 	},
 	"importFailed": {
 		"message": "Importul a eșuat. Verifică consola pentru detalii."
+	},
+	"importHighlights": {
+		"message": "Importă evidențieri"
+	},
+	"importHighlightsDescription": {
+		"message": "Importă evidențieri dintr-un fișier. Evidențierile existente sunt păstrate."
 	},
 	"importModalTitle": {
 		"message": "Importă"
