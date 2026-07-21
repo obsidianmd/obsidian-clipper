@@ -1,5 +1,5 @@
 {
-	"version": "2026.07.20",
+	"version": "2026.07.21",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -65,6 +65,18 @@
 		"baseUrl": "https://api.meta.ai/v1/chat/completions",
 		"popularModels": [
 			{ "id": "muse-spark-1.1", "name": "Muse Spark 1.1" }
+		]
+	},
+	"moonshot": {
+		"id": "moonshot",
+		"name": "Moonshot AI",
+		"apiKeyUrl": "https://platform.kimi.ai/console/api-keys",
+		"apiKeyRequired": true,
+		"modelsList": "https://platform.kimi.ai/docs/models",
+		"baseUrl": "https://api.moonshot.ai/v1/chat/completions",
+		"popularModels": [
+			{ "id": "kimi-k3", "name": "Kimi K3" },
+			{ "id": "kimi-k2.6", "name": "Kimi K2.6" }
 		]
 	},
 	"ollama": {
