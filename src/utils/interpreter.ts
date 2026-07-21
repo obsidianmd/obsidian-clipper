@@ -247,7 +247,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				llmResponseContent = JSON.stringify(data);
 			}
 		} else {
-			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
+			llmResponseContent = data.choices?.[0]?.message?.content || JSON.stringify(data);
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
 
