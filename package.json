@@ -59,7 +59,7 @@
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
 		"defuddle": "^0.19.0",
-		"dompurify": "^3.0.9",
+		"dompurify": "^3.4.12",
 		"highlight.js": "^11.11.1",
 		"linkedom": "^0.18.0",
 		"lucide": "^0.359.0",
