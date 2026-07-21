@@ -77,7 +77,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				max_completion_tokens: 1600,
+				max_completion_tokens: 8000,
 				stream: false
 			};
 			headers = {
@@ -93,7 +93,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				max_tokens: 1600,
+				max_tokens: 8000,
 				thinking: {
 					type: 'disabled'
 				},
@@ -107,7 +107,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
-				max_tokens: 1600,
+				max_tokens: 8000,
 				messages: [
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
@@ -124,7 +124,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
-				max_tokens: 1600,
+				max_tokens: 8000,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `
@@ -209,6 +209,14 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		debugLog('Interpreter', `Parsed ${provider.name} response:`, data);
 
 		lastRequestTime = now;
+
+		// Surface truncated responses instead of silently saving incomplete output
+		const finishReason = data.stop_reason // Anthropic
+			?? data.done_reason // Ollama
+			?? data.choices?.[0]?.finish_reason; // OpenAI-compatible providers
+		if (finishReason === 'max_tokens' || finishReason === 'length') {
+			throw new Error(`${provider.name} response was cut off because it reached the output token limit. Try shorter prompts or a smaller prompt context.`);
+		}
 
 		let llmResponseContent: string;
 		if (provider.name.toLowerCase().includes('anthropic')) {
@@ -344,7 +352,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 		// Validate the response structure
 		if (!parsedResponse?.prompts_responses) {
 			debugLog('Interpreter', 'No prompts_responses found in parsed response', parsedResponse);
-			return { promptResponses: [] };
+			throw new Error('The model response did not contain any prompt responses.');
 		}
 
 		// Convert escaped newlines to actual newlines in the responses
@@ -371,7 +379,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			error: parseError,
 			responseContent: responseContent
 		});
-		return { promptResponses: [] };
+		throw new Error('The model returned a response that could not be parsed. It may be incomplete or malformed.');
 	}
 }
 
