@@ -1,5 +1,5 @@
 import { generalSettings, saveSettings } from './storage-utils';
-import { PromptVariable, Template, ModelConfig } from '../types/types';
+import { PromptVariable, Template, ModelConfig, Provider } from '../types/types';
 import { compileTemplate } from './template-compiler';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
@@ -589,6 +589,9 @@ export async function handleInterpreterUI(
 		// Update fields with responses
 		replacePromptVariables(promptVariables, promptResponses);
 
+		// Update fields with details of the model that was used
+		replaceModelVariables(modelConfig, provider);
+
 		// Re-enable clip button
 		clipButton.disabled = false;
 		moreButton.disabled = false;
@@ -630,6 +633,29 @@ export async function handleInterpreterUI(
 	}
 }
 
+// Replace model variables ({{model}}, {{modelId}}, {{modelProvider}}) with
+// details of the model used to interpret the page
+export function replaceModelVariables(modelConfig: ModelConfig, provider: Provider) {
+	const modelValues: { [key: string]: string } = {
+		model: modelConfig.name,
+		modelId: modelConfig.providerModelId,
+		modelProvider: provider.name
+	};
+
+	const allInputs = document.querySelectorAll('input, textarea');
+	allInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+			input.value = input.value.replace(/{{(modelProvider|modelId|model)(\|[\s\S]*?)?}}/g, (match, name, filters) => {
+				let value = modelValues[name];
+				if (filters) {
+					value = applyFilters(value, filters.slice(1));
+				}
+				return value;
+			});
+		}
+	});
+}
+
 // Similar to replaceVariables, but happens after the LLM response is received
 export function replacePromptVariables(promptVariables: PromptVariable[], promptResponses: any[]) {
 	const allInputs = document.querySelectorAll('input, textarea');
@@ -661,11 +687,6 @@ export function replacePromptVariables(promptVariables: PromptVariable[], prompt
 				}
 				return match; // Return original if no match found
 			});
-
-			// Adjust height for noteNameField after updating its value
-			if (input.id === 'note-name-field' && input instanceof HTMLTextAreaElement) {
-				adjustNoteNameHeight(input);
-			}
 		}
 	});
 }

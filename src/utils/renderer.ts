@@ -220,6 +220,16 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 			return reconstructPromptTemplate(node.expression);
 		}
 
+		// Special case: interpreter model variables ({{model}}, {{modelId}}, {{modelProvider}})
+		// are only known once the interpreter runs, so preserve them for post-processing
+		if (getModelVariableBase(node.expression)) {
+			if (node.trimRight) {
+				state.pendingTrimRight = true;
+			}
+			state.hasDeferredVariables = true;
+			return reconstructPromptTemplate(node.expression);
+		}
+
 		const value = await evaluateExpression(node.expression, state);
 		const result = valueToString(value);
 
@@ -248,6 +258,26 @@ function getPromptBase(expr: Expression): string | null {
 	}
 	if (expr.type === 'filter') {
 		return getPromptBase((expr as FilterExpression).value);
+	}
+	return null;
+}
+
+/**
+ * Interpreter model variables — resolved after the interpreter runs,
+ * so they are preserved through compilation like prompt variables.
+ */
+export const MODEL_VARIABLE_NAMES = ['model', 'modelId', 'modelProvider'];
+
+/**
+ * Check if an expression is an interpreter model variable, or a filter chain
+ * with one as its base. Returns the variable name if found, null otherwise.
+ */
+function getModelVariableBase(expr: Expression): string | null {
+	if (expr.type === 'identifier' && MODEL_VARIABLE_NAMES.includes((expr as IdentifierExpression).name)) {
+		return (expr as IdentifierExpression).name;
+	}
+	if (expr.type === 'filter') {
+		return getModelVariableBase((expr as FilterExpression).value);
 	}
 	return null;
 }
@@ -288,6 +318,9 @@ function reconstructPromptTemplateInner(expr: Expression): string {
 	if (expr.type === 'literal') {
 		const value = (expr as LiteralExpression).value;
 		return typeof value === 'string' ? `"${value}"` : String(value);
+	}
+	if (expr.type === 'identifier') {
+		return (expr as IdentifierExpression).name;
 	}
 	if (expr.type === 'filter') {
 		const filter = expr as FilterExpression;

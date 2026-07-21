@@ -152,6 +152,28 @@ describe('Renderer', () => {
 		});
 	});
 
+	describe('Model Variables', () => {
+		test('model variables are preserved for post-processing', async () => {
+			const ctx = createContext({});
+			const result = await render('{{model}} via {{modelProvider}} ({{modelId}})', ctx);
+			expect(result.hasDeferredVariables).toBe(true);
+			expect(result.output).toBe('{{model}} via {{modelProvider}} ({{modelId}})');
+		});
+
+		test('model variable with filters preserves filter chain in reconstruction', async () => {
+			const ctx = createContext({});
+			const result = await render('{{model|lower|replace:" ":"-"}}', ctx);
+			expect(result.hasDeferredVariables).toBe(true);
+			expect(result.output).toBe('{{model|lower|replace:" ":"-"}}');
+		});
+
+		test('model variables are not resolved from page variables', async () => {
+			const ctx = createContext({ model: 'page-value' });
+			const result = await render('{{model}}', ctx);
+			expect(result.output).toBe('{{model}}');
+		});
+	});
+
 	describe('If Statements', () => {
 		test('renders if with truthy condition', async () => {
 			const ctx = createContext({ show: true });

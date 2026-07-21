@@ -8,6 +8,7 @@ import { processSimpleVariable } from './variables/simple';
 import { processSelector, resolveSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
+import { isModelVariable, processModelVariable } from './variables/model';
 
 /**
  * A function that processes a selector match string and returns the result.
@@ -109,6 +110,8 @@ export async function processVariables(
 			replacement = await processSchema(fullMatch, variables, currentUrl);
 		} else if (trimmedMatch.startsWith('"') || trimmedMatch.startsWith('prompt:')) {
 			replacement = await processPrompt(fullMatch, variables, currentUrl);
+		} else if (isModelVariable(trimmedMatch)) {
+			replacement = await processModelVariable(fullMatch);
 		} else {
 			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
 		}
