@@ -48,6 +48,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		let requestBody: any;
 		let headers: HeadersInit = {
 			'Content-Type': 'application/json',
+			'Accept': 'application/json',
 		};
 
 		if (provider.name.toLowerCase().includes('hugging')) {
@@ -68,19 +69,39 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		} else if (provider.baseUrl.includes('openai.azure.com')) {
-			requestUrl = provider.baseUrl;
+			// Azure routes by deployment in the URL, not by a model field in the body
+			requestUrl = provider.baseUrl.replace('{deployment-id}', model.providerModelId);
 			requestBody = {
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				max_tokens: 1600,
+				max_completion_tokens: 1600,
 				stream: false
 			};
 			headers = {
 				...headers,
 				'api-key': provider.apiKey
+			};
+		} else if (provider.name.toLowerCase().includes('deepseek')) {
+			requestUrl = provider.baseUrl;
+			requestBody = {
+				model: model.providerModelId,
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
+				],
+				max_tokens: 1600,
+				thinking: {
+					type: 'disabled'
+				},
+				stream: false
+			};
+			headers = {
+				...headers,
+				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		} else if (provider.name.toLowerCase().includes('anthropic')) {
 			requestUrl = provider.baseUrl;
@@ -140,7 +161,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
-				]
+				],
+				stream: false
 			};
 			headers = {
 				...headers,
@@ -190,8 +212,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		let llmResponseContent: string;
 		if (provider.name.toLowerCase().includes('anthropic')) {
-			// Handle Anthropic's nested content structure
-			const textContent = data.content[0]?.text;
+			// Find the text block — newer models may return a thinking block first
+			const textContent = data.content?.find((block: any) => block.type === 'text')?.text;
 			if (textContent) {
 				try {
 					// Try to parse the inner content first
