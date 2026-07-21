@@ -1,5 +1,5 @@
 {
-	"version": "2026.07.21",
+	"version": "2026.07.21.1",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -43,7 +43,7 @@
 		"apiKeyUrl": "https://aistudio.google.com/apikey",
 		"apiKeyRequired": true,
 		"modelsList": "https://ai.google.dev/gemini-api/docs/models",
-		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
+		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/models/{model-id}:generateContent",
 		"popularModels": [
 			{ "id": "gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite" },
 			{ "id": "gemini-3.5-flash", "name": "Gemini 3.5 Flash" },

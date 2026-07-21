@@ -103,6 +103,32 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				...headers,
 				'Authorization': `Bearer ${provider.apiKey}`
 			};
+		} else if (provider.baseUrl.includes('generativelanguage.googleapis.com')) {
+			// Use the native Gemini API — Google's OpenAI-compatible endpoint
+			// rejects the newer AQ-prefixed API keys
+			requestUrl = provider.baseUrl.includes('{model-id}')
+				? provider.baseUrl.replace('{model-id}', model.providerModelId)
+				: `https://generativelanguage.googleapis.com/v1beta/models/${model.providerModelId}:generateContent`;
+			requestBody = {
+				systemInstruction: { parts: [{ text: systemContent }] },
+				contents: [
+					{
+						role: 'user',
+						parts: [
+							{ text: `${promptContext}` },
+							{ text: `${JSON.stringify(promptContent)}` }
+						]
+					}
+				],
+				generationConfig: {
+					maxOutputTokens: 8000,
+					responseMimeType: 'application/json'
+				}
+			};
+			headers = {
+				...headers,
+				'X-goog-api-key': provider.apiKey
+			};
 		} else if (provider.name.toLowerCase().includes('anthropic')) {
 			requestUrl = provider.baseUrl;
 			requestBody = {
@@ -213,8 +239,9 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		// Surface truncated responses instead of silently saving incomplete output
 		const finishReason = data.stop_reason // Anthropic
 			?? data.done_reason // Ollama
+			?? data.candidates?.[0]?.finishReason // Gemini
 			?? data.choices?.[0]?.finish_reason; // OpenAI-compatible providers
-		if (finishReason === 'max_tokens' || finishReason === 'length') {
+		if (finishReason === 'max_tokens' || finishReason === 'length' || finishReason === 'MAX_TOKENS') {
 			throw new Error(`${provider.name} response was cut off because it reached the output token limit. Try shorter prompts or a smaller prompt context.`);
 		}
 
@@ -229,6 +256,20 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					llmResponseContent = JSON.stringify(parsed);
 				} catch {
 					// If parsing fails, use the raw text
+					llmResponseContent = textContent;
+				}
+			} else {
+				llmResponseContent = JSON.stringify(data);
+			}
+		} else if (provider.baseUrl.includes('generativelanguage.googleapis.com')) {
+			// Native Gemini responses carry text in candidate content parts
+			const parts = data.candidates?.[0]?.content?.parts;
+			const textContent = Array.isArray(parts) ? parts.map((part: any) => part.text || '').join('') : undefined;
+			if (textContent) {
+				try {
+					const parsed = JSON.parse(textContent);
+					llmResponseContent = JSON.stringify(parsed);
+				} catch {
 					llmResponseContent = textContent;
 				}
 			} else {
