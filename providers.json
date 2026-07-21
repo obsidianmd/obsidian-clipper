@@ -1,5 +1,5 @@
 {
-	"version": "2026.12.08",
+	"version": "2026.07.20",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -8,11 +8,9 @@
 		"modelsList": "https://platform.claude.com/docs/en/about-claude/models/overview",
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
-			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
 			{ "id": "claude-haiku-4-5", "name": "Claude 4.5 Haiku" },
-			{ "id": "claude-sonnet-4-0", "name": "Claude 4.0 Sonnet" },
-			{ "id": "claude-sonnet-4-5", "name": "Claude 4.5 Sonnet" },
-			{ "id": "claude-opus-4-5", "name": "Claude 4.5 Opus" }
+			{ "id": "claude-sonnet-5", "name": "Claude 5 Sonnet" },
+			{ "id": "claude-opus-4-8", "name": "Claude 4.8 Opus" }
 		]
 	},
 	"azure-openai": {
@@ -23,11 +21,11 @@
 		"modelsList": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
 		"baseUrl": "https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21",
 		"popularModels": [
-			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
-			{ "id": "gpt-4o", "name": "GPT-4o" }
+			{ "id": "gpt-5.6-luna", "name": "GPT-5.6 Luna" },
+			{ "id": "gpt-5.6-sol", "name": "GPT-5.6 Sol" }
 		]
 	},
-	"deepseek": {   
+	"deepseek": {
 		"id": "deepseek",
 		"name": "DeepSeek",
 		"apiKeyUrl": "https://platform.deepseek.com/api_keys",
@@ -35,8 +33,8 @@
 		"modelsList": "https://api-docs.deepseek.com/quick_start/pricing",
 		"baseUrl": "https://api.deepseek.com/v1/chat/completions",
 		"popularModels": [
-			{ "id": "deepseek-chat", "name": "DeepSeek Chat" },
-			{ "id": "deepseek-reasoner", "name": "DeepSeek Reasoner" }
+			{ "id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash" },
+			{ "id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro" }
 		]
 	},
 	"google-gemini": {
@@ -47,10 +45,9 @@
 		"modelsList": "https://ai.google.dev/gemini-api/docs/models",
 		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
 		"popularModels": [
-			{ "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
-			{ "id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash Lite" },
-			{ "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro" },
-			{ "id": "gemini-3-pro-preview", "name": "Gemini 3 Pro Preview" }
+			{ "id": "gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite" },
+			{ "id": "gemini-3.5-flash", "name": "Gemini 3.5 Flash" },
+			{ "id": "gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro Preview" }
 		]
 	},
 	"huggingface": {
@@ -63,12 +60,11 @@
 	"meta": {
 		"id": "meta",
 		"name": "Meta",
-		"apiKeyUrl": "https://llama.developer.meta.com",
-		"modelsList": "https://llama.developer.meta.com/docs/models",
-		"baseUrl": "https://api.llama.com/v1/chat/completions",
+		"apiKeyUrl": "https://ai.developer.meta.com",
+		"modelsList": "https://ai.developer.meta.com/docs/getting-started/models/",
+		"baseUrl": "https://api.meta.ai/v1/chat/completions",
 		"popularModels": [
-			{ "id": "Llama-3.3-8B-Instruct", "name": "Llama 3.3 8B" },
-			{ "id": "Llama-3.3-70B-Instruct", "name": "Llama 3.3 70B" }
+			{ "id": "muse-spark-1.1", "name": "Muse Spark 1.1" }
 		]
 	},
 	"ollama": {
@@ -78,9 +74,9 @@
 		"modelsList": "https://ollama.com/models",
 		"baseUrl": "http://127.0.0.1:11434/api/chat",
 		"popularModels": [
+			{ "id": "gemma4", "name": "Gemma 4" },
+			{ "id": "qwen3.5", "name": "Qwen 3.5" },
 			{ "id": "gpt-oss:20b", "name": "GPT OSS 20B" },
-			{ "id": "llama3.2:1b", "name": "Llama 3.2 1B" },
-			{ "id": "llama3.2", "name": "Llama 3.2 3B" },
 			{ "id": "llama3.3", "name": "Llama 3.3 70B" }
 		]
 	},
@@ -92,11 +88,9 @@
 		"modelsList": "https://platform.openai.com/docs/models",
 		"baseUrl": "https://api.openai.com/v1/chat/completions",
 		"popularModels": [
-			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
-			{ "id": "gpt-4o", "name": "GPT-4o" },
-			{ "id": "gpt-5", "name": "GPT 5" },
-			{ "id": "gpt-5-mini", "name": "GPT 5 Mini" },
-			{ "id": "gpt-5-nano", "name": "GPT 5 Nano" }
+			{ "id": "gpt-5.6-luna", "name": "GPT-5.6 Luna" },
+			{ "id": "gpt-5.6-terra", "name": "GPT-5.6 Terra" },
+			{ "id": "gpt-5.6-sol", "name": "GPT-5.6 Sol" }
 		]
 	},
 	"openrouter": {
@@ -107,8 +101,8 @@
 		"modelsList": "https://openrouter.ai/models",
 		"baseUrl": "https://openrouter.ai/api/v1/chat/completions",
 		"popularModels": [
-			{ "id": "meta-llama/llama-3.2-1b-instruct", "name": "Llama 3.2 1B Instruct" },
-			{ "id": "meta-llama/llama-3.2-3b-instruct", "name": "Llama 3.2 3B Instruct" }
+			{ "id": "meta-llama/llama-4-scout", "name": "Llama 4 Scout" },
+			{ "id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick" }
 		]
 	},
 	"perplexity": {
@@ -120,10 +114,7 @@
 		"baseUrl": "https://api.perplexity.ai/chat/completions",
 		"popularModels": [
 			{ "id": "sonar", "name": "Sonar" },
-			{ "id": "sonar-pro", "name": "Sonar Pro" },
-			{ "id": "sonar-reasoning", "name": "Sonar Reasoning" },
-			{ "id": "sonar-reasoning-pro", "name": "Sonar Reasoning Pro" },
-			{ "id": "sonar-deep-research", "name": "Sonar Deep Research" }
+			{ "id": "sonar-pro", "name": "Sonar Pro" }
 		]
 	},
 	"xai": {
@@ -134,10 +125,8 @@
 		"modelsList": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
 		"popularModels": [
-			{ "id": "grok-4-fast-non-reasoning", "name": "Grok 4 Fast" },
-			{ "id": "grok-4", "name": "Grok 4" },
-			{ "id": "grok-3", "name": "Grok 3" },
-			{ "id": "grok-3-mini", "name": "Grok 3 Mini" }
+			{ "id": "grok-4.5", "name": "Grok 4.5" },
+			{ "id": "grok-4.3", "name": "Grok 4.3" }
 		]
 	}
 }
