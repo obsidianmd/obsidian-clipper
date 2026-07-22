@@ -331,6 +331,65 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 		});
 });
 
+function isObsidianProtocolUrl(url: unknown): url is string {
+	return typeof url === 'string' && url.startsWith('obsidian://');
+}
+
+function isEdgeRuntime(): boolean {
+	if (typeof navigator === 'undefined') return false;
+
+	const userAgent = navigator.userAgent.toLowerCase();
+	if (userAgent.includes('edga/') || userAgent.includes('edg/')) {
+		return true;
+	}
+
+	const brands = (navigator as Navigator & { userAgentData?: { brands?: Array<{ brand: string }> } }).userAgentData?.brands ?? [];
+	return brands.some(({ brand }) => brand.toLowerCase().includes('edge'));
+}
+
+async function shouldOpenProtocolFromContentScript(): Promise<boolean> {
+	try {
+		const platform = await browser.runtime.getPlatformInfo();
+		return platform.os === 'android' && isEdgeRuntime();
+	} catch {
+		return false;
+	}
+}
+
+async function openProtocolUrlFromContentScript(tabId: number, url: string): Promise<boolean> {
+	try {
+		await ensureContentScriptLoadedInBackground(tabId);
+		const response = await browser.tabs.sendMessage(tabId, {
+			action: 'open-protocol-url',
+			url
+		}) as { success?: boolean } | undefined;
+		return response?.success === true;
+	} catch (error) {
+		debugLog('Clipper', 'Content script protocol open failed', error);
+		return false;
+	}
+}
+
+async function openObsidianUrl(url: string) {
+	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+	const currentTab = tabs[0];
+
+	if (currentTab?.id) {
+		if (isNormalPageUrl(currentTab.url) && await shouldOpenProtocolFromContentScript()) {
+			const opened = await openProtocolUrlFromContentScript(currentTab.id, url);
+			if (opened) {
+				return { success: true };
+			}
+		}
+
+		await browser.tabs.update(currentTab.id, { url });
+		return { success: true };
+	}
+
+	await browser.tabs.create({ url });
+	return { success: true };
+}
+
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
 		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
@@ -689,40 +748,23 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "openObsidianUrl") {
 			const url = (typedRequest as any).url;
-			if (url) {
-				browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-					const currentTab = tabs[0];
-					if (currentTab && currentTab.id) {
-						browser.tabs.update(currentTab.id, { url: url }).then(() => {
-							sendResponse({ success: true });
-						}).catch((error) => {
-							console.error('Error opening Obsidian URL:', error);
-							sendResponse({
-								success: false,
-								error: error instanceof Error ? error.message : String(error)
-							});
-						});
-					} else {
-						sendResponse({
-							success: false,
-							error: 'No active tab found'
-						});
-					}
-				}).catch((error) => {
-					console.error('Error querying tabs:', error);
+			if (!isObsidianProtocolUrl(url)) {
+				sendResponse({
+					success: false,
+					error: 'Missing or invalid Obsidian URL'
+				});
+				return true;
+			}
+
+			openObsidianUrl(url)
+				.then(sendResponse)
+				.catch((error) => {
 					sendResponse({
 						success: false,
 						error: error instanceof Error ? error.message : String(error)
 					});
 				});
-				return true;
-			} else {
-				sendResponse({
-					success: false,
-					error: 'Missing URL'
-				});
-				return true;
-			}
+			return true;
 		}
 
 		// For other actions that use sendResponse
