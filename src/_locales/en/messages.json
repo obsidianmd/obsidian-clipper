@@ -129,6 +129,21 @@
 	"commandToggleReader": {
 		"message": "Toggle reader"
 	},
+	"codexNativeHostConnected": {
+		"message": "Codex CLI native host is connected."
+	},
+	"codexNativeHostConnectionFailed": {
+		"message": "Codex CLI native host connection failed."
+	},
+	"codexNativeHostConnectionTimedOut": {
+		"message": "Codex CLI native host connection timed out. Reload the extension and try again."
+	},
+	"codexNativeHostSetup": {
+		"message": "Codex CLI native host"
+	},
+	"codexNativeHostSetupDescription": {
+		"message": "Codex CLI uses Chrome Native Messaging. If the host is not installed, copy and run the command below from the repository root, then reload the extension."
+	},
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
 	},
@@ -140,6 +155,9 @@
 	},
 	"copyAsJson": {
 		"message": "Copy as JSON"
+	},
+	"copyInstallCommand": {
+		"message": "Copy install command"
 	},
 	"copyToClipboard": {
 		"message": "Copy to clipboard"
@@ -246,6 +264,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableInterpreterImageInput": {
+		"message": "Enable image input for Codex CLI"
+	},
+	"enableInterpreterImageInputDescription": {
+		"message": "Attach the current visible tab screenshot to Codex CLI interpreter requests. Other providers are not affected."
 	},
 	"enableReader": {
 		"message": "Open reading view"
@@ -441,6 +465,12 @@
 	},
 	"importSettings": {
 		"message": "Import settings"
+	},
+	"installCommandCopied": {
+		"message": "Install command copied."
+	},
+	"installCommandCopyFailed": {
+		"message": "Could not copy install command."
 	},
 	"importTemplate": {
 		"message": "Import template"
@@ -1033,6 +1063,12 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"testConnection": {
+		"message": "Test connection"
+	},
+	"testingConnection": {
+		"message": "Testing connection..."
 	},
 	"templateValid": {
 		"message": "Template syntax is valid"

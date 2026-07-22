@@ -567,6 +567,27 @@
 									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
+								<div class="setting-item mod-horizontal mod-toggle">
+									<div class="setting-item-info">
+										<label for="interpreter-image-input-toggle" data-i18n="enableInterpreterImageInput">Enable image input for Codex CLI</label>
+										<div class="setting-item-description" data-i18n="enableInterpreterImageInputDescription">Attach the current visible tab screenshot to Codex CLI interpreter requests. Other providers are not affected.</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="interpreter-image-input-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item" id="codex-native-host-setup" style="display: none;">
+									<label data-i18n="codexNativeHostSetup">Codex CLI native host</label>
+									<div class="setting-item-description" id="codex-native-host-description" data-i18n="codexNativeHostSetupDescription">Codex CLI uses Chrome Native Messaging. If the host is not installed, copy and run the command below from the repository root, then reload the extension.</div>
+									<textarea id="codex-native-host-command" rows="3" spellcheck="false" readonly></textarea>
+									<div class="setting-item-control">
+										<button type="button" id="copy-codex-native-host-command" data-i18n="copyInstallCommand">Copy install command</button>
+										<button type="button" id="test-codex-native-host" data-i18n="testConnection">Test connection</button>
+									</div>
+									<div class="setting-item-description" id="codex-native-host-status"></div>
+								</div>
 								
 								</div>
 							</div>

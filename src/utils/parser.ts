@@ -1694,6 +1694,10 @@ export function validateVariables(ast: ASTNode[]): ParserError[] {
 
 	// Check each reference against its scope
 	for (const ref of references) {
+		if (ref.name.startsWith('prompt:') || ref.name.startsWith('"')) {
+			continue;
+		}
+
 		if (!isValidVariable(ref.name, ref.scope)) {
 			const similar = findSimilarVariable(ref.name);
 			let message = `Unknown variable "${ref.name}"`;
