@@ -25,17 +25,7 @@ export const remove_html = (html: string, params: string = ''): string => {
 	const doc = parser.parseFromString(html, 'text/html');
 
 	elementsToRemove.forEach(elem => {
-		let elements: NodeListOf<Element> | HTMLCollectionOf<Element>;
-		if (elem.startsWith('.')) {
-			// Class selector
-			elements = doc.querySelectorAll(`[class*="${elem.slice(1)}"]`);
-		} else if (elem.startsWith('#')) {
-			// ID selector
-			elements = doc.querySelectorAll(`[id="${elem.slice(1)}"]`);
-		} else {
-			// Tag selector
-			elements = doc.getElementsByTagName(elem);
-		}
+    	let elements: NodeListOf<Element> | HTMLCollectionOf<Element> = doc.querySelectorAll(elem);
 
 		// Convert HTMLCollection to Array if necessary
 		Array.from(elements).forEach(el => el.parentNode?.removeChild(el));
