@@ -57,7 +57,7 @@
 		"message": "Jalankan secara otomatis"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Jalankan variabel prompt segera jika template berisi variabel. Ini akan menggunakan kredit API dari penyedia model Anda. Matikan jika Anda hanya ingin menjalankan interpreter secara manual."
+		"message": "Langsung jalankan variabel prompt jika template mengandung variabel apapun. Ini akan menggunakan kredit API dari penyedia model Anda. Matikan jika Anda ingin menjalankan interpreter secara manual."
 	},
 	"behavior": {
 		"message": "Perilaku"
@@ -124,7 +124,7 @@
 		"message": "Klip cepat"
 	},
 	"commandToggleHighlighter": {
-		"message": "Aktifkan/nonaktifkan mode sorotan"
+		"message": "Alihkan mode sorotan"
 	},
 	"commandToggleReader": {
 		"message": "Alihkan tampilan baca"
@@ -133,7 +133,7 @@
 		"message": "Apakah Anda yakin ingin menghapus template \"$1\"?"
 	},
 	"confirmReplaceSettings": {
-		"message": "Ini akan menggantikan semua pengaturan Anda saat ini, termasuk template dan properti. Anda yakin ingin melanjutkan?"
+		"message": "Ini akan mengganti semua pengaturan Anda saat ini, termasuk template dan properti. Yakin ingin melanjutkan?"
 	},
 	"copied": {
 		"message": "Tersalin!"
@@ -196,7 +196,7 @@
 		"message": "Duplikat"
 	},
 	"earlyAccessDescription": {
-		"message": "Gunakan fitur yang memerlukan versi $link_start$akses awal$link_end$ terbaru dari Obsidian. Saat ini memerlukan Obsidian 1.7.2 atau yang lebih baru.",
+		"message": "Gunakan fitur yang memerlukan versi $link_start$early access$link_end$ terbaru dari Obsidian. Saat ini memerlukan Obsidian 1.7.2 atau versi lebih baru.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -210,13 +210,13 @@
 		"message": "Fitur early access"
 	},
 	"edit": {
-		"message": "Edit"
+		"message": "Ubah"
 	},
 	"editModel": {
-		"message": "Edit model"
+		"message": "Ubah model"
 	},
 	"editProvider": {
-		"message": "Edit penyedia"
+		"message": "Ubah penyedia"
 	},
 	"editTemplate": {
 		"message": "Ubah template"
@@ -251,7 +251,7 @@
 		"message": "Buka tampilan baca"
 	},
 	"error": {
-		"message": "Error"
+		"message": "Eror"
 	},
 	"export": {
 		"message": "Ekspor"
@@ -283,7 +283,7 @@
 		}
 	},
 	"extensionDescription": {
-		"message": "Simpan konten dari web dalam format yang bersifat privat dan tahan lama dan dapat diakses secara offline. Ekstensi browser resmi untuk Obsidian."
+		"message": "Simpan konten dari web dalam format yang bersifat privat dan tahan lama dan dapat diakses secara luring. Ekstensi browser resmi untuk Obsidian."
 	},
 	"extensionName": {
 		"message": "Obsidian Web Clipper"
@@ -307,7 +307,7 @@
 		"message": "Tidak dapat mengekstrak konten laman web."
 	},
 	"failedToImportTemplate": {
-		"message": "Kesalahan saat mengimpor template. Silakan periksa file dan coba lagi."
+		"message": "Terdapat kesalahan saat mengimpor template. Silakan periksa file dan coba lagi."
 	},
 	"failedToInitialize": {
 		"message": "Silakan coba muat ulang ekstensi."
@@ -423,7 +423,7 @@
 		"message": "Impor properti"
 	},
 	"importPropertiesDescription": {
-		"message": "Untuk mengimpor properti dari Obsidian, temukan file $strong_1_start$types.json$strong_1_end$ di folder $strong_2_start$.obsidian$strong_2_end$ dalam vault Anda. Sebagai catatan, folder ini tersembunyi secara default di sebagian besar sistem operasi.",
+		"message": "Untuk mengimpor properti dari Obsidian, temukan file $strong_1_start$types.json$strong_1_end$ di folder $strong_2_start$.obsidian$strong_2_end$ dalam vault Anda. Sebagai catatan, dalam pengaturan default folder ini tersembunyi di sebagian besar sistem operasi.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -481,7 +481,7 @@
 		"message": "Mode Legacy"
 	},
 	"legacyModeDescription": {
-		"message": "Menggunakan metode klip URI yang kompatibel dengan Obsidian 1.6.7 atau yang lebih lama. Perhatikan bahwa panjang konten yang dapat Anda klip dibatasi oleh browser dan sistem operasi Anda. Beberapa laman web bisa saja gagal tanpa ada pesan error yang tampil."
+		"message": "Menggunakan metode klip URI yang kompatibel dengan Obsidian 1.6.7 atau lebih lama. Perhatikan bahwa panjang konten yang dapat Anda klip dibatasi oleh browser dan sistem operasi Anda. Beberapa laman web bisa saja gagal tanpa ada pesan error yang muncul."
 	},
 	"loadArticle": {
 		"message": "Baca artikel"
@@ -499,13 +499,13 @@
 		"message": "Penyedia"
 	},
 	"modelProviderDescription": {
-		"message": "Penyedia model, misalnya Ollama, OpenRouter, Google, dll."
+		"message": "Pilih penyedia untuk model ini."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Penyedia"
 	},
 	"modelRequiredFields": {
-		"message": "Nama model, Penyedia, dan ID Model diperlukan."
+		"message": "Nama model, Penyedia, dan ID Model perlu disebutkan."
 	},
 	"models": {
 		"message": "Model"
@@ -529,13 +529,13 @@
 		"message": "Tidak ada template yang tersedia. Silakan tambahkan template di pengaturan."
 	},
 	"noUnusedProperties": {
-		"message": "Tidak ada properti yang tidak digunakan ditemukan."
+		"message": "Tidak ada properti yang tidak digunakan."
 	},
 	"noteContent": {
-		"message": "Konten catatan"
+		"message": "Isi catatan"
 	},
 	"noteContentDescription": {
-		"message": "Sesuaikan konten catatan. Gunakan variabel untuk mengisi data yang tersedia dari laman web."
+		"message": "Sesuaikan isi catatan. Gunakan variabel untuk menggunakan data yang tersedia dari laman web."
 	},
 	"noteLocation": {
 		"message": "Lokasi catatan"
@@ -550,7 +550,7 @@
 		"message": "Nama catatan"
 	},
 	"noteNameFormatDescription": {
-		"message": "Format untuk nama file catatan. Anda dapat menggunakan variabel seperti {{title}}, {{date}}, dan {{published}} untuk mengisi data yang tersedia dari laman web. $link_start$Pelajari lebih lanjut$link_end$.",
+		"message": "Format untuk nama file catatan. Anda dapat menggunakan variabel seperti {{title}}, {{date}}, dan {{published}} untuk menggunakan data yang tersedia dari laman web. $link_start$Pelajari lebih lanjut$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -624,10 +624,10 @@
 		"message": "Popup"
 	},
 	"prependToDaily": {
-		"message": "Tambah ke catatan harian, di bagian awal"
+		"message": "Tambah ke bagian awal catatan harian"
 	},
 	"prependToExisting": {
-		"message": "Tambah ke catatan yang telah ada, di bagian awal"
+		"message": "Tambah ke bagian awal catatan yang telah ada"
 	},
 	"preview": {
 		"message": "Pratinjau"
@@ -663,7 +663,7 @@
 		"message": "Teks"
 	},
 	"propertyValue": {
-		"message": "Value properti"
+		"message": "Nilai properti"
 	},
 	"provider": {
 		"message": "Penyedia"
@@ -684,7 +684,7 @@
 		"message": "ID model"
 	},
 	"providerModelIdDescription": {
-		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya nama pendek tanpa spasi."
+		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya berupa nama pendek tanpa spasi."
 	},
 	"providerModelIdPlaceholder": {
 		"message": "ID model"
@@ -699,10 +699,10 @@
 		"message": "Preset"
 	},
 	"providerPresetDescription": {
-		"message": "Pilih penyedia atau buat yang kustom."
+		"message": "Pilih penyedia atau buat tambahan baru."
 	},
 	"providerRequiredFields": {
-		"message": "Nama penyedia dan URL Dasar diperlukan."
+		"message": "Perlu nama penyedia dan URL Dasar."
 	},
 	"providers": {
 		"message": "Penyedia"
@@ -747,7 +747,7 @@
 		"message": "Ciutkan komentar"
 	},
 	"readerColorLinks": {
-		"message": "Warnai tautan"
+		"message": "Buat tautan menjadi berwarna"
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
@@ -777,7 +777,7 @@
 		"message": "Default"
 	},
 	"readerFontDescription": {
-		"message": "Tambahkan font yang terinstal di sistem Anda. Tekan Enter untuk menambahkan font."
+		"message": "Tambahkan font yang terpasang di sistem Anda. Tekan Enter untuk menambahkan font."
 	},
 	"readerFontNotFound": {
 		"message": "Tidak ditemukan"
@@ -933,7 +933,7 @@
 		"message": "Pengaturan"
 	},
 	"settingsImportSuccess": {
-		"message": "Semua pengaturan berhasil diimpor. Silakan segarkan halaman untuk melihat perubahannya."
+		"message": "Semua pengaturan berhasil diimpor. Silakan muat ulang halaman untuk melihat perubahannya."
 	},
 	"share": {
 		"message": "Bagikan..."
@@ -957,7 +957,7 @@
 		"message": "Pintasan keyboard memberi Anda akses cepat ke fitur clipper."
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Pintasan keyboard tidak dapat disesuaikan di Safari."
+		"message": "Pintasan keyboard tidak dapat diubah di Safari."
 	},
 	"shortcutNotSet": {
 		"message": "Belum diatur"
@@ -999,7 +999,7 @@
 		"message": "Sistem"
 	},
 	"template": {
-		"message": "Templat"
+		"message": "Template"
 	},
 	"templateCopied": {
 		"message": "Template JSON telah disalin ke papan klip"
@@ -1026,7 +1026,7 @@
 		"message": "Properti"
 	},
 	"templatePropertiesDescription": {
-		"message": "Properti untuk ditambahkan ke bagian atas catatan yang diklip. Gunakan variabel untuk mengisi data yang tersedia dari laman web."
+		"message": "Properti yang akan ditambahkan ke bagian atas catatan yang diklip. Gunakan variabel untuk menggunakan data yang tersedia dari laman web."
 	},
 	"templateTriggers": {
 		"message": "Pemicu template"
@@ -1041,7 +1041,7 @@
 		"message": "Template"
 	},
 	"thinking": {
-		"message": "berpikir"
+		"message": "sedang berpikir"
 	},
 	"unknownProvider": {
 		"message": "Penyedia tidak dikenal"
@@ -1070,7 +1070,7 @@
 		"message": "Vault"
 	},
 	"vaultsDescription": {
-		"message": "Secara default, catatan yang diklip akan disimpan ke vault yang sedang dibuka. Anda dapat menambahkan vault di sini jika Anda ingin menambah opsi untuk menyimpan ke vault lainnya. Nama vault harus sama persis dengan nama vault Obsidian. Tekan $strong_start$enter$strong_end$ untuk menambah vault.",
+		"message": "Secara default, catatan yang diklip akan disimpan ke vault yang sedang dibuka. Anda dapat menambahkan vault di sini jika Anda ingin menambah opsi untuk menyimpan ke vault lain. Nama vault harus sama persis dengan nama vault Obsidian. Tekan $strong_start$enter$strong_end$ untuk menambah vault.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
