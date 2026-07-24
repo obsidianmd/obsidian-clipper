@@ -154,6 +154,16 @@ declare global {
 		return false;
 	}
 
+	function reportFrameActivity(action: 'frameSelectionChanged' | 'frameContextMenu'): void {
+		const hasSelection = captureAndPersistSelection();
+		browser.runtime.sendMessage({
+			action,
+			hasSelection,
+			selectedHtml: hasSelection ? selectedHtml : '',
+			frameUrl: window.location.href,
+		}).catch(() => undefined);
+	}
+
 	function getExplicitCapture(): CaptureResult | null {
 		captureAndPersistSelection();
 		const capture = resolveCaptureResult({
@@ -202,7 +212,8 @@ declare global {
 
 	// The popup can take browser focus before it requests content. Persist the
 	// last non-collapsed range while the page still owns the selection.
-	document.addEventListener('selectionchange', () => captureAndPersistSelection());
+	document.addEventListener('selectionchange', () => reportFrameActivity('frameSelectionChanged'));
+	document.addEventListener('contextmenu', () => reportFrameActivity('frameContextMenu'));
 
 	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 		// If a newer generation of this content script has been injected,
@@ -255,7 +266,12 @@ declare global {
 
 		if (request.action === 'captureSelectionSnapshot') {
 			const hasSelection = captureAndPersistSelection(true);
-			sendResponse({ success: true, hasSelection });
+			sendResponse({
+				success: true,
+				hasSelection,
+				selectedHtml: hasSelection ? selectedHtml : '',
+				frameUrl: window.location.href,
+			});
 			return true;
 		}
 

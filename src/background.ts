@@ -6,6 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
 import { captureContextSelection } from './utils/context-capture';
+import { FrameSelectionTracker } from './utils/frame-selection';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -115,17 +116,23 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
+const frameSelections = new FrameSelectionTracker();
 
-async function injectContentScript(tabId: number): Promise<void> {
+function sendMessageToFrame(tabId: number, message: any, frameId?: number): Promise<any> {
+	if (frameId === undefined) return browser.tabs.sendMessage(tabId, message);
+	return browser.tabs.sendMessage(tabId, message, { frameId });
+}
+
+async function injectContentScript(tabId: number, frameId = 0): Promise<void> {
 	if (browser.scripting) {
 		debugLog('Clipper', 'Using scripting API');
 		await browser.scripting.executeScript({
-			target: { tabId },
+			target: { tabId, frameIds: [frameId] },
 			files: ['content.js']
 		});
 	} else {
 		debugLog('Clipper', 'Using tabs.executeScript fallback');
-		await browser.tabs.executeScript(tabId, { file: 'content.js' });
+		await browser.tabs.executeScript(tabId, { file: 'content.js', frameId });
 	}
 	debugLog('Clipper', 'Injection completed, waiting for init...');
 
@@ -134,7 +141,7 @@ async function injectContentScript(tabId: number): Promise<void> {
 	let ready = false;
 	for (let i = 0; i < 8; i++) {
 		try {
-			await browser.tabs.sendMessage(tabId, { action: "ping" });
+			await sendMessageToFrame(tabId, { action: "ping" }, frameId);
 			ready = true;
 			break;
 		} catch {
@@ -148,7 +155,7 @@ async function injectContentScript(tabId: number): Promise<void> {
 	debugLog('Clipper', 'Post-injection ping succeeded');
 }
 
-async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
+async function ensureContentScriptLoadedInBackground(tabId: number, frameId = 0): Promise<void> {
 	try {
 		// First, get the tab information
 		const tab = await browser.tabs.get(tabId);
@@ -159,7 +166,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		}
 
 		// Attempt to send a message to the content script
-		await browser.tabs.sendMessage(tabId, { action: "ping" });
+		await sendMessageToFrame(tabId, { action: "ping" }, frameId);
 		debugLog('Clipper', 'Content script ping succeeded');
 	} catch (error) {
 		// If the error is about invalid URL, re-throw it
@@ -169,17 +176,17 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// If the message fails, the content script is not loaded, so inject it
 		debugLog('Clipper', 'Ping failed, injecting content script...', error);
-		await injectContentScript(tabId);
+		await injectContentScript(tabId, frameId);
 	}
 }
 
 // Route a message to a tab, handling both normal pages (via content script)
 // and extension pages like the reader page (via runtime.sendMessage forwarding).
-async function routeMessageToTab(tabId: number, message: any): Promise<any> {
+async function routeMessageToTab(tabId: number, message: any, frameId?: number): Promise<any> {
 	const tab = await browser.tabs.get(tabId);
 	if (isNormalPageUrl(tab.url)) {
-		await ensureContentScriptLoadedInBackground(tabId);
-		return browser.tabs.sendMessage(tabId, message);
+		await ensureContentScriptLoadedInBackground(tabId, frameId ?? 0);
+		return sendMessageToFrame(tabId, message, frameId);
 	} else {
 		return browser.runtime.sendMessage({
 			action: 'extensionPageMessage',
@@ -239,6 +246,7 @@ async function initialize() {
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
 			delete readerModeState[tabId];
+			frameSelections.removeTab(tabId);
 		});
 		
 		// Initialize context menu
@@ -334,7 +342,16 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; hasSelection?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string; selectedHtml?: string; frameUrl?: string };
+
+		if ((typedRequest.action === 'frameSelectionChanged' || typedRequest.action === 'frameContextMenu') && sender.tab?.id !== undefined) {
+			frameSelections.report(sender.tab.id, sender.frameId ?? 0, {
+				hasSelection: Boolean(typedRequest.hasSelection),
+				selectedHtml: typedRequest.selectedHtml || '',
+				frameUrl: typedRequest.frameUrl || sender.url || '',
+			});
+			return;
+		}
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -656,7 +673,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tabId = (typedRequest as any).tabId;
 			const message = (typedRequest as any).message;
 			if (tabId && message) {
-				routeMessageToTab(tabId, message).then((response) => {
+				const selectionFrameId = ['getPageContent', 'copyMarkdownToClipboard', 'saveMarkdownToFile'].includes(message.action)
+					? frameSelections.getLatest(tabId)?.frameId
+					: undefined;
+				routeMessageToTab(tabId, message, selectionFrameId).then((response) => {
 					sendResponse(response);
 				}).catch((error) => {
 					console.error('[Obsidian Clipper] Error sending message to tab:', error);
@@ -849,10 +869,54 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 	}
 }, 100); // 100ms debounce time
 
+function recordCapturedFrameSelection(tabId: number, frameId: number, response: { hasSelection: boolean; selectedHtml?: string; frameUrl?: string }): void {
+	if (response.hasSelection) {
+		frameSelections.report(tabId, frameId, {
+			hasSelection: true,
+			selectedHtml: response.selectedHtml || '',
+			frameUrl: response.frameUrl || '',
+		});
+	} else {
+		frameSelections.clear(tabId, frameId);
+	}
+}
+
+async function captureContextSelectionForFrame(tabId: number, contextFrameId?: number): Promise<number> {
+	const preferredFrameId = frameSelections.getContextFrame(tabId, contextFrameId);
+	const captureInFrame = async (frameId: number) => {
+		try {
+			const response = await captureContextSelection(
+				(message, targetFrameId) => routeMessageToTab(tabId, message, targetFrameId),
+				frameId
+			);
+			recordCapturedFrameSelection(tabId, frameId, response);
+			return response;
+		} catch (error) {
+			// The browser blocks content-script access to restricted frames. Clear
+			// only that frame's stale record and retain ordinary top-frame capture.
+			debugLog('Clipper', 'Unable to capture selection in frame', frameId, error);
+			frameSelections.clear(tabId, frameId);
+			return { success: false, hasSelection: false };
+		}
+	};
+
+	let response = await captureInFrame(preferredFrameId);
+
+	// A stale or restricted child frame must not block the normal top-document
+	// behavior. Only use frame 0 after no explicit selection remains in the
+	// requested frame.
+	if (!response.hasSelection && preferredFrameId !== 0) {
+		response = await captureInFrame(0);
+		return 0;
+	}
+
+	return preferredFrameId;
+}
+
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		if (tab?.id) {
-			await captureContextSelection(message => routeMessageToTab(tab.id!, message));
+			await captureContextSelectionForFrame(tab.id, (info as { frameId?: number }).frameId);
 		}
 		await openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
@@ -879,8 +943,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		sidePanelOpenWindows.add(tab.windowId);
 		await ensureContentScriptLoadedInBackground(tab.id);
 	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
-		await captureContextSelection(message => routeMessageToTab(tab.id!, message));
-		await routeMessageToTab(tab.id, { action: "copyMarkdownToClipboard" });
+		const frameId = await captureContextSelectionForFrame(tab.id, (info as { frameId?: number }).frameId);
+		await routeMessageToTab(tab.id, { action: "copyMarkdownToClipboard" }, frameId);
 	}
 });
 
