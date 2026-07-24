@@ -1,5 +1,5 @@
 {
-	"version": "2026.07.21.1",
+	"version": "2026.07.24",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -8,9 +8,9 @@
 		"modelsList": "https://platform.claude.com/docs/en/about-claude/models/overview",
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
-			{ "id": "claude-haiku-4-5", "name": "Claude 4.5 Haiku" },
-			{ "id": "claude-sonnet-5", "name": "Claude 5 Sonnet" },
-			{ "id": "claude-opus-4-8", "name": "Claude 4.8 Opus" }
+			{ "id": "claude-haiku-4-5", "name": "Claude Haiku 4.5" },
+			{ "id": "claude-sonnet-5", "name": "Claude Sonnet 5" },
+			{ "id": "claude-opus-5", "name": "Claude Opus 5" }
 		]
 	},
 	"azure-openai": {
