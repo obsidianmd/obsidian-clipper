@@ -12,10 +12,14 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { ElementPicker } from './utils/element-picker';
+import { cloneAndCleanSelectedElement } from './utils/selected-element';
 
 declare global {
 	interface Window {
 		obsidianClipperGeneration?: number;
+		obsidianElementPicker?: ElementPicker;
+		obsidianPickedElementHtml?: string;
 	}
 }
 
@@ -33,6 +37,27 @@ declare global {
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
+	let pickedElementHtml = window.obsidianPickedElementHtml ?? '';
+
+	window.obsidianElementPicker?.stop();
+	const elementPicker = new ElementPicker({
+		document,
+		isExcluded: element => Boolean(
+			element.closest(`#${containerId}, [data-obsidian-element-picker-overlay]`)
+		),
+		onSelect: element => {
+			pickedElementHtml = cloneAndCleanSelectedElement(element, document.baseURI);
+			window.obsidianPickedElementHtml = pickedElementHtml;
+			browser.runtime.sendMessage({
+				action: 'pickedElementChanged',
+				hasPickedElement: true,
+			}).catch(() => undefined);
+		},
+		onCancel: () => {
+			browser.runtime.sendMessage({ action: 'elementPickerCancelled' }).catch(() => undefined);
+		},
+	});
+	window.obsidianElementPicker = elementPicker;
 
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
@@ -89,6 +114,7 @@ declare global {
 
 	interface ContentResponse {
 		content: string;
+		pickedElementHtml: string;
 		selectedHtml: string;
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
@@ -133,6 +159,28 @@ declare global {
 				removeContainer(existingContainer);
 			}
 			return;
+		}
+
+		if (request.action === "startElementPicker") {
+			elementPicker.start();
+			sendResponse({ success: true, isActive: true });
+			return true;
+		}
+
+		if (request.action === "clearPickedElement") {
+			pickedElementHtml = '';
+			window.obsidianPickedElementHtml = '';
+			sendResponse({ success: true, hasPickedElement: false });
+			return true;
+		}
+
+		if (request.action === "getPickedElementState") {
+			sendResponse({
+				success: true,
+				hasPickedElement: Boolean(pickedElementHtml),
+				isActive: elementPicker.isActive(),
+			});
+			return true;
 		}
 
 		if (request.action === "copy-text-to-clipboard") {
@@ -277,6 +325,7 @@ declare global {
 					image: defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
+					pickedElementHtml,
 					published: defuddled.published,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,

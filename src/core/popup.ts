@@ -278,8 +278,53 @@ function setupMessageListeners() {
 			// This message is now handled by checkHighlighterModeState
 		} else if (request.action === "highlighterModeChanged") {
 			// This message is now handled by checkHighlighterModeState
+		} else if (request.action === "pickedElementChanged") {
+			updatePickedElementUI(true);
+			if (currentTabId !== undefined) {
+				memoizedExtractPageContent.clear();
+				memoizedCompileTemplate.clear();
+				refreshFields(currentTabId, { checkTemplateTriggers: false, rebuildSkeleton: false });
+			}
+		} else if (request.action === "elementPickerCancelled") {
+			updatePickedElementUI(
+				!document.getElementById('clear-picked-element')?.classList.contains('is-hidden')
+			);
 		}
 	});
+}
+
+function updatePickedElementUI(hasPickedElement: boolean, isPicking = false): void {
+	const pickButton = document.getElementById('pick-element');
+	const clearButton = document.getElementById('clear-picked-element');
+	pickButton?.classList.toggle('is-active', hasPickedElement || isPicking);
+	pickButton?.setAttribute('aria-pressed', String(hasPickedElement || isPicking));
+	clearButton?.classList.toggle('is-hidden', !hasPickedElement);
+}
+
+async function sendPickerMessage(tabId: number, message: { action: string }): Promise<any> {
+	return browser.runtime.sendMessage({
+		action: 'sendMessageToTab',
+		tabId,
+		message,
+	});
+}
+
+async function startElementPicker(tabId: number): Promise<void> {
+	const response = await sendPickerMessage(tabId, { action: 'startElementPicker' });
+	if (!response?.success) throw new Error(response?.error || 'Unable to start element picker');
+	updatePickedElementUI(
+		!document.getElementById('clear-picked-element')?.classList.contains('is-hidden'),
+		true
+	);
+}
+
+async function clearPickedElement(tabId: number): Promise<void> {
+	const response = await sendPickerMessage(tabId, { action: 'clearPickedElement' });
+	if (!response?.success) throw new Error(response?.error || 'Unable to clear picked element');
+	updatePickedElementUI(false);
+	memoizedExtractPageContent.clear();
+	memoizedCompileTemplate.clear();
+	await refreshFields(tabId, { checkTemplateTriggers: false, rebuildSkeleton: false });
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -428,6 +473,30 @@ function setupEventListeners(tabId: number) {
 	const highlighterModeButton = document.getElementById('highlighter-mode');
 	if (highlighterModeButton) {
 		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
+	}
+
+	const pickElementButton = document.getElementById('pick-element');
+	if (pickElementButton) {
+		pickElementButton.addEventListener('click', async event => {
+			event.preventDefault();
+			try {
+				await startElementPicker(tabId);
+			} catch (error) {
+				logError('Unable to start element picker', error);
+			}
+		});
+	}
+
+	const clearPickedElementButton = document.getElementById('clear-picked-element');
+	if (clearPickedElementButton) {
+		clearPickedElementButton.addEventListener('click', async event => {
+			event.preventDefault();
+			try {
+				await clearPickedElement(tabId);
+			} catch (error) {
+				logError('Unable to clear picked element', error);
+			}
+		});
 	}
 
 	const embeddedModeButton = document.getElementById('embedded-mode');
@@ -704,6 +773,7 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 
 			const initializedContent = await initializePageContent(
 				extractedData.content,
+				extractedData.pickedElementHtml || '',
 				extractedData.selectedHtml,
 				extractedData.extractedContent,
 				currentUrl,
@@ -722,6 +792,7 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 				extractedData.metaTags
 			);
 			if (initializedContent) {
+				updatePickedElementUI(Boolean(extractedData.pickedElementHtml));
 				currentVariables = initializedContent.currentVariables;
 				console.log('Updated currentVariables:', currentVariables);
 				await fillTemplateFieldValues(

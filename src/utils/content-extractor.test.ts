@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { describe, test, expect } from 'vitest';
-import { processHighlights } from './content-extractor';
+import { afterEach, describe, test, expect } from 'vitest';
+import { initializePageContent, processHighlights } from './content-extractor';
 import { TextHighlightData } from './highlighter';
+import { generalSettings } from './storage-utils';
 
 // Default settings already use highlighterEnabled + 'highlight-inline', the
 // behavior these tests exercise.
@@ -45,5 +46,47 @@ describe('processHighlights — highlight-inline', () => {
 		expect(mark!.textContent?.replace(/\s+/g, ' ').trim()).toBe('A seismic shift is rocking the healthcare industry.');
 		// The link must survive inside the mark, proving the range crossed it.
 		expect(mark!.querySelector('a')).not.toBeNull();
+	});
+});
+
+describe('initializePageContent capture precedence', () => {
+	const originalBehavior = generalSettings.highlightBehavior;
+	const originalEnabled = generalSettings.highlighterEnabled;
+
+	afterEach(() => {
+		generalSettings.highlightBehavior = originalBehavior;
+		generalSettings.highlighterEnabled = originalEnabled;
+	});
+
+	test('keeps picked content while exposing highlights independently', async () => {
+		generalSettings.highlighterEnabled = true;
+		generalSettings.highlightBehavior = 'replace-content';
+		const highlights = [textHighlight('<p>Highlight replacement</p>')];
+
+		const result = await initializePageContent(
+			'<main>Automatic</main>',
+			'<article>Picked element</article>',
+			'<p>Live selection</p>',
+			{},
+			'https://example.com/page',
+			{},
+			'',
+			highlights,
+			'Title',
+			'',
+			'',
+			'',
+			'',
+			'',
+			'',
+			0,
+			'',
+			[]
+		);
+
+		expect(result.currentVariables['{{content}}']).toContain('Picked element');
+		expect(result.currentVariables['{{content}}']).not.toContain('Highlight replacement');
+		expect(result.currentVariables['{{highlights}}']).toContain('Highlight replacement');
+		expect(result.currentVariables['{{selection}}']).toContain('Live selection');
 	});
 });

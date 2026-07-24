@@ -7,6 +7,7 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
+import { resolveCaptureContent } from './capture-precedence';
 import {
 	getElementByXPath,
 	wrapElementWithMark,
@@ -45,6 +46,7 @@ function normalizeText(html: string): string {
 
 interface ContentResponse {
 	content: string;
+	pickedElementHtml: string;
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
@@ -126,6 +128,7 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 
 export async function initializePageContent(
 	content: string,
+	pickedElementHtml: string,
 	selectedHtml: string,
 	extractedContent: ExtractedContent,
 	currentUrl: string,
@@ -146,14 +149,26 @@ export async function initializePageContent(
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		let selectedMarkdown = '';
-		if (selectedHtml) {
-			content = selectedHtml;
-			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
-		}
+		const selectedMarkdown = selectedHtml ? createMarkdownContent(selectedHtml, currentUrl) : '';
+		const capture = resolveCaptureContent({
+			pickedElementHtml,
+			selectedHtml,
+			automaticHtml: content,
+			highlights,
+			replaceContentWithHighlights:
+				generalSettings.highlighterEnabled &&
+				generalSettings.highlightBehavior === 'replace-content',
+		});
+		content = capture.html;
 
-		// Process highlights after getting the base content
-		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
+		// Inline highlights remain a post-processing behavior for selection and
+		// automatic capture. A picked element is always preserved as selected.
+		if (
+			capture.source !== 'picked-element' &&
+			generalSettings.highlighterEnabled &&
+			generalSettings.highlightBehavior === 'highlight-inline' &&
+			highlights.length > 0
+		) {
 			content = processHighlights(content, highlights);
 		}
 

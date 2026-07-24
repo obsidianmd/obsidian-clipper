@@ -372,4 +372,9 @@
 			}
 		}
 	}
+
+	#pick-element.is-active {
+		background-color: hsla(var(--color-accent-hsl), 0.12);
+		color: var(--text-accent);
+	}
 }
