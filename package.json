@@ -1,6 +1,7 @@
 {
 	"name": "obsidian-clipper",
 	"version": "1.7.1",
+	"packageManager": "npm@11.9.0",
 	"description": "Official web clipper for Obsidian.",
 	"bin": {
 		"obsidian-clipper": "./dist/cli.cjs"
@@ -46,6 +47,7 @@
 		"mini-css-extract-plugin": "^2.9.1",
 		"sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
+		"terser-webpack-plugin": "^5.4.0",
 		"ts-loader": "^9.5.1",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.5.4",
