@@ -12,14 +12,14 @@ const highlight: TextHighlightData = {
 };
 
 describe('resolveCaptureContent', () => {
-	test('prefers a picked element over selection, highlight replacement, and automatic content', () => {
+	test('prefers selection over a picked element, highlight replacement, and automatic content', () => {
 		expect(resolveCaptureContent({
 			pickedElementHtml: '<article>Picked</article>',
 			selectedHtml: '<p>Selected</p>',
 			automaticHtml: '<main>Automatic</main>',
 			highlights: [highlight],
 			replaceContentWithHighlights: true,
-		})).toEqual({ html: '<article>Picked</article>', source: 'picked-element' });
+		})).toMatchObject({ html: '<p>Selected</p>', source: 'selected-text' });
 	});
 
 	test('prefers live text selection over highlight replacement', () => {
@@ -29,7 +29,7 @@ describe('resolveCaptureContent', () => {
 			automaticHtml: '<main>Automatic</main>',
 			highlights: [highlight],
 			replaceContentWithHighlights: true,
-		})).toEqual({ html: '<p>Selected</p>', source: 'text-selection' });
+		})).toMatchObject({ html: '<p>Selected</p>', source: 'selected-text' });
 	});
 
 	test('uses highlight replacement before automatic content', () => {
@@ -39,7 +39,7 @@ describe('resolveCaptureContent', () => {
 			automaticHtml: '<main>Automatic</main>',
 			highlights: [highlight],
 			replaceContentWithHighlights: true,
-		})).toEqual({ html: '<p>Highlight</p>', source: 'highlight-replacement' });
+		})).toMatchObject({ html: '<p>Highlight</p>', source: 'highlight-replacement' });
 	});
 
 	test('falls back to automatic content when replacement is disabled', () => {
@@ -49,6 +49,6 @@ describe('resolveCaptureContent', () => {
 			automaticHtml: '<main>Automatic</main>',
 			highlights: [highlight],
 			replaceContentWithHighlights: false,
-		})).toEqual({ html: '<main>Automatic</main>', source: 'automatic' });
+		})).toMatchObject({ html: '<main>Automatic</main>', source: 'automatic-article' });
 	});
 });

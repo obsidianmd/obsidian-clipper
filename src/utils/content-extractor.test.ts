@@ -58,7 +58,7 @@ describe('initializePageContent capture precedence', () => {
 		generalSettings.highlighterEnabled = originalEnabled;
 	});
 
-	test('keeps picked content while exposing highlights independently', async () => {
+	test('gives selected content precedence while exposing highlights independently', async () => {
 		generalSettings.highlighterEnabled = true;
 		generalSettings.highlightBehavior = 'replace-content';
 		const highlights = [textHighlight('<p>Highlight replacement</p>')];
@@ -84,7 +84,8 @@ describe('initializePageContent capture precedence', () => {
 			[]
 		);
 
-		expect(result.currentVariables['{{content}}']).toContain('Picked element');
+		expect(result.currentVariables['{{content}}']).toContain('Live selection');
+		expect(result.currentVariables['{{content}}']).not.toContain('Picked element');
 		expect(result.currentVariables['{{content}}']).not.toContain('Highlight replacement');
 		expect(result.currentVariables['{{highlights}}']).toContain('Highlight replacement');
 		expect(result.currentVariables['{{selection}}']).toContain('Live selection');

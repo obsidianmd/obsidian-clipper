@@ -5,6 +5,7 @@ import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
+import { captureContextSelection } from './utils/context-capture';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -850,7 +851,10 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
-		openPopup();
+		if (tab?.id) {
+			await captureContextSelection(message => routeMessageToTab(tab.id!, message));
+		}
+		await openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
@@ -875,8 +879,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		sidePanelOpenWindows.add(tab.windowId);
 		await ensureContentScriptLoadedInBackground(tab.id);
 	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
+		await captureContextSelection(message => routeMessageToTab(tab.id!, message));
+		await routeMessageToTab(tab.id, { action: "copyMarkdownToClipboard" });
 	}
 });
 

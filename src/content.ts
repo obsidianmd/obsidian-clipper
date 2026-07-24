@@ -7,19 +7,22 @@ import { extractContentBySelector as extractContentBySelectorShared } from './ut
 import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
-import { serializeChildren } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
 import { ElementPicker } from './utils/element-picker';
 import { cloneAndCleanSelectedElement } from './utils/selected-element';
+import { CaptureResult, resolveCaptureResult } from './utils/capture-source';
+import { captureSelectionSnapshot } from './utils/selection-capture';
+import { countWordsInHtml, getLightweightPageMetadata } from './utils/lightweight-page-metadata';
 
 declare global {
 	interface Window {
 		obsidianClipperGeneration?: number;
 		obsidianElementPicker?: ElementPicker;
 		obsidianPickedElementHtml?: string;
+		obsidianSelectionSnapshotHtml?: string;
 	}
 }
 
@@ -38,6 +41,7 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 	let pickedElementHtml = window.obsidianPickedElementHtml ?? '';
+	let selectedHtml = window.obsidianSelectionSnapshotHtml ?? '';
 
 	window.obsidianElementPicker?.stop();
 	const elementPicker = new ElementPicker({
@@ -132,7 +136,73 @@ declare global {
 		wordCount: number;
 		language: string;
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
+		captureResult?: CaptureResult;
 	}
+
+	function captureAndPersistSelection(clearWhenEmpty = false): boolean {
+		const snapshot = captureSelectionSnapshot(window.getSelection(), document);
+		if (snapshot) {
+			selectedHtml = snapshot.html;
+			window.obsidianSelectionSnapshotHtml = selectedHtml;
+			return true;
+		}
+
+		if (clearWhenEmpty) {
+			selectedHtml = '';
+			window.obsidianSelectionSnapshotHtml = '';
+		}
+		return false;
+	}
+
+	function getExplicitCapture(): CaptureResult | null {
+		captureAndPersistSelection();
+		const capture = resolveCaptureResult({
+			selectedHtml,
+			pickedElementHtml,
+			automaticHtml: '',
+			highlights: [],
+			replaceContentWithHighlights: false,
+		});
+		return capture.source === 'automatic-article' ? null : capture;
+	}
+
+	function createExplicitContentResponse(captureResult: CaptureResult): ContentResponse {
+		const metadata = getLightweightPageMetadata(document);
+		return {
+			...metadata,
+			content: captureResult.html,
+			captureResult,
+			extractedContent: {},
+			fullHtml: '',
+			highlights: highlighter.getHighlights(),
+			parseTime: 0,
+			pickedElementHtml: captureResult.pickedElementHtml,
+			schemaOrgData: {},
+			selectedHtml: captureResult.selectedHtml,
+			wordCount: countWordsInHtml(captureResult.html, document),
+		};
+	}
+
+	async function getMarkdownForCurrentCapture(): Promise<{ markdown: string; title: string }> {
+		const explicitCapture = getExplicitCapture();
+		if (explicitCapture) {
+			return {
+				markdown: createMarkdownContent(explicitCapture.html, document.URL),
+				title: document.title || 'Untitled',
+			};
+		}
+
+		await flattenShadowDom(document);
+		const defuddled = parseForClip(document);
+		return {
+			markdown: createMarkdownContent(defuddled.content, document.URL),
+			title: defuddled.title || document.title || 'Untitled',
+		};
+	}
+
+	// The popup can take browser focus before it requests content. Persist the
+	// last non-collapsed range while the page still owns the selection.
+	document.addEventListener('selectionchange', () => captureAndPersistSelection());
 
 	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 		// If a newer generation of this content script has been injected,
@@ -183,6 +253,12 @@ declare global {
 			return true;
 		}
 
+		if (request.action === 'captureSelectionSnapshot') {
+			const hasSelection = captureAndPersistSelection(true);
+			sendResponse({ success: true, hasSelection });
+			return true;
+		}
+
 		if (request.action === "copy-text-to-clipboard") {
 			const textArea = document.createElement("textarea");
 			textArea.value = request.text;
@@ -199,13 +275,8 @@ declare global {
 		}
 
 		if (request.action === "copyMarkdownToClipboard") {
-			flattenShadowDom(document).then(() => {
+			getMarkdownForCurrentCapture().then(({ markdown }) => {
 				try {
-					const defuddled = parseForClip(document);
-
-					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
-
 					// Copy to clipboard
 					const textArea = document.createElement("textarea");
 					textArea.value = markdown;
@@ -224,11 +295,8 @@ declare global {
 		}
 
 		if (request.action === "saveMarkdownToFile") {
-			flattenShadowDom(document).then(async () => {
+			getMarkdownForCurrentCapture().then(async ({ markdown, title }) => {
 				try {
-					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
-					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
 						content: markdown,
@@ -245,20 +313,15 @@ declare global {
 		}
 
 		if (request.action === "getPageContent") {
+			const explicitCapture = getExplicitCapture();
+			if (explicitCapture) {
+				sendResponse(createExplicitContentResponse(explicitCapture));
+				return true;
+			}
+
 			// Flatten shadow DOM before extraction (async, needs main world)
 			const flattenTimeout = new Promise<void>(resolve => setTimeout(resolve, 3000));
 			Promise.race([flattenShadowDom(document), flattenTimeout]).then(async () => {
-				let selectedHtml = '';
-				const selection = window.getSelection();
-
-				if (selection && selection.rangeCount > 0) {
-					const range = selection.getRangeAt(0);
-					const clonedSelection = range.cloneContents();
-					const div = document.createElement('div');
-					div.appendChild(clonedSelection);
-					selectedHtml = serializeChildren(div);
-				}
-
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
 				const defuddle = new Defuddle(document, { url: document.URL });
@@ -313,22 +376,33 @@ declare global {
 				// Get the modified HTML without scripts, styles, and style attributes
 				const cleanedHtml = doc.documentElement.outerHTML;
 
+				const highlights = highlighter.getHighlights();
+				const captureResult = resolveCaptureResult({
+					selectedHtml: '',
+					pickedElementHtml: '',
+					automaticHtml: defuddled.content,
+					highlights,
+					replaceContentWithHighlights:
+						generalSettings.highlighterEnabled && generalSettings.highlightBehavior === 'replace-content',
+				});
+
 				const response: ContentResponse = {
 					author: defuddled.author,
-					content: defuddled.content,
+					content: captureResult.html,
+					captureResult,
 					description: defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
-					highlights: highlighter.getHighlights(),
+					highlights,
 					image: defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					pickedElementHtml,
+					pickedElementHtml: '',
 					published: defuddled.published,
 					schemaOrgData: defuddled.schemaOrgData,
-					selectedHtml: selectedHtml,
+					selectedHtml: '',
 					site: defuddled.site,
 					title: defuddled.title,
 					wordCount: defuddled.wordCount,

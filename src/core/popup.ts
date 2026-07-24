@@ -789,7 +789,8 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || '',
-				extractedData.metaTags
+				extractedData.metaTags,
+				extractedData.captureResult
 			);
 			if (initializedContent) {
 				updatePickedElementUI(Boolean(extractedData.pickedElementHtml));

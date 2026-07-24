@@ -7,7 +7,7 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
-import { resolveCaptureContent } from './capture-precedence';
+import { CaptureResult, resolveCaptureResult } from './capture-source';
 import {
 	getElementByXPath,
 	wrapElementWithMark,
@@ -64,6 +64,7 @@ interface ContentResponse {
 	wordCount: number;
 	language: string;
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[];
+	captureResult?: CaptureResult;
 }
 
 async function sendExtractRequest(tabId: number): Promise<ContentResponse> {
@@ -144,13 +145,13 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	captureResult?: CaptureResult
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		const selectedMarkdown = selectedHtml ? createMarkdownContent(selectedHtml, currentUrl) : '';
-		const capture = resolveCaptureContent({
+		const capture = captureResult ?? resolveCaptureResult({
 			pickedElementHtml,
 			selectedHtml,
 			automaticHtml: content,
@@ -159,6 +160,8 @@ export async function initializePageContent(
 				generalSettings.highlighterEnabled &&
 				generalSettings.highlightBehavior === 'replace-content',
 		});
+		selectedHtml = capture.selectedHtml || selectedHtml;
+		const selectedMarkdown = selectedHtml ? createMarkdownContent(selectedHtml, currentUrl) : '';
 		content = capture.html;
 
 		// Inline highlights remain a post-processing behavior for selection and

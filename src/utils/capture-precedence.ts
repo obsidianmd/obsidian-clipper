@@ -1,41 +1,8 @@
-import { AnyHighlightData } from './highlighter';
+import { CaptureResolutionInput, CaptureResult, resolveCaptureResult } from './capture-source';
 
-export type CaptureSource = 'picked-element' | 'text-selection' | 'highlight-replacement' | 'automatic';
+export type CaptureSource = CaptureResult['source'];
+export type CapturePrecedenceInput = CaptureResolutionInput;
+export type CapturePrecedenceResult = CaptureResult;
 
-export interface CapturePrecedenceInput {
-	pickedElementHtml: string;
-	selectedHtml: string;
-	automaticHtml: string;
-	highlights: AnyHighlightData[];
-	replaceContentWithHighlights: boolean;
-}
-
-export interface CapturePrecedenceResult {
-	html: string;
-	source: CaptureSource;
-}
-
-export function resolveCaptureContent({
-	pickedElementHtml,
-	selectedHtml,
-	automaticHtml,
-	highlights,
-	replaceContentWithHighlights,
-}: CapturePrecedenceInput): CapturePrecedenceResult {
-	if (pickedElementHtml) {
-		return { html: pickedElementHtml, source: 'picked-element' };
-	}
-
-	if (selectedHtml) {
-		return { html: selectedHtml, source: 'text-selection' };
-	}
-
-	if (replaceContentWithHighlights && highlights.length > 0) {
-		return {
-			html: highlights.map(highlight => highlight.content).join(''),
-			source: 'highlight-replacement',
-		};
-	}
-
-	return { html: automaticHtml, source: 'automatic' };
-}
+// Kept as a compatibility entry point while callers move to CaptureResult.
+export const resolveCaptureContent = resolveCaptureResult;
