@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Paginavariabelen"
 	},
+	"pagesRead": {
+		"message": "pagina gelezen"
+	},
+	"pagesReadPlural": {
+		"message": "pagina's gelezen"
+	},
 	"pagesSaved": {
 		"message": "pagina opgeslagen"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Geniet u van Web Clipper? Help ons door het een beoordeling te geven."
+	},
+	"read": {
+		"message": "Gelezen"
 	},
 	"reader": {
 		"message": "Lezer"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Opslaggedrag"
+	},
+	"saved": {
+		"message": "Opgeslagen"
 	},
 	"saveFile": {
 		"message": "Bestand opslaan..."

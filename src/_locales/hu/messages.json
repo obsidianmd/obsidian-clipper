@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Oldalváltozók"
 	},
+	"pagesRead": {
+		"message": "oldal elolvasva"
+	},
+	"pagesReadPlural": {
+		"message": "oldal elolvasva"
+	},
 	"pagesSaved": {
 		"message": "oldal mentve"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Tetszik a Web Clipper? Segíts nekünk azzal, hogy értékeled."
+	},
+	"read": {
+		"message": "Elolvasva"
 	},
 	"reader": {
 		"message": "Olvasó"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Mentési viselkedés"
+	},
+	"saved": {
+		"message": "Mentve"
 	},
 	"saveFile": {
 		"message": "Fájl mentése..."

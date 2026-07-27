@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "페이지 변수"
 	},
+	"pagesRead": {
+		"message": "페이지 읽음"
+	},
+	"pagesReadPlural": {
+		"message": "페이지들을 읽음"
+	},
 	"pagesSaved": {
 		"message": "페이지 저장됨"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "웹 클리퍼를 즐기고 계신가요? 평가를 통해 우리를 도와주세요."
+	},
+	"read": {
+		"message": "읽음"
 	},
 	"reader": {
 		"message": "리더"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "저장 동작"
+	},
+	"saved": {
+		"message": "저장됨"
 	},
 	"saveFile": {
 		"message": "파일 저장..."

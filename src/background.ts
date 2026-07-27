@@ -5,6 +5,7 @@ import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
+import { incrementStat } from './utils/storage-utils';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -433,6 +434,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			if (tabId) {
 				readerModeState[tabId] = typedRequest.isActive;
 				debouncedUpdateContextMenu(tabId);
+			}
+			if (typedRequest.isActive === true) {
+				incrementStat('readerMode', undefined, undefined, sender.tab.url, sender.tab.title)
+					.catch((error) => debugLog('Reader', 'Failed to record reader mode stat:', error));
 			}
 		}
 

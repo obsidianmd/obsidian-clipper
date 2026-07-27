@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "ページ変数"
 	},
+	"pagesRead": {
+		"message": "ページを読みました"
+	},
+	"pagesReadPlural": {
+		"message": "ページを読みました"
+	},
 	"pagesSaved": {
 		"message": "ページが保存されました"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Web Clipperを楽しんでいますか？評価をつけることで私たちを支えてください。"
+	},
+	"read": {
+		"message": "読了"
 	},
 	"reader": {
 		"message": "リーダー"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "保存の動作"
+	},
+	"saved": {
+		"message": "保存済み"
 	},
 	"saveFile": {
 		"message": "ファイルを保存..."

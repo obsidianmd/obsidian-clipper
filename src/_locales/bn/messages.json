@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "পেজের ভেরিয়েবলসমূহ"
 	},
+	"pagesRead": {
+		"message": "পৃষ্ঠা পড়া হয়েছে"
+	},
+	"pagesReadPlural": {
+		"message": "পৃষ্ঠাগুলি পড়া হয়েছে"
+	},
 	"pagesSaved": {
 		"message": "পৃষ্ঠা সংরক্ষিত হয়েছে"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "আপনি কি ওয়েব ক্লিপার উপভোগ করছেন? এটি একটি রেটিং দিয়ে আমাদের সাহায্য করুন।"
+	},
+	"read": {
+		"message": "পঠিত"
 	},
 	"reader": {
 		"message": "পাঠক"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "সংরক্ষণ আচরণ"
+	},
+	"saved": {
+		"message": "সংরক্ষিত"
 	},
 	"saveFile": {
 		"message": "ফাইল সংরক্ষণ করুন..."

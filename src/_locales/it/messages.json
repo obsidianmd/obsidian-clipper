@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Variabili della pagina"
 	},
+	"pagesRead": {
+		"message": "pagina letta"
+	},
+	"pagesReadPlural": {
+		"message": "pagine lette"
+	},
 	"pagesSaved": {
 		"message": "pagina salvata"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Ti piace Web Clipper? Aiutaci dandogli una valutazione."
+	},
+	"read": {
+		"message": "Lette"
 	},
 	"reader": {
 		"message": "Lettore"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Comportamento di salvataggio"
+	},
+	"saved": {
+		"message": "Salvate"
 	},
 	"saveFile": {
 		"message": "Salva file..."

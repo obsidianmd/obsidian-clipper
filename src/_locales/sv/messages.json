@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Sidvariabler"
 	},
+	"pagesRead": {
+		"message": "sida läst"
+	},
+	"pagesReadPlural": {
+		"message": "sidor lästa"
+	},
 	"pagesSaved": {
 		"message": "sida sparad"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Gillar du Web Clipper? Hjälp oss genom att ge det ett betyg."
+	},
+	"read": {
+		"message": "Lästa"
 	},
 	"reader": {
 		"message": "Läsare"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Spara beteende"
+	},
+	"saved": {
+		"message": "Sparade"
 	},
 	"saveFile": {
 		"message": "Spara fil..."

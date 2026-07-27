@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "Variabile pagină"
 	},
+	"pagesRead": {
+		"message": "Pagină citită"
+	},
+	"pagesReadPlural": {
+		"message": "Pagini citite"
+	},
 	"pagesSaved": {
 		"message": "Pagină salvată"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Îți place Web Clipper? Ajută-ne dându-ne o evaluare."
+	},
+	"read": {
+		"message": "Citite"
 	},
 	"reader": {
 		"message": "Cititor"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Comportamentul de salvare"
+	},
+	"saved": {
+		"message": "Salvate"
 	},
 	"saveFile": {
 		"message": "Salvează fișier..."

@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "អថេរទំព័រ"
 	},
+	"pagesRead": {
+		"message": "បានអានទំព័រ"
+	},
+	"pagesReadPlural": {
+		"message": "បានអានទំព័រ"
+	},
 	"pagesSaved": {
 		"message": "បានរក្សាទុកទំព័រ"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "តើអ្នកកំពុងរីករាយជាមួយ Web Clipper មែនទេ? ជួយយើងដោយផ្តល់ការវាយតម្លៃ។"
+	},
+	"read": {
+		"message": "បានអាន"
 	},
 	"reader": {
 		"message": "របៀបអាន"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "ឥរិយាបថការរក្សាទុក"
+	},
+	"saved": {
+		"message": "បានរក្សាទុក"
 	},
 	"saveFile": {
 		"message": "រក្សាទុកឯកសារ..."

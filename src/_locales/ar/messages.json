@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "متغيرات الصفحة"
 	},
+	"pagesRead": {
+		"message": "تمت قراءة الصفحة"
+	},
+	"pagesReadPlural": {
+		"message": "تمت قراءة الصفحات"
+	},
 	"pagesSaved": {
 		"message": "تم حفظ الصفحة"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "هل تستمتع بـ Web Clipper؟ ساعدنا عن طريق تقييمه."
+	},
+	"read": {
+		"message": "مقروءة"
 	},
 	"reader": {
 		"message": "القارئ"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "سلوك الحفظ"
+	},
+	"saved": {
+		"message": "محفوظة"
 	},
 	"saveFile": {
 		"message": "حفظ الملف..."

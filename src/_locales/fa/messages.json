@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "متغیرهای صفحه"
 	},
+	"pagesRead": {
+		"message": "صفحه خوانده شد"
+	},
+	"pagesReadPlural": {
+		"message": "صفحات خوانده شدند"
+	},
 	"pagesSaved": {
 		"message": "صفحه ذخیره شد"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "آیا از وب کلیپر لذت می برید؟ با ارزیابی آن به ما کمک کنید."
+	},
+	"read": {
+		"message": "خوانده‌شده"
 	},
 	"reader": {
 		"message": "خواننده"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "رفتار ذخیره سازی"
+	},
+	"saved": {
+		"message": "ذخیره‌شده"
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."

@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "Μεταβλητές σελίδας"
 	},
+	"pagesRead": {
+		"message": "σελίδα διαβάστηκε"
+	},
+	"pagesReadPlural": {
+		"message": "σελίδες διαβάστηκαν"
+	},
 	"pagesSaved": {
 		"message": "σελίδα αποθηκεύτηκε"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Σας αρέσει το Web Clipper; Βοηθήστε μας δίνοντάς του μια αξιολόγηση."
+	},
+	"read": {
+		"message": "Διαβασμένες"
 	},
 	"reader": {
 		"message": "Αναγνώστης"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Συμπεριφορά αποθήκευσης"
+	},
+	"saved": {
+		"message": "Αποθηκευμένες"
 	},
 	"saveFile": {
 		"message": "Αποθήκευση αρχείου..."

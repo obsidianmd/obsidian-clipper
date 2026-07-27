@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "Sidevariabler"
 	},
+	"pagesRead": {
+		"message": "Side lest"
+	},
+	"pagesReadPlural": {
+		"message": "Sider lest"
+	},
 	"pagesSaved": {
 		"message": "Side lagret"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Liker du Web Clipper? Hjelp oss ved å gi en vurdering."
+	},
+	"read": {
+		"message": "Lest"
 	},
 	"reader": {
 		"message": "Lesevisning"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Lagre oppførsel"
+	},
+	"saved": {
+		"message": "Lagret"
 	},
 	"saveFile": {
 		"message": "Lagre fil..."

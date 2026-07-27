@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesRead": {
+		"message": "पृष्ठ पढ़ा गया"
+	},
+	"pagesReadPlural": {
+		"message": "पृष्ठ पढ़े गए"
+	},
 	"pagesSaved": {
 		"message": "पृष्ठ सहेजा गया"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
+	},
+	"read": {
+		"message": "पढ़े गए"
 	},
 	"reader": {
 		"message": "पाठक"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "सहेजने का व्यवहार"
+	},
+	"saved": {
+		"message": "सहेजे गए"
 	},
 	"saveFile": {
 		"message": "File save karein..."

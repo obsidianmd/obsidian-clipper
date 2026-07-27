@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "משתני עמוד"
 	},
+	"pagesRead": {
+		"message": "דף נקרא"
+	},
+	"pagesReadPlural": {
+		"message": "דפים נקראו"
+	},
 	"pagesSaved": {
 		"message": "דף נשמר"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "אוהב את Web Clipper? עזור לנו על ידי דירוג."
+	},
+	"read": {
+		"message": "נקראו"
 	},
 	"reader": {
 		"message": "קורא"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "התנהגות שמירה"
+	},
+	"saved": {
+		"message": "נשמרו"
 	},
 	"saveFile": {
 		"message": "שמור קובץ..."

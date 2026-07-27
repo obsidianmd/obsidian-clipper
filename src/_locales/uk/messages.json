@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "Змінні сторінки"
 	},
+	"pagesRead": {
+		"message": "Сторінку прочитано"
+	},
+	"pagesReadPlural": {
+		"message": "Сторінок прочитано"
+	},
 	"pagesSaved": {
 		"message": "Сторінку збережено"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Подобається Web Clipper? Допоможіть нам, поставивши оцінку."
+	},
+	"read": {
+		"message": "Прочитано"
 	},
 	"reader": {
 		"message": "Читач"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Поведінка збереження"
+	},
+	"saved": {
+		"message": "Збережено"
 	},
 	"saveFile": {
 		"message": "Зберегти файл..."

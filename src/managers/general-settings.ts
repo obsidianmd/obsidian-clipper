@@ -13,7 +13,7 @@ import { exportHighlights, importHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
 import browser from '../utils/browser-polyfill';
-import { createUsageChart, aggregateUsageData } from '../utils/charts';
+import { createUsageChart, aggregateUsageData, UsageMetric } from '../utils/charts';
 import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
@@ -177,7 +177,7 @@ export function initializeGeneralSettings(): void {
 
 		// Get clip history and ratings
 		const history = await getClipHistory();
-		const totalClips = history.length;
+		const totalClips = history.filter(entry => entry.action !== 'readerMode').length;
 		const existingRatings = await getLocalStorage('ratings') || [];
 
 		// Show rating section only total clips >= 20 and no previous ratings
@@ -436,9 +436,10 @@ function initializeHighlighterSettings(): void {
 
 async function initializeUsageChart(): Promise<void> {
 	const chartContainer = document.getElementById('usage-chart');
+	const metricSelect = document.getElementById('usage-metric-select') as HTMLSelectElement;
 	const periodSelect = document.getElementById('usage-period-select') as HTMLSelectElement;
 	const aggregationSelect = document.getElementById('usage-aggregation-select') as HTMLSelectElement;
-	if (!chartContainer || !periodSelect || !aggregationSelect) return;
+	if (!chartContainer || !metricSelect || !periodSelect || !aggregationSelect) return;
 
 	const history = await getClipHistory();
 
@@ -447,15 +448,16 @@ async function initializeUsageChart(): Promise<void> {
 			timeRange: periodSelect.value as '30d' | 'all',
 			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
 		};
-		
+
 		const chartData = aggregateUsageData(history, options);
-		await createUsageChart(chartContainer, chartData);
+		await createUsageChart(chartContainer, chartData, metricSelect.value as UsageMetric);
 	};
 
 	// Initialize with default selections
 	await updateChart();
 
 	// Update when any selector changes
+	metricSelect.addEventListener('change', updateChart);
 	periodSelect.addEventListener('change', updateChart);
 	aggregationSelect.addEventListener('change', updateChart);
 }

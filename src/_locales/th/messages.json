@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "ตัวแปรหน้า"
 	},
+	"pagesRead": {
+		"message": "หน้าที่อ่าน"
+	},
+	"pagesReadPlural": {
+		"message": "หน้าที่อ่าน"
+	},
 	"pagesSaved": {
 		"message": "หน้าที่บันทึก"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "ชอบ Web Clipper ไหม? ช่วยเราด้วยการให้คะแนน"
+	},
+	"read": {
+		"message": "อ่านแล้ว"
 	},
 	"reader": {
 		"message": "อ่าน"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "พฤติกรรมการบันทึก"
+	},
+	"saved": {
+		"message": "บันทึกแล้ว"
 	},
 	"saveFile": {
 		"message": "บันทึกไฟล์..."

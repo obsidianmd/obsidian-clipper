@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Sayfa değişkenleri"
 	},
+	"pagesRead": {
+		"message": "sayfa okundu"
+	},
+	"pagesReadPlural": {
+		"message": "sayfalar okundu"
+	},
 	"pagesSaved": {
 		"message": "sayfa kaydedildi"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Web Clipper'ı beğeniyor musunuz? Bize bir puan vererek yardımcı olun."
+	},
+	"read": {
+		"message": "Okundu"
 	},
 	"reader": {
 		"message": "Okuyucu"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Kaydetme davranışı"
+	},
+	"saved": {
+		"message": "Kaydedildi"
 	},
 	"saveFile": {
 		"message": "Dosyayı kaydet..."

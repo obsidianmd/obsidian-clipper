@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "页面变量"
 	},
+	"pagesRead": {
+		"message": "页面已阅读"
+	},
+	"pagesReadPlural": {
+		"message": "页面已阅读"
+	},
 	"pagesSaved": {
 		"message": "页面已保存"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "您喜欢使用Web Clipper吗？请帮助我们给它评分。"
+	},
+	"read": {
+		"message": "已阅读"
 	},
 	"reader": {
 		"message": "阅读器"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "保存行为"
+	},
+	"saved": {
+		"message": "已保存"
 	},
 	"saveFile": {
 		"message": "保存文件..."

@@ -594,6 +594,12 @@
 	"pageVariables": {
 		"message": "Mga variable ng pahina"
 	},
+	"pagesRead": {
+		"message": "Nabasa na ang pahina"
+	},
+	"pagesReadPlural": {
+		"message": "Nabasa na ang mga pahina"
+	},
 	"pagesSaved": {
 		"message": "Na-save na ang pahina"
 	},
@@ -701,6 +707,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Nagustuhan mo ba ang Web Clipper? Tulungan mo kami sa pamamagitan ng pagbibigay ng rating."
+	},
+	"read": {
+		"message": "Nabasa"
 	},
 	"reader": {
 		"message": "Tagabasa"
@@ -902,6 +911,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Ugali ng pag-save"
+	},
+	"saved": {
+		"message": "Na-save"
 	},
 	"saveFile": {
 		"message": "I-save ang file..."

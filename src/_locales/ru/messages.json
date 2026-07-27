@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Переменные страницы"
 	},
+	"pagesRead": {
+		"message": "страница прочитана"
+	},
+	"pagesReadPlural": {
+		"message": "страницы прочитаны"
+	},
 	"pagesSaved": {
 		"message": "страница сохранена"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Вам нравится Web Clipper? Помогите нам, оценив его."
+	},
+	"read": {
+		"message": "Прочитано"
 	},
 	"reader": {
 		"message": "Читатель"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Поведение при сохранении"
+	},
+	"saved": {
+		"message": "Сохранено"
 	},
 	"saveFile": {
 		"message": "Сохранить файл..."

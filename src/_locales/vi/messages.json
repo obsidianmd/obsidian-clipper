@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Biến trang"
 	},
+	"pagesRead": {
+		"message": "trang đã đọc"
+	},
+	"pagesReadPlural": {
+		"message": "trang đã đọc"
+	},
 	"pagesSaved": {
 		"message": "trang đã lưu"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Bạn thích Web Clipper? Hãy giúp chúng tôi bằng cách đánh giá nó."
+	},
+	"read": {
+		"message": "Đã đọc"
 	},
 	"reader": {
 		"message": "Đọc"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Hành vi lưu"
+	},
+	"saved": {
+		"message": "Đã lưu"
 	},
 	"saveFile": {
 		"message": "Lưu tệp..."

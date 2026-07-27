@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Premenné stránky"
 	},
+	"pagesRead": {
+		"message": "stránka prečítaná"
+	},
+	"pagesReadPlural": {
+		"message": "stránok prečítaných"
+	},
 	"pagesSaved": {
 		"message": "stránka uložená"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Páči sa vám Web Clipper? Pomôžte nám tým, že mu dáte hodnotenie."
+	},
+	"read": {
+		"message": "Prečítané"
 	},
 	"reader": {
 		"message": "Čítačka"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Správanie ukladania"
+	},
+	"saved": {
+		"message": "Uložené"
 	},
 	"saveFile": {
 		"message": "Uložiť súbor..."

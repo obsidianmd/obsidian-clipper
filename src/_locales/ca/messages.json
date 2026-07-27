@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Variables de pàgina"
 	},
+	"pagesRead": {
+		"message": "pàgina llegida"
+	},
+	"pagesReadPlural": {
+		"message": "pàgines llegides"
+	},
 	"pagesSaved": {
 		"message": "pàgina desada"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "T'està agradant Web Clipper? Ajuda'ns donant-li una valoració."
+	},
+	"read": {
+		"message": "Llegides"
 	},
 	"reader": {
 		"message": "Lector"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Comportament de guardar"
+	},
+	"saved": {
+		"message": "Desades"
 	},
 	"saveFile": {
 		"message": "Guardar fitxer..."

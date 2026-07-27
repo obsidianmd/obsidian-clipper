@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Variabel laman web"
 	},
+	"pagesRead": {
+		"message": "halaman dibaca"
+	},
+	"pagesReadPlural": {
+		"message": "halaman-halaman dibaca"
+	},
 	"pagesSaved": {
 		"message": "halaman tersimpan"
 	},
@@ -709,6 +715,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Apakah Anda menikmati Web Clipper? Bantu kami dengan memberikan penilaian."
+	},
+	"read": {
+		"message": "Dibaca"
 	},
 	"reader": {
 		"message": "Pembaca"
@@ -910,6 +919,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Perilaku penyimpanan"
+	},
+	"saved": {
+		"message": "Tersimpan"
 	},
 	"saveFile": {
 		"message": "Simpan file..."

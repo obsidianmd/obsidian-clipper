@@ -602,6 +602,12 @@
 	"pageVariables": {
 		"message": "Sivun muuttujat"
 	},
+	"pagesRead": {
+		"message": "sivu luettu"
+	},
+	"pagesReadPlural": {
+		"message": "sivut luettu"
+	},
 	"pagesSaved": {
 		"message": "sivu tallennettu"
 	},
@@ -717,6 +723,9 @@
 	},
 	"rateExtensionDescription": {
 		"message": "Pidätkö Web Clipperista? Auta meitä antamalla sille arvostelu."
+	},
+	"read": {
+		"message": "Luettu"
 	},
 	"reader": {
 		"message": "Lukija"
@@ -918,6 +927,9 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Tallennuskäyttäytyminen"
+	},
+	"saved": {
+		"message": "Tallennettu"
 	},
 	"saveFile": {
 		"message": "Tallenna tiedosto..."
