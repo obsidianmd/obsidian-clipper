@@ -5,6 +5,8 @@ import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
+import browser from '../utils/browser-polyfill';
+import { copyToClipboard } from '../utils/clipboard-utils';
 
 export interface PresetProvider {
 	id: string;
@@ -26,6 +28,7 @@ interface ProviderPresets {
 }
 
 const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
+const BUNDLED_PROVIDERS_URL = 'providers.json';
 const PRESET_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const PRESET_RETRY_DELAY = 60 * 1000; // 1 minute
 const LOCAL_STORAGE_KEY = 'provider_presets';
@@ -36,6 +39,46 @@ let lastErrorTime = 0;
 let isFetching = false;
 
 let cachedPresetProviders: Record<string, PresetProvider> | null = null;
+const CODEX_HOST_NAME = 'com.obsidian_clipper.codex';
+const CODEX_PROVIDER_BASE_URL = `native:${CODEX_HOST_NAME}`;
+const CODEX_NATIVE_HOST_TEST_TIMEOUT_MS = 8000;
+type CodexBrowserTarget = 'Chrome' | 'Edge';
+type CodexHostOS = 'windows' | 'macos' | 'linux';
+
+declare const CODEX_NATIVE_HOST_SCRIPT_DIR: string;
+
+function normalizePresetProviders(data: ProviderPresets): Record<string, PresetProvider> {
+	const providers: Record<string, PresetProvider> = {};
+	for (const key in data) {
+		if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+			const provider = data[key] as PresetProvider;
+			provider.id = key;
+			providers[key] = provider;
+		}
+	}
+	return providers;
+}
+
+async function getBundledPresets(): Promise<Record<string, PresetProvider>> {
+	try {
+		const response = await fetch(BUNDLED_PROVIDERS_URL);
+		if (!response.ok) return {};
+		const data = await response.json() as ProviderPresets;
+		return normalizePresetProviders(data);
+	} catch (error) {
+		debugLog('Providers', 'Failed to load bundled providers:', error);
+		return {};
+	}
+}
+
+async function mergeBundledPresets(providers: Record<string, PresetProvider>): Promise<Record<string, PresetProvider>> {
+	const bundledPresets = await getBundledPresets();
+	const merged = { ...providers };
+	if (bundledPresets['codex-cli']) {
+		merged['codex-cli'] = bundledPresets['codex-cli'];
+	}
+	return merged;
+}
 
 async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
@@ -49,17 +92,10 @@ async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 		await setLocalStorage(LOCAL_STORAGE_KEY, data);
 		debugLog('Providers', 'Stored providers in local storage:', data);
 
-		const providers: Record<string, PresetProvider> = {};
-		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
-			}
-		}
+		const providers = normalizePresetProviders(data);
 
 		debugLog('Providers', 'Successfully fetched presets:', providers);
-		return providers;
+		return mergeBundledPresets(providers);
 	} catch (error) {
 		console.error('Failed to fetch preset providers:', error);
 		throw error;
@@ -71,15 +107,7 @@ async function getLocalPresets(): Promise<Record<string, PresetProvider> | null>
 		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
 		if (!data) return null;
 
-		const providers: Record<string, PresetProvider> = {};
-		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
-			}
-		}
-		return providers;
+		return normalizePresetProviders(data);
 	} catch (error) {
 		console.error('Failed to get providers from local storage:', error);
 		return null;
@@ -118,10 +146,10 @@ export async function getPresetProviders(): Promise<Record<string, PresetProvide
 		debugLog('Providers', 'Fetching is already in progress or recently failed');
 		const localPresets = await getLocalPresets();
 		if (localPresets) {
-			cachedPresets = localPresets;
+			cachedPresets = await mergeBundledPresets(localPresets);
 		}
 		debugLog('Providers', 'Returning fallback presets (local or previous cache)');
-		return localPresets || cachedPresets || {};
+		return cachedPresets || await getBundledPresets();
 	}
 
 	isFetching = true;
@@ -131,11 +159,11 @@ export async function getPresetProviders(): Promise<Record<string, PresetProvide
 		if (!needsUpdate) {
 			const localPresets = await getLocalPresets();
 			if (localPresets) {
-				cachedPresets = localPresets;
+				cachedPresets = await mergeBundledPresets(localPresets);
 				lastFetchTime = now;
 				lastErrorTime = 0;
 				debugLog('Providers', 'Using up-to-date local storage presets');
-				return localPresets;
+				return cachedPresets;
 			}
 			debugLog('Providers', 'Local presets missing despite version match or failed check, fetching fresh.');
 		}
@@ -153,10 +181,10 @@ export async function getPresetProviders(): Promise<Record<string, PresetProvide
 		
 		const localPresets = await getLocalPresets();
 		if (localPresets) {
-			cachedPresets = localPresets;
+			cachedPresets = await mergeBundledPresets(localPresets);
 		}
 		debugLog('Providers', 'Fetch failed, returning fallback presets (local or previous cache)');
-		return localPresets || cachedPresets || {};
+		return cachedPresets || await getBundledPresets();
 	} finally {
 		isFetching = false;
 	}
@@ -239,6 +267,9 @@ export async function initializeInterpreterSettings(): Promise<void> {
 		if (addProviderBtn) {
 			addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
 		}
+
+		initializeCodexNativeHostSetup();
+		updateCodexNativeHostSetupVisibility();
 	} catch (error) {
 		console.error('Error in initializeInterpreterSettings:', error);
 		// Reset to safe defaults and re-throw to be handled by caller
@@ -257,6 +288,155 @@ function initializeInterpreterToggles(): void {
 
 	initializeSettingToggle('interpreter-auto-run-toggle', generalSettings.interpreterAutoRun, (checked) => {
 		saveSettings({ ...generalSettings, interpreterAutoRun: checked });
+	});
+
+	initializeSettingToggle('interpreter-image-input-toggle', generalSettings.interpreterImageInput, (checked) => {
+		saveSettings({ ...generalSettings, interpreterImageInput: checked });
+	});
+}
+
+function hasCodexProvider(): boolean {
+	return generalSettings.providers.some(provider => provider.baseUrl === CODEX_PROVIDER_BASE_URL);
+}
+
+function hasCodexModel(): boolean {
+	const codexProviderIds = new Set(generalSettings.providers
+		.filter(provider => provider.baseUrl === CODEX_PROVIDER_BASE_URL)
+		.map(provider => provider.id));
+	return generalSettings.models.some(model => codexProviderIds.has(model.providerId));
+}
+
+function shouldShowCodexNativeHostSetup(): boolean {
+	return hasCodexProvider() || hasCodexModel();
+}
+
+function getBrowserInstallTarget(): CodexBrowserTarget {
+	return navigator.userAgent.includes('Edg/') ? 'Edge' : 'Chrome';
+}
+
+function getCodexHostOS(): CodexHostOS {
+	const platform = String(
+		((navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform)
+		|| navigator.platform
+		|| navigator.userAgent
+	).toLowerCase();
+
+	if (platform.includes('win')) return 'windows';
+	if (platform.includes('mac')) return 'macos';
+	return 'linux';
+}
+
+function quoteForPowerShell(value: string): string {
+	return `"${value.replace(/"/g, '`"')}"`;
+}
+
+function quoteForShell(value: string): string {
+	return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
+function getCodexNativeHostScriptPath(fileName: string, fallbackPath: string): string {
+	const scriptDir = typeof CODEX_NATIVE_HOST_SCRIPT_DIR === 'string' ? CODEX_NATIVE_HOST_SCRIPT_DIR : '';
+	if (!scriptDir) return fallbackPath;
+	const separator = scriptDir.includes('\\') ? '\\' : '/';
+	return `${scriptDir.replace(/[\\/]+$/, '')}${separator}${fileName}`;
+}
+
+function buildCodexNativeHostInstallCommand(): string {
+	const browserName = getBrowserInstallTarget();
+	const extensionId = browser.runtime.id;
+	const osName = getCodexHostOS();
+
+	if (osName === 'windows') {
+		const scriptPath = getCodexNativeHostScriptPath('install-codex-host-windows.ps1', '.\\native\\install-codex-host-windows.ps1');
+		return [
+			'powershell.exe',
+			'-NoProfile',
+			'-ExecutionPolicy Bypass',
+			'-File',
+			quoteForPowerShell(scriptPath),
+			'-Browser',
+			browserName,
+			'-ExtensionId',
+			quoteForPowerShell(extensionId),
+		].join(' ');
+	}
+
+	const scriptPath = getCodexNativeHostScriptPath('install-codex-host-unix.sh', './native/install-codex-host-unix.sh');
+	return [
+		'bash',
+		quoteForShell(scriptPath),
+		'--browser',
+		browserName.toLowerCase(),
+		'--extension-id',
+		quoteForShell(extensionId),
+	].join(' ');
+}
+
+function setCodexNativeHostStatus(message: string, state: 'neutral' | 'success' | 'error' = 'neutral'): void {
+	const status = document.getElementById('codex-native-host-status');
+	if (!status) return;
+	status.textContent = message;
+	status.className = `setting-item-description codex-native-host-status is-${state}`;
+}
+
+function updateCodexNativeHostSetupVisibility(): void {
+	const container = document.getElementById('codex-native-host-setup');
+	const command = document.getElementById('codex-native-host-command') as HTMLTextAreaElement | null;
+	if (!container || !command) return;
+
+	const visible = shouldShowCodexNativeHostSetup();
+	container.style.display = visible ? 'block' : 'none';
+	if (visible) {
+		command.value = buildCodexNativeHostInstallCommand();
+	}
+}
+
+function initializeCodexNativeHostSetup(): void {
+	const copyButton = document.getElementById('copy-codex-native-host-command') as HTMLButtonElement | null;
+	const testButton = document.getElementById('test-codex-native-host') as HTMLButtonElement | null;
+	const command = document.getElementById('codex-native-host-command') as HTMLTextAreaElement | null;
+
+	if (!copyButton || !testButton || !command) return;
+
+	copyButton.addEventListener('click', async () => {
+		command.value = buildCodexNativeHostInstallCommand();
+		const copied = await copyToClipboard(command.value);
+		setCodexNativeHostStatus(
+			copied ? getMessage('installCommandCopied') : getMessage('installCommandCopyFailed'),
+			copied ? 'success' : 'error'
+		);
+	});
+
+	testButton.addEventListener('click', async () => {
+		testButton.disabled = true;
+		setCodexNativeHostStatus(getMessage('testingConnection'));
+		try {
+			const response = await withTimeout(
+				browser.runtime.sendNativeMessage(CODEX_HOST_NAME, { type: 'ping' }) as Promise<{ ok?: boolean; host?: string; pong?: boolean; error?: string }>,
+				CODEX_NATIVE_HOST_TEST_TIMEOUT_MS,
+				getMessage('codexNativeHostConnectionTimedOut')
+			);
+			if (response?.ok && response?.pong) {
+				setCodexNativeHostStatus(getMessage('codexNativeHostConnected'), 'success');
+			} else {
+				setCodexNativeHostStatus(response?.error || getMessage('codexNativeHostConnectionFailed'), 'error');
+			}
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			setCodexNativeHostStatus(message || getMessage('codexNativeHostConnectionFailed'), 'error');
+		} finally {
+			testButton.disabled = false;
+		}
+	});
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+	return new Promise((resolve, reject) => {
+		const timeoutId = window.setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+		promise
+			.then(resolve)
+			.catch(reject)
+			.finally(() => window.clearTimeout(timeoutId));
 	});
 }
 
@@ -425,6 +605,7 @@ function duplicateProvider(index: number) {
 	generalSettings.providers.push(duplicatedProvider);
 	saveSettings();
 	initializeProviderList();
+	updateCodexNativeHostSetupVisibility();
 
 	const newIndex = generalSettings.providers.length - 1;
 	showProviderModal(duplicatedProvider, newIndex);
@@ -443,6 +624,7 @@ function deleteProvider(index: number): void {
 		generalSettings.providers.splice(index, 1);
 		saveSettings();
 		initializeProviderList();
+		updateCodexNativeHostSetupVisibility();
 	}
 }
 
@@ -623,6 +805,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 			await saveSettings();
 			debugLog('Providers', 'Settings saved');
 			initializeProviderList();
+			updateCodexNativeHostSetupVisibility();
 			hideModal(modal);
 		} catch (error) {
 			console.error('Failed to save settings:', error);
@@ -1053,6 +1236,7 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			try {
 				await saveSettings();
 				initializeModelList();
+				updateCodexNativeHostSetupVisibility();
 				hideModal(modal);
 			} catch (error) {
 				console.error('Failed to save model settings:', error);
@@ -1073,6 +1257,7 @@ function deleteModel(index: number) {
 		generalSettings.models.splice(index, 1);
 		saveSettings();
 		initializeModelList();
+		updateCodexNativeHostSetupVisibility();
 	}
 }
 
@@ -1086,6 +1271,7 @@ function initializeAutoSave(): void {
 function saveInterpreterSettingsFromForm(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
+	const interpreterImageInputToggle = document.getElementById('interpreter-image-input-toggle') as HTMLInputElement;
 	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 
 	const updatedSettings: Partial<typeof generalSettings> = {}; 
@@ -1094,6 +1280,9 @@ function saveInterpreterSettingsFromForm(): void {
 	}
 	if (interpreterAutoRunToggle) {
 		updatedSettings.interpreterAutoRun = interpreterAutoRunToggle.checked;
+	}
+	if (interpreterImageInputToggle) {
+		updatedSettings.interpreterImageInput = interpreterImageInputToggle.checked;
 	}
 	if (defaultPromptContextInput) {
 		updatedSettings.defaultPromptContext = defaultPromptContextInput.value;
@@ -1124,6 +1313,7 @@ function duplicateModel(index: number) {
 	
 	saveSettings();
 	initializeModelList();
+	updateCodexNativeHostSetupVisibility();
 
 	const newIndex = index + 1;
 	showModelModal(duplicatedModel, newIndex);

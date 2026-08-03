@@ -16,6 +16,12 @@ builds/
 changelogs/
 assets/shared
 
+# Native messaging generated files
+native/com.obsidian_clipper.codex.chrome.json
+native/com.obsidian_clipper.codex.edge.json
+native/obsidian-clipper-codex-host
+native/obsidian-clipper-codex-host.exe
+
 # Xcode
 *.xcuserstate
 *.xcuserdatad

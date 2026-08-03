@@ -13,6 +13,7 @@ import {
 	BinaryExpression,
 	UnaryExpression,
 	FilterExpression,
+	validateVariables,
 } from './parser';
 
 // Type guards
@@ -170,6 +171,17 @@ describe('Parser', () => {
 			const varNode = result.ast[0] as VariableNode;
 			expect(isIdentifier(varNode.expression)).toBe(true);
 			expect((varNode.expression as IdentifierExpression).name).toBe('author.name');
+		});
+
+		test('does not warn for prompt variables', () => {
+			const result = parse([
+				'{{prompt:"Return exactly CODEX_CLIPPER_CONNECTED."}}',
+				'{{prompt:Return exactly CODEX_CLIPPER_CONNECTED.}}',
+				'{{"Return exactly CODEX_CLIPPER_CONNECTED."}}',
+			].join('\n'));
+
+			expect(result.errors).toHaveLength(0);
+			expect(validateVariables(result.ast)).toHaveLength(0);
 		});
 	});
 

@@ -6,13 +6,13 @@ import { extractPageContent, initializePageContent } from '../utils/content-extr
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
-import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
+import { getLocalStorage, setLocalStorage, loadSettings, saveSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
-import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
+import { initializeInterpreter, handleInterpreterUI, collectPromptVariables, getActiveInterpreterModel } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
@@ -875,7 +875,12 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 				option.textContent = model.name;
 				modelSelect.appendChild(option);
 			});
-			modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
+			const activeModel = getActiveInterpreterModel(generalSettings.interpreterModel);
+			modelSelect.value = activeModel?.id || '';
+			if (activeModel && generalSettings.interpreterModel !== activeModel.id) {
+				generalSettings.interpreterModel = activeModel.id;
+				void saveSettings();
+			}
 			modelSelect.style.display = 'inline-block';
 		}
 	}
@@ -946,10 +951,9 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 			try {
 				const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 				const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-				const selectedModelId = modelSelect?.value || generalSettings.interpreterModel;
-				const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+				const modelConfig = getActiveInterpreterModel(modelSelect?.value);
 				if (!modelConfig) {
-					throw new Error(`Model configuration not found for ${selectedModelId}`);
+					throw new Error('No enabled interpreter model found. Enable a model in Interpreter settings first.');
 				}
 				await handleInterpreterUI(template, variables, currentTabId!, currentUrl, modelConfig);
 
@@ -1329,8 +1333,17 @@ async function handleClipObsidian(): Promise<void> {
 			if (interpretBtn.classList.contains('processing')) {
 				await waitForInterpreter(interpretBtn);
 			} else if (!interpretBtn.classList.contains('done')) {
-				interpretBtn.click();
-				await waitForInterpreter(interpretBtn);
+				const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+				const modelConfig = getActiveInterpreterModel(modelSelect?.value);
+				if (!modelConfig) {
+					throw new Error('No enabled interpreter model found. Enable a model in Interpreter settings first.');
+				}
+				const tabId = currentTabId;
+				if (!tabId) {
+					throw new Error('No active tab found for interpreter processing.');
+				}
+				const tab = await getTabInfo(tabId);
+				await handleInterpreterUI(currentTemplate, currentVariables, tabId, tab.url || '', modelConfig);
 			}
 		}
 

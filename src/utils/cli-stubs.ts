@@ -21,6 +21,7 @@ export const generalSettings: Settings = {
 	providers: [],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
+	interpreterImageInput: false,
 	defaultPromptContext: '',
 	propertyTypes: [],
 	readerSettings: {

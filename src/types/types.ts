@@ -85,6 +85,7 @@ export interface Settings {
 	providers: Provider[];
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
+	interpreterImageInput: boolean;
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;

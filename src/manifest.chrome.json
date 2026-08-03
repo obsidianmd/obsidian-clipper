@@ -10,6 +10,7 @@
 		"clipboardWrite",
 		"commands",
 		"contextMenus",
+		"nativeMessaging",
 		"sidePanel",
 		"storage",
 		"scripting",
