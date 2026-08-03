@@ -178,11 +178,13 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 
 	// Use pre-parsed document if provided, otherwise parse
 	const doc = parsedDocument ?? documentParser.parseFromString(html, 'text/html');
-	const documentElement = doc.documentElement || doc;
 
-	// Extract content with defuddle
-	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
+	// Extract content with defuddle.
+	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document.
+	// Pass the full `doc` rather than `doc.documentElement`; on linkedom the element root
+	// does not expose <head> meta tags, which leaves title/metaTags empty.
+	// This matches the usage in template-integration.test.ts.
+	const defuddle = new DefuddleClass(doc as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
 
 	// Convert to markdown
