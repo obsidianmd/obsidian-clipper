@@ -339,6 +339,51 @@ describe('Tokenizer', () => {
 		});
 	});
 
+	describe('Regex Literal Filter Arguments', () => {
+		test('tokenizes an unquoted regex literal as a string token', () => {
+			const result = tokenize('{{domain|replace:/^www\\./:""}}');
+			expect(result.errors).toHaveLength(0);
+			const strings = result.tokens.filter(t => t.type === 'string');
+			expect(strings[0].value).toBe('/^www\\./');
+			expect(strings[1].value).toBe('');
+		});
+
+		test('keeps regex flags with the literal', () => {
+			const result = tokenize('{{title|replace:/hello/gi:"hi"}}');
+			expect(result.errors).toHaveLength(0);
+			const strings = result.tokens.filter(t => t.type === 'string');
+			expect(strings[0].value).toBe('/hello/gi');
+		});
+
+		test('does not end the literal at a slash inside a character class', () => {
+			const result = tokenize('{{url|replace:/[/:]/g:"-"}}');
+			expect(result.errors).toHaveLength(0);
+			const strings = result.tokens.filter(t => t.type === 'string');
+			expect(strings[0].value).toBe('/[/:]/g');
+		});
+
+		test('keeps alternation inside the literal instead of ending at the pipe', () => {
+			const result = tokenize('{{domain|replace:/^(www|m)\\./:""}}');
+			expect(result.errors).toHaveLength(0);
+			const strings = result.tokens.filter(t => t.type === 'string');
+			expect(strings[0].value).toBe('/^(www|m)\\./');
+		});
+
+		test('still tokenizes a bare slash separator as a slash token', () => {
+			const result = tokenize('{{path|split:/|join:"-"}}');
+			expect(result.errors).toHaveLength(0);
+			expect(getTypes(result.tokens)).toContain('slash');
+			expect(result.tokens.some(t => t.type === 'string' && t.value.startsWith('/'))).toBe(false);
+		});
+
+		test('does not treat a slash in a text node as a regex', () => {
+			const result = tokenize('Clippings/{{domain}}');
+			expect(result.errors).toHaveLength(0);
+			expect(result.tokens[0].type).toBe('text');
+			expect(result.tokens[0].value).toBe('Clippings/');
+		});
+	});
+
 	describe('Filter Arguments with Empty String', () => {
 		test('tokenizes filter with empty string argument', () => {
 			const result = tokenize('{{"test"|replace:"%":""}}');

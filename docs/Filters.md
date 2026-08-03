@@ -80,6 +80,7 @@ Regex is supported using JavaScript regex syntax:
 - Case-insensitive: `"HELLO world"|replace:"/hello/i":"hi"` → `"hi world".`
 - Multiple regex: `"hello world"|replace:("/[aeiou]/g":"*","/\s+/":"-")` → `"h*ll*-w*rld"`.
 - Available flags: `g` (global), `i` (case-insensitive), `m` (multiline), `s` (dotAll), `u` (unicode), `y` (sticky).
+- The quotes around the pattern are optional: `replace:/[aeiou]/g:"*"` works the same way.
 
 ### `safe_name`
 

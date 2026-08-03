@@ -490,6 +490,17 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 		return;
 	}
 
+	// Regex literal in filter argument position, e.g. replace:/^www\./:""
+	// Emitted as a string token so the parser and the filters see the same
+	// /pattern/flags form they already accept when it is written in quotes.
+	if (char === '/') {
+		const regexLiteral = tryTokenizeRegexLiteral(state);
+		if (regexLiteral !== null) {
+			state.tokens.push({ type: 'string', value: regexLiteral, line: startLine, column: startColumn });
+			return;
+		}
+	}
+
 	// Single-character operators and punctuation
 	switch (char) {
 		case '>':
@@ -586,6 +597,68 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 // ============================================================================
 // Literal Tokenization
 // ============================================================================
+
+/**
+ * Try to read a regex literal (/pattern/flags) starting at the current slash.
+ *
+ * Returns the raw literal including its delimiters and flags and advances past it,
+ * or null when this slash does not start a well-formed regex literal — in which case
+ * the caller falls back to emitting a plain slash token, so a bare separator such as
+ * `split:/` keeps working.
+ */
+function tryTokenizeRegexLiteral(state: TokenizerState): string | null {
+	// A regex literal only makes sense where a filter argument is expected.
+	const prev = state.tokens[state.tokens.length - 1];
+	if (!prev || (prev.type !== 'colon' && prev.type !== 'comma')) return null;
+
+	let pos = state.pos + 1;
+	let inCharClass = false;
+	let closed = false;
+	let pattern = '';
+
+	while (pos < state.input.length) {
+		const char = state.input[pos];
+
+		if (char === '\\') {
+			const next = state.input[pos + 1];
+			if (next === undefined || next === '\n') return null;
+			pattern += char + next;
+			pos += 2;
+			continue;
+		}
+
+		// Bail out rather than swallowing the rest of the expression. Quotes and the
+		// closing delimiters mean this slash was punctuation, not a regex opener.
+		if (char === '\n' || char === '"' || char === "'") return null;
+		if (char === '}' && state.input[pos + 1] === '}') return null;
+		if (char === '%' && state.input[pos + 1] === '}') return null;
+
+		if (char === '[') inCharClass = true;
+		else if (char === ']') inCharClass = false;
+		else if (char === '/' && !inCharClass) {
+			closed = true;
+			break;
+		}
+
+		pattern += char;
+		pos++;
+	}
+
+	if (!closed || pattern.length === 0) return null;
+
+	pos++; // Consume the closing slash
+
+	let flags = '';
+	while (pos < state.input.length && REGEX_FLAGS.includes(state.input[pos])) {
+		flags += state.input[pos];
+		pos++;
+	}
+
+	advance(state, pos - state.pos);
+	return `/${pattern}/${flags}`;
+}
+
+const REGEX_FLAGS = 'gimsuy';
 
 function tokenizeString(state: TokenizerState): void {
 	const quote = state.input[state.pos];
