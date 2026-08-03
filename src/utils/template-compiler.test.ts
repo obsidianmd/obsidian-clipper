@@ -42,4 +42,12 @@ describe('compileTemplate', () => {
 		});
 	});
 
+	describe('root_domain Filter', () => {
+		test('resolves the registrable domain in a path', async () => {
+			const output = await compile('Clippings/{{domain|root_domain|split:"."|first}}', {
+				'{{domain}}': 'news.ycombinator.com',
+			});
+			expect(output).toBe('Clippings/ycombinator');
+		});
+	});
 });

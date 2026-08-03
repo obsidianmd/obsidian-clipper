@@ -35,6 +35,7 @@ import { remove_html } from './filters/remove_html';
 import { remove_tags } from './filters/remove_tags';
 import { replace, validateReplaceParams } from './filters/replace';
 import { replace_tags } from './filters/replace_tags';
+import { root_domain } from './filters/root_domain';
 import { round, validateRoundParams } from './filters/round';
 import { safe_name, validateSafeNameParams } from './filters/safe_name';
 import { slice, validateSliceParams } from './filters/slice';
@@ -110,6 +111,7 @@ export const filterMetadata: Record<string, FilterMetadata> = {
 	remove_tags: {},
 	replace_tags: {},
 	reverse: {},
+	root_domain: {},
 	round: { example: 'round:2', validateParams: validateRoundParams },
 	safe_name: { example: 'safe_name:windows', validateParams: validateSafeNameParams },
 	snake: {},
@@ -165,6 +167,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	remove_tags,
 	replace,
 	replace_tags,
+	root_domain,
 	round,
 	safe_name,
 	slice,

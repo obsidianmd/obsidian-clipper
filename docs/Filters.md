@@ -82,6 +82,15 @@ Regex is supported using JavaScript regex syntax:
 - Available flags: `g` (global), `i` (case-insensitive), `m` (multiline), `s` (dotAll), `u` (unicode), `y` (sticky).
 - The quotes around the pattern are optional: `replace:/[aeiou]/g:"*"` works the same way.
 
+### `root_domain`
+
+Reduces a hostname or URL to the registrable domain, dropping any subdomains.
+
+- `"news.ycombinator.com"|root_domain` returns `"ycombinator.com"`.
+- `"https://www.bbc.co.uk/news"|root_domain` returns `"bbc.co.uk"`, keeping two-part country suffixes intact.
+- Hosts without a dot and IP addresses are returned unchanged.
+- To get just the site name, chain it: `"news.ycombinator.com"|root_domain|split:"."|first` returns `"ycombinator"`.
+
 ### `safe_name`
 
 Converts text to a safe file name.
