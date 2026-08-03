@@ -135,6 +135,27 @@ declare global {
 			return;
 		}
 
+		if (request.action === "open-protocol-url") {
+			if (typeof request.url !== 'string' || !request.url.startsWith('obsidian://')) {
+				sendResponse({ success: false, error: 'Invalid protocol URL' });
+				return true;
+			}
+
+			const target = document.body || document.documentElement;
+			try {
+				const a = document.createElement('a');
+				a.href = request.url;
+				a.style.display = 'none';
+				target.appendChild(a);
+				a.click();
+				a.remove();
+				sendResponse({ success: true });
+			} catch (err) {
+				sendResponse({ success: false, error: (err as Error).message });
+			}
+			return true;
+		}
+
 		if (request.action === "copy-text-to-clipboard") {
 			const textArea = document.createElement("textarea");
 			textArea.value = request.text;
