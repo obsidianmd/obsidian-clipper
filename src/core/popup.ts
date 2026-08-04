@@ -23,6 +23,7 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { formatPropertyValue } from '../utils/shared';
+import { runQuickClip } from '../utils/quick-clip';
 
 interface ReaderModeResponse {
 	success: boolean;
@@ -35,6 +36,13 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let resolvePopupReady: (() => void) | null = null;
+let popupReadySettled = false;
+let popupReadyError: unknown = null;
+
+const popupReadyPromise = new Promise<void>((resolve) => {
+	resolvePopupReady = resolve;
+});
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -245,10 +253,10 @@ function setupStorageListeners() {
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 		if (request.action === "triggerQuickClip") {
-			handleClipObsidian().then(() => {
+			handleQuickClip().then(() => {
 				sendResponse({success: true});
 			}).catch((error) => {
-				console.error('Error in handleClipObsidian:', error);
+				console.error('Error in handleQuickClip:', error);
 				sendResponse({success: false, error: error.message});
 			});
 			return true;
@@ -282,6 +290,26 @@ function setupMessageListeners() {
 	});
 }
 
+function markPopupReady(): void {
+	if (popupReadySettled) return;
+	popupReadySettled = true;
+	resolvePopupReady?.();
+}
+
+function markPopupInitializationFailed(error: unknown): void {
+	if (popupReadySettled) return;
+	popupReadySettled = true;
+	popupReadyError = error;
+	resolvePopupReady?.();
+}
+
+async function waitForPopupReady(): Promise<void> {
+	await popupReadyPromise;
+	if (popupReadyError) {
+		throw popupReadyError;
+	}
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
 	loadedSettings = await loadSettings();
 	if (isIframe) {
@@ -294,6 +322,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Get the active tab via background script to handle Firefox compatibility
 		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
 		if (!response || response.error || !response.tabId) {
+			markPopupInitializationFailed(new Error(getMessage('pleaseReload')));
 			showError(getMessage('pleaseReload'));
 			return;
 		}
@@ -372,6 +401,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
+				markPopupInitializationFailed(new Error(getMessage('pleaseReload')));
 				return;
 			}
 
@@ -394,15 +424,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 				// Initial content load
 				await refreshFields(currentTabId);
+				markPopupReady();
 			} catch (error) {
 				console.error('Error initializing popup:', error);
+				markPopupInitializationFailed(error);
 				showError(getMessage('pleaseReload'));
 			}
 		} else {
+			markPopupInitializationFailed(new Error(getMessage('pleaseReload')));
 			showError(getMessage('pleaseReload'));
 		}
 	} catch (error) {
 		console.error('Error getting active tab:', error);
+		markPopupInitializationFailed(error);
 		showError(getMessage('pleaseReload'));
 	}
 });
@@ -1306,6 +1340,22 @@ function determineMainAction() {
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+	}
+}
+
+async function handleQuickClip(): Promise<void> {
+	await runQuickClip({
+		waitUntilReady: waitForPopupReady,
+		getSaveBehavior: () => loadedSettings?.saveBehavior,
+		handlers: {
+			addToObsidian: handleClipObsidian,
+			saveFile: handleSaveToDownloads,
+			copyToClipboard: copyContent,
+		},
+	});
+
+	if (!isSidePanel && !isIframe) {
+		setTimeout(() => window.close(), 500);
 	}
 }
 
