@@ -4,6 +4,7 @@ import browser from '../utils/browser-polyfill';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
+import { DEFAULT_TEMPLATE_PATH } from './template-defaults';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -116,7 +117,7 @@ export function createDefaultTemplate(): Template {
 		name: getMessage('defaultTemplateName'),
 		behavior: 'create',
 		noteNameFormat: '{{title}}',
-		path: 'Clippings',
+		path: DEFAULT_TEMPLATE_PATH,
 		noteContentFormat: '{{content}}',
 		context: "",
 		properties: [

@@ -1,5 +1,6 @@
 import { Template, Property } from '../types/types';
 import { deleteTemplate, templates, editingTemplateIndex, saveTemplateSettings, setEditingTemplateIndex, loadTemplates } from './template-manager';
+import { DEFAULT_TEMPLATE_PATH } from './template-defaults';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { generalSettings } from '../utils/storage-utils';
@@ -146,7 +147,7 @@ export function showTemplateEditor(template: Template | null): void {
 			name: newTemplateName,
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
-			path: 'Clippings',
+			path: DEFAULT_TEMPLATE_PATH,
 			noteContentFormat: '{{content}}',
 			properties: [],
 			triggers: [],
@@ -556,7 +557,7 @@ function clearTemplateEditor(): void {
 	if (templateName) templateName.value = '';
 	if (templateProperties) templateProperties.textContent = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = 'Clippings';
+	if (pathInput) pathInput.value = DEFAULT_TEMPLATE_PATH;
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) triggersTextarea.value = '';
 	const templateEditor = document.getElementById('template-editor');
