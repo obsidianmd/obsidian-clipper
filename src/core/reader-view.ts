@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
 
+		// Capture the source document's declared direction (some RTL pages set dir
+		// without a lang) to carry onto the reader page alongside the language. (#864)
+		const sourceDir = parsedDoc.documentElement.getAttribute('dir') || parsedDoc.body?.getAttribute('dir') || undefined;
+
 		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
 		const result = await defuddle.parseAsync();
 
@@ -62,6 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			domain: getDomain(url),
 			wordCount: result.wordCount,
 			parseTime: result.parseTime,
+			language: result.language,
+			dir: sourceDir,
 		};
 
 		Reader.isReaderPage = true;
@@ -219,6 +225,10 @@ async function loadArticle(newUrl: string) {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
 
+		// Capture the source document's declared direction to mirror correctly on
+		// in-reader navigation, even when the page omits a lang. (#864)
+		const sourceDir = parsedDoc.documentElement.getAttribute('dir') || parsedDoc.body?.getAttribute('dir') || undefined;
+
 		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
 		const result = await defuddle.parseAsync();
 
@@ -244,6 +254,8 @@ async function loadArticle(newUrl: string) {
 			domain: getDomain(newUrl),
 			wordCount: result.wordCount,
 			parseTime: result.parseTime,
+			language: result.language,
+			dir: sourceDir,
 		});
 
 		setupReaderPageMessageHandler(newUrl, result);
