@@ -32,6 +32,7 @@ Options:
                                If a directory, auto-matches template by URL triggers
   -o, --output <path>          Output .md file path (default: stdout)
       --html <path>            Read HTML from file instead of fetching URL (use - for stdin)
+                               When set, the <url> argument is optional
       --vault <name>           Obsidian vault name
       --open                   Send to Obsidian instead of writing file
       --uri                    Use URI scheme instead of Obsidian CLI
@@ -104,8 +105,8 @@ function parseArgs(argv: string[]): CliArgs {
 		}
 	}
 
-	if (!url) {
-		console.error('Error: URL is required');
+	if (!url && !htmlPath) {
+		console.error('Error: a <url> argument is required (or use --html to read local HTML)');
 		printUsage();
 		process.exit(1);
 	}
@@ -184,6 +185,13 @@ async function main(): Promise<void> {
 			html = fs.readFileSync(0, 'utf-8'); // stdin
 		} else {
 			html = fs.readFileSync(path.resolve(args.htmlPath), 'utf-8');
+		}
+		// Fall back to the page's own canonical URL when none is passed.
+		if (!args.url) {
+			const { document } = parseHTML(html);
+			args.url = document.querySelector('link[rel="canonical"]')?.getAttribute('href')
+				|| document.querySelector('meta[property="og:url"]')?.getAttribute('content')
+				|| 'about:blank';
 		}
 	} else {
 		const response = await fetch(args.url);
