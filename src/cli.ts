@@ -1,6 +1,7 @@
 // Browser globals (DOMParser, window, document) are provided by the esbuild
 // banner in scripts/build-cli.mjs. They must run before any bundled module code.
 import { parseHTML } from 'linkedom';
+import DefuddleClass from 'defuddle';
 import { clip, matchTemplate, DocumentParser } from './api';
 import { openInObsidian } from './utils/cli-utils';
 import { Template } from './types/types';
@@ -205,9 +206,8 @@ async function main(): Promise<void> {
 		if (!matched) {
 			const hasSchemaTrigs = templates.some(t => t.triggers?.some(tr => tr.startsWith('schema:')));
 			if (hasSchemaTrigs) {
-				const DefuddleClass = (await import('defuddle')).default;
 				parsedDocument = linkedomParser.parseFromString(html, 'text/html');
-				const defuddle = new DefuddleClass((parsedDocument.documentElement || parsedDocument) as unknown as Document, { url: args.url });
+				const defuddle = new DefuddleClass(parsedDocument as unknown as Document, { url: args.url });
 				const defuddleResult = defuddle.parse();
 				matched = matchTemplate(templates, args.url, defuddleResult.schemaOrgData);
 			}
