@@ -25,7 +25,7 @@ export interface ClipOptions {
 	template: Template;
 	documentParser: DocumentParser;
 	propertyTypes?: Record<string, string>;
-	/** Pre-parsed document to skip re-parsing (e.g. when already parsed for trigger matching). */
+	/** A complete, unmodified document that can be reused instead of parsing html. */
 	parsedDocument?: any;
 }
 
@@ -175,15 +175,12 @@ export function matchTemplate(templates: Template[], url: string, schemaOrgData?
  */
 export async function clip(options: ClipOptions): Promise<ClipResult> {
 	const { html, url, template, documentParser, propertyTypes, parsedDocument } = options;
-
-	// Use pre-parsed document if provided, otherwise parse
 	const doc = parsedDocument ?? documentParser.parseFromString(html, 'text/html');
-	const documentElement = doc.documentElement || doc;
 
 	// Extract content with defuddle
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
-	const defuddleResult = defuddle.parse();
+	const defuddle = new DefuddleClass(doc as unknown as Document, { url });
+	const defuddleResult = await defuddle.parseAsync();
 
 	// Convert to markdown
 	const markdownContent = createMarkdownContent(defuddleResult.content, url);

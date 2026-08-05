@@ -1,6 +1,7 @@
 // Browser globals (DOMParser, window, document) are provided by the esbuild
 // banner in scripts/build-cli.mjs. They must run before any bundled module code.
 import { parseHTML } from 'linkedom';
+import DefuddleClass from 'defuddle';
 import { clip, matchTemplate, DocumentParser } from './api';
 import { openInObsidian } from './utils/cli-utils';
 import { Template } from './types/types';
@@ -196,7 +197,6 @@ async function main(): Promise<void> {
 
 	// If using a template directory, match template by triggers.
 	// Try URL triggers first (no parsing needed). Only parse for schema if required.
-	let parsedDocument: any;
 	if (templates) {
 		// First try URL-only matching (no HTML parsing needed)
 		let matched = matchTemplate(templates, args.url);
@@ -205,9 +205,8 @@ async function main(): Promise<void> {
 		if (!matched) {
 			const hasSchemaTrigs = templates.some(t => t.triggers?.some(tr => tr.startsWith('schema:')));
 			if (hasSchemaTrigs) {
-				const DefuddleClass = (await import('defuddle')).default;
-				parsedDocument = linkedomParser.parseFromString(html, 'text/html');
-				const defuddle = new DefuddleClass((parsedDocument.documentElement || parsedDocument) as unknown as Document, { url: args.url });
+				const matchingDocument = linkedomParser.parseFromString(html, 'text/html');
+				const defuddle = new DefuddleClass(matchingDocument as unknown as Document, { url: args.url });
 				const defuddleResult = defuddle.parse();
 				matched = matchTemplate(templates, args.url, defuddleResult.schemaOrgData);
 			}
@@ -227,14 +226,13 @@ async function main(): Promise<void> {
 		process.exit(1);
 	}
 
-	// Call the API (reuse pre-parsed document if available)
+	// Call the API
 	const result = await clip({
 		html,
 		url: args.url,
 		template,
 		documentParser: linkedomParser,
 		propertyTypes,
-		parsedDocument,
 	});
 
 	// Output
