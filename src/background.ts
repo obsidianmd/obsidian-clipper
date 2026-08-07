@@ -799,7 +799,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 		}[] = [
 				{
 					id: "open-obsidian-clipper",
-					title: "Save this page",
+					title: browser.i18n.getMessage('saveThisPage'),
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
 				{
@@ -819,12 +819,12 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				},
 				{
 					id: "highlight-selection",
-					title: "Add to highlights",
+					title: browser.i18n.getMessage('addToHighlights'),
 					contexts: ["selection"]
 				},
 				{
 					id: "highlight-element",
-					title: "Add to highlights",
+					title: browser.i18n.getMessage('addToHighlights'),
 					contexts: ["image", "video", "audio"]
 				},
 				{
