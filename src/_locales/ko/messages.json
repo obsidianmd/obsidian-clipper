@@ -17,6 +17,9 @@
 	"addProviderTitle": {
 		"message": "제공자 추가"
 	},
+	"addToHighlights": {
+		"message": "하이라이트 추가"
+	},
 	"addToObsidian": {
 		"message": "Obsidian에 추가하기"
 	},
@@ -925,6 +928,9 @@
 	},
 	"saveFile": {
 		"message": "파일 저장..."
+	},
+	"saveThisPage": {
+		"message": "페이지 저장"
 	},
 	"searchHighlightsPlaceholder": {
 		"message": "하이라이트 검색…"

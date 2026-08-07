@@ -17,6 +17,9 @@
 	"addProviderTitle": {
 		"message": "Add provider"
 	},
+	"addToHighlights": {
+		"message": "Add to highlights"
+	},
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},
@@ -925,6 +928,9 @@
 	},
 	"saveFile": {
 		"message": "Save file..."
+	},
+	"saveThisPage": {
+		"message": "Save this page"
 	},
 	"searchHighlightsPlaceholder": {
 		"message": "Search highlights…"
