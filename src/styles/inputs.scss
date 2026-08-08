@@ -2,11 +2,16 @@ textarea {
 	resize: vertical;
 	min-height: 3rem;
 	padding: 0.375rem 0.5rem;
+	// Ensure textarea content direction is determined per-element from the
+	// first strong character, not inherited from the document. This fixes
+	// mixed Arabic/English rendering for all users regardless of UI language.
+	unicode-bidi: plaintext;
 }
 input[type="password"],
 input[type="text"] {
 	height: var(--input-height);
 	padding: 0 0.5rem;
+	unicode-bidi: plaintext;
 }
 textarea::placeholder,
 input::placeholder {
@@ -25,6 +30,7 @@ textarea {
 	outline: none;
 	width: 100%;
 	margin: 0;
+	text-align: start;
 
 	@media (hover: hover) {
 		&:hover {
