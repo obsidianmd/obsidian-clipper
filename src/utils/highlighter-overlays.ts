@@ -3,8 +3,11 @@ import {
 	highlightElement,
 	AnyHighlightData,
 	BLOCK_HIGHLIGHT_TAGS,
+	HighlightColor,
+	HIGHLIGHT_COLORS,
 	highlights,
 	isApplyingHighlights,
+	recolorHighlightRecords,
 	sortHighlights,
 	applyHighlights,
 	saveHighlights,
@@ -48,7 +51,7 @@ interface HighlightInstance {
 	priority: number;
 }
 
-let userHighlight: HighlightInstance | null = null;
+const userHighlights = new Map<HighlightColor | '', HighlightInstance>();
 // Map of highlight id → list of Ranges. One stored highlight may produce
 // multiple ranges in edge cases (future-proofing); today it's always one.
 const textHighlightRanges = new Map<string, Range[]>();
@@ -59,8 +62,9 @@ function getHighlightRegistry(): CSSHighlightsRegistry | null {
 }
 
 let highlightApiWarned = false;
-function ensureUserHighlight(): HighlightInstance | null {
-	if (userHighlight) return userHighlight;
+function ensureUserHighlight(color: HighlightColor | '' = ''): HighlightInstance | null {
+	const existing = userHighlights.get(color);
+	if (existing) return existing;
 	const registry = getHighlightRegistry();
 	const HighlightCtor = (window as unknown as { Highlight?: new () => HighlightInstance }).Highlight;
 	if (!registry || !HighlightCtor) {
@@ -70,9 +74,10 @@ function ensureUserHighlight(): HighlightInstance | null {
 		}
 		return null;
 	}
-	userHighlight = new HighlightCtor();
+	const userHighlight = new HighlightCtor();
 	userHighlight.priority = USER_HIGHLIGHT_PRIORITY;
-	registry.set(USER_HIGHLIGHT_NAME, userHighlight);
+	registry.set(color ? `${USER_HIGHLIGHT_NAME}-${color}` : USER_HIGHLIGHT_NAME, userHighlight);
+	userHighlights.set(color, userHighlight);
 	return userHighlight;
 }
 
@@ -115,10 +120,11 @@ type RenderableTextHighlight = {
 	endOffset: number;
 	content?: string;
 	textQuote?: TextQuoteAnchor;
+	color?: HighlightColor;
 };
 
 export function renderTextHighlight(highlight: RenderableTextHighlight): void {
-	const hl = ensureUserHighlight();
+	const hl = ensureUserHighlight(highlight.color);
 	if (!hl) return;
 
 	// Primary: resolve by stored XPath + character offsets.
@@ -358,7 +364,7 @@ function domPositionForNormalizedOffset(index: NormalizedTextIndex, offset: numb
 }
 
 export function clearTextHighlights(): void {
-	userHighlight?.clear();
+	for (const highlight of userHighlights.values()) highlight.clear();
 	textHighlightRanges.clear();
 	normalizedTextIndexCache = null;
 	normalizedTextIndexRoot = null;
@@ -402,29 +408,62 @@ function findTextHighlightAtPoint(x: number, y: number): string | null {
 // Shown on click/tap on any highlight, or on Alt+hover (desktop shortcut).
 // Positioned center-top above the highlight's bounding box.
 
-let highlightDeleteButton: HTMLButtonElement | null = null;
+let highlightDeleteButton: HTMLDivElement | null = null;
 let currentDeleteTargetId: string | null = null;
 let deleteButtonShownViaAlt = false;
 
-function ensureHighlightDeleteButton(): HTMLButtonElement {
+function ensureHighlightDeleteButton(): HTMLDivElement {
 	if (highlightDeleteButton) return highlightDeleteButton;
-	const btn = document.createElement('button');
-	btn.type = 'button';
-	btn.className = 'obsidian-highlight-delete';
-	btn.setAttribute('aria-label', getMessage('remove'));
-	setElementHTML(btn, `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg><span>${getMessage('remove')}</span>`);
-	btn.style.display = 'none';
-	btn.addEventListener('mousedown', e => e.stopPropagation());
-	btn.addEventListener('click', (e) => {
+	const toolbar = document.createElement('div');
+	toolbar.className = 'obsidian-highlight-delete';
+	toolbar.setAttribute('role', 'toolbar');
+	toolbar.setAttribute('aria-label', getMessage('highlighter'));
+	toolbar.style.display = 'none';
+	toolbar.addEventListener('mousedown', e => {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	const choices: Array<HighlightColor | ''> = ['', ...HIGHLIGHT_COLORS];
+	for (const color of choices) {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.dataset.highlightChoice = color || 'default';
+		button.dataset.highlight = color || 'default';
+		const colorName = color ? `${color[0].toUpperCase()}${color.slice(1)}` : 'Default';
+		button.setAttribute('aria-label', `${colorName} ${getMessage('highlighter').toLowerCase()}`);
+		button.title = button.getAttribute('aria-label') || '';
+		if (!color) {
+			setElementHTML(button, '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>');
+		}
+		button.addEventListener('click', e => {
+			e.stopPropagation();
+			e.preventDefault();
+			if (currentDeleteTargetId) recolorHighlightById(currentDeleteTargetId, color || undefined);
+		});
+		toolbar.appendChild(button);
+	}
+
+	const divider = document.createElement('span');
+	divider.className = 'obsidian-highlight-actions-divider';
+	toolbar.appendChild(divider);
+
+	const trashButton = document.createElement('button');
+	trashButton.type = 'button';
+	trashButton.className = 'obsidian-highlight-trash';
+	trashButton.setAttribute('aria-label', getMessage('remove'));
+	trashButton.title = getMessage('remove');
+	setElementHTML(trashButton, '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>');
+	trashButton.addEventListener('click', e => {
 		e.stopPropagation();
 		e.preventDefault();
-		if (currentDeleteTargetId) {
-			void deleteHighlightById(currentDeleteTargetId);
-		}
+		if (currentDeleteTargetId) void deleteHighlightById(currentDeleteTargetId);
 	});
-	document.body.appendChild(btn);
-	highlightDeleteButton = btn;
-	return btn;
+	toolbar.appendChild(trashButton);
+
+	document.body.appendChild(toolbar);
+	highlightDeleteButton = toolbar;
+	return toolbar;
 }
 
 function showHighlightDeleteButtonForText(id: string): void {
@@ -452,12 +491,35 @@ function showHighlightDeleteButtonForOverlay(overlay: HTMLElement): void {
 function positionDeleteButton(id: string, centerX: number, top: number): void {
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
+	const target = highlights.find((highlight: AnyHighlightData) => highlight.id === id);
+	const selected = target?.color ?? 'default';
+	btn.querySelectorAll<HTMLButtonElement>('[data-highlight-choice]').forEach(button => {
+		const active = button.dataset.highlightChoice === selected;
+		button.classList.toggle('is-active', active);
+		button.setAttribute('aria-pressed', String(active));
+	});
 	btn.style.display = 'flex';
-	const btnWidth = btn.offsetWidth || 80;
+	const btnWidth = btn.offsetWidth || 220;
+	const btnHeight = btn.offsetHeight || 30;
 	const idealLeft = centerX - btnWidth / 2;
 	const clampedLeft = Math.max(4, Math.min(idealLeft, window.innerWidth - btnWidth - 4));
 	btn.style.left = `${clampedLeft + window.scrollX}px`;
-	btn.style.top = `${top + window.scrollY - 28}px`;
+	btn.style.top = `${top + window.scrollY - btnHeight - 4}px`;
+}
+
+function recolorHighlightById(id: string, color?: HighlightColor): void {
+	const target = highlights.find((highlight: AnyHighlightData) => highlight.id === id);
+	if (!target || target.color === color) {
+		hideHighlightDeleteButton();
+		return;
+	}
+	const next = recolorHighlightRecords(highlights, id, color);
+	updateHighlights(next);
+	hideHighlightDeleteButton();
+	sortHighlights();
+	applyHighlights();
+	saveHighlights();
+	updateHighlighterMenu();
 }
 
 export function hideHighlightDeleteButton(): void {
@@ -610,6 +672,7 @@ export function planHighlightOverlayRects(target: Element | null, highlight: Any
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightId = highlight.id;
+	if (highlight.color) overlay.dataset.highlight = highlight.color;
 	overlay.style.position = 'absolute';
 	overlay.style.left = `${rect.left + window.scrollX - 2}px`;
 	overlay.style.top = `${rect.top + window.scrollY - 2}px`;

@@ -32,6 +32,13 @@ describe('renderTextHighlight', () => {
 		expect(addedRanges[0].toString()).toBe('Hello');
 	});
 
+	test('registers colored text in a color-specific CSS highlight', () => {
+		document.body.innerHTML = '<p>Hello world.</p>';
+		const p = document.querySelector('p')!;
+		renderTextHighlight({ id: 'color-1', xpath: getElementXPath(p), startOffset: 0, endOffset: 5, color: 'red' });
+		expect((CSS.highlights as Map<string, unknown>).has('obsidian-highlight-red')).toBe(true);
+	});
+
 	// Regression: a highlight made in a different DOM (live vs reader, or a
 	// regenerated reader view) has a stale XPath. It must still render by
 	// falling back to locating its stored content text.

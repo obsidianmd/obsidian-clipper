@@ -18,11 +18,23 @@ import { removeExistingHighlights as localRemoveExistingHighlights } from './hig
 // first resolution so the fallback spread doesn't re-allocate per call.
 let _hl: HighlighterAPI;
 function hl(): HighlighterAPI {
-	return _hl ??= window.__obsidianHighlighter ?? {
+	if (_hl) return _hl;
+	const bridge = window.__obsidianHighlighter;
+	if (bridge?.supportsColoredHighlights) return _hl = bridge;
+
+	// A reader bundle can be newer than the content script after an unpacked
+	// extension reload. Replace that stale bridge so its old two-argument
+	// handleTextSelection cannot silently discard the selected color. Pointing
+	// the global at this API also makes the stale bundle's storage listener
+	// stand down, preserving a single renderer/state owner.
+	const localAPI: HighlighterAPI = {
 		...localHighlighter,
+		supportsColoredHighlights: true,
 		removeExistingHighlights: localRemoveExistingHighlights,
 		ensureHighlighterCSS: () => Reader.ensureHighlighterCSS(document),
 	};
+	window.__obsidianHighlighter = localAPI;
+	return _hl = localAPI;
 }
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
@@ -2234,8 +2246,8 @@ export class Reader {
 			Reader.registerHotkey(doc, 'h', () => Reader.toggleHighlighter(doc));
 
 			// Selection → highlight affordance. When highlighter is OFF and the
-			// user makes a normal text selection inside the article, surface a
-			// floating button that converts the selection into a highlight.
+			// user makes a normal text selection inside the article, surface the
+			// floating default/color choices.
 			Reader.registerSelectionToHighlightButton(doc);
 
 			// Set up color scheme media query listener
@@ -2387,7 +2399,7 @@ export class Reader {
 		}
 	}
 
-	// Floating "Highlight" button that appears on text selection while
+	// Floating highlight-color toolbar that appears on text selection while
 	// highlighter is OFF, and converts the selection into a highlight. When
 	// highlighter is ON, the usual mouseup path in highlighter-overlays.ts
 	// handles selections directly, so we stay out of its way.
@@ -2396,29 +2408,44 @@ export class Reader {
 		// SPA navigation where we re-enter reader), don't stack a second
 		// button + three more listeners on the same document.
 		if (doc.querySelector('.obsidian-selection-action')) return;
-		const btn = doc.createElement('button');
-		btn.type = 'button';
-		btn.className = 'obsidian-selection-action';
-		btn.setAttribute('aria-label', getMessage('highlightSelection'));
-		setElementHTML(btn, `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>${getMessage('highlightSelection')}</span>`);
-		btn.style.display = 'none';
+		const toolbar = doc.createElement('div');
+		toolbar.className = 'obsidian-selection-action';
+		toolbar.setAttribute('role', 'toolbar');
+		toolbar.setAttribute('aria-label', getMessage('highlightSelection'));
+		toolbar.style.display = 'none';
+
+		const choices: Array<{ color?: localHighlighter.HighlightColor; label: string }> = [
+			{ label: getMessage('highlightSelection') },
+			...localHighlighter.HIGHLIGHT_COLORS.map(color => ({
+				color,
+				label: `${color[0].toUpperCase()}${color.slice(1)} ${getMessage('highlightSelection').toLowerCase()}`,
+			})),
+		];
+		for (const choice of choices) {
+			const button = doc.createElement('button');
+			button.type = 'button';
+			button.dataset.highlight = choice.color ?? 'default';
+			button.setAttribute('aria-label', choice.label);
+			button.title = choice.label;
+			if (!choice.color) {
+				setElementHTML(button, `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>`);
+			}
+			button.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				const sel = doc.getSelection();
+				if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+				hl().handleTextSelection(sel, undefined, choice.color);
+				hide();
+			});
+			toolbar.appendChild(button);
+		}
 		// Preserve the selection when the pointer goes down on the button —
 		// otherwise the browser clears it before click handlers run.
-		btn.addEventListener('mousedown', e => e.preventDefault());
-		btn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const sel = doc.getSelection();
-			if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
-			// Create the highlight without entering highlighter mode — the
-			// user's intent is a single edit, not a session. handleTextSelection
-			// reads the live selection and clears it on return.
-			hl().handleTextSelection(sel);
-			hide();
-		});
-		doc.body.appendChild(btn);
+		toolbar.addEventListener('mousedown', e => e.preventDefault());
+		doc.body.appendChild(toolbar);
 
-		const hide = () => { btn.style.display = 'none'; };
+		const hide = () => { toolbar.style.display = 'none'; };
 
 		const update = () => {
 			if (!this.isActive) return hide();
@@ -2431,13 +2458,13 @@ export class Reader {
 			const rects = range.getClientRects();
 			if (rects.length === 0) return hide();
 			const last = rects[rects.length - 1];
-			btn.style.display = 'flex';
-			// Ensure the button stays within the viewport.
-			const btnWidth = btn.offsetWidth || 90;
+			toolbar.style.display = 'flex';
+			// Ensure the toolbar stays within the viewport.
+			const btnWidth = toolbar.offsetWidth || 190;
 			const idealLeft = last.right + 2;
 			const clampedLeft = Math.min(idealLeft, window.innerWidth - btnWidth - 4);
-			btn.style.left = `${Math.max(4, clampedLeft) + window.scrollX}px`;
-			btn.style.top = `${last.bottom + window.scrollY - 6}px`;
+			toolbar.style.left = `${Math.max(4, clampedLeft) + window.scrollX}px`;
+			toolbar.style.top = `${last.bottom + window.scrollY - 6}px`;
 		};
 
 		// mouseup / keyup catch the end of a drag-select or shift-arrow select;

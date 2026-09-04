@@ -93,7 +93,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: highlighter.AnyHighlightData[];
 		title: string;
 		description: string;
 		domain: string;
@@ -451,6 +451,7 @@ declare global {
 	// both bundles own a copy of highlighter.ts with independent mutable
 	// state — the bridge ensures one source of truth per tab.
 	window.__obsidianHighlighter = {
+		supportsColoredHighlights: true,
 		toggleHighlighterMenu: highlighter.toggleHighlighterMenu,
 		handleTextSelection: highlighter.handleTextSelection,
 		highlightElement: highlighter.highlightElement,

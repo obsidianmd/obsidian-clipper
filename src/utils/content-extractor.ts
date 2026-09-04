@@ -5,7 +5,7 @@ import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
+import { AnyHighlightData, TextHighlightData, HighlightData, HIGHLIGHT_COLOR_MARKERS, HighlightColor, collapseGroupsForExport, isHighlightColor } from './highlighter';
 import { generalSettings } from './storage-utils';
 import {
 	getElementByXPath,
@@ -157,7 +157,7 @@ export async function initializePageContent(
 			content = processHighlights(content, highlights);
 		}
 
-		const markdownBody = createMarkdownContent(content, currentUrl);
+		const markdownBody = createMarkdownContentWithHighlightColors(content, currentUrl);
 
 		const highlightsData = collapseGroupsForExport(highlights, c => createMarkdownContent(c, currentUrl));
 
@@ -199,6 +199,22 @@ export async function initializePageContent(
 			throw new Error('Unable to initialize page content: Unknown error');
 		}
 	}
+}
+
+// Defuddle converts <mark> to ==highlight==. Until its generic HTML converter
+// understands Obsidian's data-highlight attribute, add the color control marker
+// to a throwaway DOM immediately before Markdown conversion.
+export function createMarkdownContentWithHighlightColors(content: string, currentUrl: string): string {
+	if (!content.includes('data-highlight')) return createMarkdownContent(content, currentUrl);
+
+	const doc = new DOMParser().parseFromString(content, 'text/html');
+	for (const mark of Array.from(doc.querySelectorAll('mark[data-highlight]'))) {
+		const color = mark.getAttribute('data-highlight');
+		if (!isHighlightColor(color)) continue;
+		mark.prepend(doc.createTextNode(HIGHLIGHT_COLOR_MARKERS[color]));
+		mark.removeAttribute('data-highlight');
+	}
+	return createMarkdownContent(doc.body.innerHTML, currentUrl);
 }
 
 export function processHighlights(content: string, highlights: AnyHighlightData[]): string {
@@ -295,7 +311,7 @@ function processXPathHighlight(highlight: TextHighlightData | ElementHighlightDa
 
 	if (element) {
 		if (highlight.type === 'element') {
-			wrapElementWithMark(element);
+			wrapElementWithMark(element, highlight.color);
 		} else {
 			wrapTextWithMark(element, highlight as TextHighlightData);
 		}
@@ -338,7 +354,7 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 
 	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
 	if (paragraphs.length) {
-		processContentParagraphs(paragraphs, tempDiv);
+		processContentParagraphs(paragraphs, tempDiv, highlight.color);
 		return;
 	}
 
@@ -353,20 +369,20 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 		for (const candidate of candidates) {
 			const candidateText = (candidate.textContent || '').replace(/\s+/g, ' ').trim();
 			if (candidateText === searchText) {
-				wrapElementWithMark(candidate);
+				wrapElementWithMark(candidate, highlight.color);
 				return;
 			}
 			if (candidateText.includes(searchText)) {
-				processInlineContent(searchText, candidate as HTMLElement);
+				processInlineContent(searchText, candidate as HTMLElement, false, highlight.color);
 				return;
 			}
 		}
 	}
 
-	processInlineContent(innerContent, tempDiv);
+	processInlineContent(innerContent, tempDiv, false, highlight.color);
 }
 
-function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
+function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement, color?: HighlightColor) {
 	// Strip each target paragraph's text once, reused across every source
 	// paragraph and both the exact and substring passes below.
 	const targets = Array.from(tempDiv.querySelectorAll('p'))
@@ -381,7 +397,7 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 		const exact = targets.find(t => t.text === sourceText);
 		if (exact) {
 			debugLog('Highlights', 'Found matching paragraph:', exact.el.outerHTML);
-			wrapElementWithMark(exact.el);
+			wrapElementWithMark(exact.el, color);
 			return;
 		}
 
@@ -391,7 +407,7 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 		const container = targets.find(t => t.text.includes(sourceText));
 		if (container) {
 			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.el.outerHTML);
-			processInlineContent(sourceParagraph.outerHTML, container.el, true);
+			processInlineContent(sourceParagraph.outerHTML, container.el, true, color);
 		}
 	});
 }
@@ -415,7 +431,7 @@ function findTextNodeAtOffset(root: Node, offset: number): { node: Node; index: 
 // mid-sentence), so it uses extractContents() — surroundContents() throws when
 // a range crosses element boundaries. Callers pass a scoped element in that
 // case; the whole-body fallback stays single-node so a range can't span blocks.
-function processInlineContent(content: string, root: HTMLElement, spanInline = false) {
+function processInlineContent(content: string, root: HTMLElement, spanInline = false, color?: HighlightColor) {
 	const searchText = stripHtml(content).trim();
 	if (!searchText) return;
 	debugLog('Highlights', 'Searching for text:', searchText);
@@ -433,6 +449,7 @@ function processInlineContent(content: string, root: HTMLElement, spanInline = f
 		if (range.collapsed) return;
 
 		const mark = document.createElement('mark');
+		if (color) mark.dataset.highlight = color;
 		mark.appendChild(range.extractContents());
 		range.insertNode(mark);
 		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
@@ -452,6 +469,7 @@ function processInlineContent(content: string, root: HTMLElement, spanInline = f
 		range.setEnd(node, index + searchText.length);
 
 		const mark = document.createElement('mark');
+		if (color) mark.dataset.highlight = color;
 		range.surroundContents(mark);
 		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 		return;

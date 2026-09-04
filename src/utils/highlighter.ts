@@ -68,9 +68,48 @@ export type AnyHighlightData = TextHighlightData | ElementHighlightData;
 
 export { normalizeUrl } from './url-utils';
 
+export const HIGHLIGHT_COLOR_MARKERS = {
+	red: '🔴',
+	orange: '🟠',
+	yellow: '🟡',
+	green: '🟢',
+	blue: '🔵',
+	purple: '🟣',
+} as const;
+
+export type HighlightColor = keyof typeof HIGHLIGHT_COLOR_MARKERS;
+export const HIGHLIGHT_COLORS = Object.keys(HIGHLIGHT_COLOR_MARKERS) as HighlightColor[];
+
+export function isHighlightColor(value: unknown): value is HighlightColor {
+	return typeof value === 'string' && Object.prototype.hasOwnProperty.call(HIGHLIGHT_COLOR_MARKERS, value);
+}
+
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
 export let pageTitle: string = '';
+let activeHighlightColor: HighlightColor | undefined;
+let isChoosingHighlightColor = false;
+
+function syncActiveHighlightColor() {
+	document.body.dataset.obsidianHighlightColor = activeHighlightColor ?? 'default';
+}
+
+export function getActiveHighlightColor(): HighlightColor | undefined {
+	return activeHighlightColor;
+}
+
+export function setActiveHighlightColor(color?: HighlightColor) {
+	activeHighlightColor = color;
+	isChoosingHighlightColor = false;
+	syncActiveHighlightColor();
+	updateHighlighterMenu();
+}
+
+function getNewHighlightColor(explicitColor?: HighlightColor): HighlightColor | undefined {
+	return explicitColor ?? (document.body.classList.contains('obsidian-highlighter-active')
+		? activeHighlightColor
+		: undefined);
+}
 
 // The bridge interface: every highlighter function that reader-script needs.
 // content.js exposes an object of this shape on window.__obsidianHighlighter;
@@ -81,6 +120,7 @@ declare global {
 }
 
 export interface HighlighterAPI {
+	supportsColoredHighlights: true;
 	toggleHighlighterMenu: typeof toggleHighlighterMenu;
 	handleTextSelection: typeof handleTextSelection;
 	highlightElement: typeof highlightElement;
@@ -176,6 +216,9 @@ export interface HighlightData {
 	id: string;
 	xpath: string;
 	content: string;
+	// Omitted for the classic/default yellow highlight. Colored highlights use
+	// Obsidian's six named colors and serialize with a leading emoji marker.
+	color?: HighlightColor;
 	notes?: string[]; // Annotations
 	// When one selection crosses multiple blocks, all resulting highlights
 	// share a groupId so they delete, clip, and visually associate together.
@@ -248,6 +291,25 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	addToHistory('add', oldHighlights, newHighlights);
 }
 
+export function recolorHighlightRecords(
+	records: AnyHighlightData[],
+	id: string,
+	color?: HighlightColor,
+): AnyHighlightData[] {
+	const target = records.find(highlight => highlight.id === id);
+	if (!target || target.color === color) return records;
+	const shouldRecolor = (highlight: AnyHighlightData) => target.groupId
+		? highlight.groupId === target.groupId
+		: highlight.id === target.id;
+	return records.map((highlight): AnyHighlightData => {
+		if (!shouldRecolor(highlight)) return highlight;
+		const { color: _oldColor, ...withoutColor } = highlight;
+		return color
+			? { ...withoutColor, color } as AnyHighlightData
+			: withoutColor as AnyHighlightData;
+	});
+}
+
 // Toggle highlighter mode. When active: mouse/touch listeners that create
 // highlights from selections and block-clicks are attached, and the floating
 // menu appears. When inactive: creation is off, but the hover-delete affordance
@@ -256,6 +318,7 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 export function toggleHighlighterMenu(isActive: boolean) {
 	document.body.classList.toggle('obsidian-highlighter-active', isActive);
 	if (isActive) {
+		syncActiveHighlightColor();
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('touchstart', handleTouchStart);
 		document.addEventListener('touchmove', handleTouchMove);
@@ -273,6 +336,7 @@ export function toggleHighlighterMenu(isActive: boolean) {
 			handleTextSelection(selection);
 		}
 	} else {
+		isChoosingHighlightColor = false;
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('touchstart', handleTouchStart);
 		document.removeEventListener('touchmove', handleTouchMove);
@@ -357,6 +421,65 @@ async function handleClipButtonClick(e: Event) {
 	}
 }
 
+function createHighlightColorTrigger(): HTMLButtonElement {
+	const trigger = document.createElement('button');
+	trigger.id = 'obsidian-highlight-color-trigger';
+	trigger.type = 'button';
+	trigger.dataset.highlight = activeHighlightColor ?? 'default';
+	trigger.setAttribute('aria-label', 'Highlight color');
+	trigger.title = 'Highlight color';
+
+	if (activeHighlightColor) {
+		const swatch = document.createElement('span');
+		swatch.className = 'obsidian-highlight-color-swatch';
+		swatch.dataset.highlight = activeHighlightColor;
+		trigger.appendChild(swatch);
+	} else {
+		trigger.appendChild(createSVG({
+			width: '16',
+			height: '16',
+			viewBox: '0 0 24 24',
+			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4'],
+		}));
+	}
+	trigger.addEventListener('click', event => {
+		event.preventDefault();
+		event.stopPropagation();
+		isChoosingHighlightColor = true;
+		createHighlighterMenu();
+	});
+	return trigger;
+}
+
+function renderHighlightColorChoices(menu: Element): void {
+	menu.setAttribute('aria-label', 'Choose highlight color');
+	for (const color of ['', ...HIGHLIGHT_COLORS] as Array<HighlightColor | ''>) {
+		const option = document.createElement('button');
+		option.type = 'button';
+		option.className = 'obsidian-highlight-color-option';
+		option.dataset.highlight = color || 'default';
+		const colorName = color ? `${color[0].toUpperCase()}${color.slice(1)}` : 'Default';
+		option.setAttribute('aria-label', `${colorName} highlight`);
+		option.setAttribute('aria-pressed', String(color === (activeHighlightColor ?? '')));
+		option.title = option.getAttribute('aria-label') || '';
+		option.classList.toggle('is-active', color === (activeHighlightColor ?? ''));
+		if (!color) {
+			option.appendChild(createSVG({
+				width: '15',
+				height: '15',
+				viewBox: '0 0 24 24',
+				paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4'],
+			}));
+		}
+		option.addEventListener('click', event => {
+			event.preventDefault();
+			event.stopPropagation();
+			setActiveHighlightColor(color || undefined);
+		});
+		menu.appendChild(option);
+	}
+}
+
 export function createHighlighterMenu() {
 	// Check if the menu already exists
 	let menu = document.querySelector('.obsidian-highlighter-menu');
@@ -372,6 +495,13 @@ export function createHighlighterMenu() {
 	const highlightText = `${highlightCount}`;
 
 	menu.textContent = '';
+	menu.classList.toggle('is-color-picker', isChoosingHighlightColor);
+	menu.setAttribute('role', 'toolbar');
+	if (isChoosingHighlightColor) {
+		renderHighlightColorChoices(menu);
+		return;
+	}
+	menu.setAttribute('aria-label', 'Highlighter actions');
 	
 	// Add clip button or no highlights message
 	if (highlightCount > 0) {
@@ -410,6 +540,8 @@ export function createHighlighterMenu() {
 		noHighlights.textContent = 'Select elements to highlight';
 		menu.appendChild(noHighlights);
 	}
+
+	menu.appendChild(createHighlightColorTrigger());
 	
 	// Add undo button
 	const undoButton = document.createElement('button');
@@ -549,20 +681,23 @@ function enableLinkClicks() {
 // Click-to-highlight a block element (figure, picture, img, table, pre).
 // Text-containing blocks (paragraphs, headings, etc.) are not highlightable
 // by click — those go through selection → TextHighlightData instead.
-export function highlightElement(element: Element, notes?: string[]) {
+export function highlightElement(element: Element, notes?: string[], color?: HighlightColor) {
 	if (!BLOCK_HIGHLIGHT_TAGS.has(element.tagName.toUpperCase())) return;
+	const selectedColor = getNewHighlightColor(color);
 	addHighlight({
 		xpath: getElementXPath(element),
 		content: element.outerHTML,
 		type: 'element',
 		id: Date.now().toString(),
+		...(selectedColor ? { color: selectedColor } : {}),
 	}, notes);
 	markHighlightJustCreated();
 }
 
 // Handle text selection for highlighting
-export function handleTextSelection(selection: Selection, notes?: string[]) {
+export function handleTextSelection(selection: Selection, notes?: string[], color?: HighlightColor) {
 	if (selection.isCollapsed) return;
+	const selectedColor = getNewHighlightColor(color);
 	const range = selection.getRangeAt(0);
 	const newHighlightDatas = getHighlightRanges(range);
 
@@ -575,7 +710,11 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 
 		for (const highlightData of newHighlightDatas) {
 			const beforeCount = currentBatchHighlights.length;
-			const newHighlightWithNotes = { ...highlightData, notes: notes || [] };
+			const newHighlightWithNotes = {
+				...highlightData,
+				notes: notes || [],
+				...(selectedColor ? { color: selectedColor } : {}),
+			};
 			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
 			// If the array didn't grow, a merge happened — the new piece was
 			// absorbed into an existing highlight whose groupId we should adopt
@@ -943,7 +1082,8 @@ function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighli
 
 function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
 	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
-		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
+		return highlight1.color === highlight2.color &&
+			(highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset);
 	}
 	return false;
 }
@@ -989,6 +1129,9 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 			// Preserve groupId so a merged highlight keeps its multi-block
 			// delete/export association. Prefer whichever side already has one.
 			const groupId = h1.groupId ?? h2.groupId;
+			// mergeOverlappingHighlights passes the newly-created highlight as h2,
+			// so selecting an existing range with a color also recolors the merge.
+			const color = h2.color;
 			return {
 				xpath: h1.xpath,
 				content: el?.textContent?.slice(startOffset, endOffset) ?? '',
@@ -999,6 +1142,7 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 				...(el ? { textQuote: createTextQuoteAnchor(el, startOffset, endOffset) } : {}),
 				...(notes.length > 0 ? { notes } : {}),
 				...(groupId ? { groupId } : {}),
+				...(color ? { color } : {}),
 			};
 		}
 		return h1;
@@ -1089,8 +1233,10 @@ function commitHighlightChanges() {
 	updateHighlighterMenu();
 }
 
-export function getHighlights(): string[] {
-	return highlights.map(h => h.content);
+export function getHighlights(): AnyHighlightData[] {
+	// Callers need the complete record: color, anchors, grouping, and notes are
+	// all required when the extracted page is turned into Markdown.
+	return [...highlights];
 }
 
 // Group highlights that share a groupId (produced by a single multi-block

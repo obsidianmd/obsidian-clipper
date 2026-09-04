@@ -133,6 +133,30 @@ body.obsidian-highlighter-active {
 	*::selection {
 		background-color: rgba(255, 235, 0, 0.35) !important;
 	}
+	&[data-obsidian-highlight-color="red"] *::selection {
+		background-color: rgba(233, 49, 71, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent) !important;
+	}
+	&[data-obsidian-highlight-color="orange"] *::selection {
+		background-color: rgba(236, 117, 0, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent) !important;
+	}
+	&[data-obsidian-highlight-color="yellow"] *::selection {
+		background-color: rgba(224, 172, 0, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent) !important;
+	}
+	&[data-obsidian-highlight-color="green"] *::selection {
+		background-color: rgba(8, 185, 78, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent) !important;
+	}
+	&[data-obsidian-highlight-color="blue"] *::selection {
+		background-color: rgba(8, 109, 221, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent) !important;
+	}
+	&[data-obsidian-highlight-color="purple"] *::selection {
+		background-color: rgba(120, 82, 238, 0.35) !important;
+		background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent) !important;
+	}
 	.obsidian-highlight-overlay {
 		cursor: pointer;
 		pointer-events: auto;
@@ -249,15 +273,84 @@ body.obsidian-highlighter-active {
 			}
 		}
 	}
+
+	button#obsidian-highlight-color-trigger {
+		padding: 0 !important;
+	}
+
+	.obsidian-highlight-color-swatch,
+	.obsidian-highlight-color-option:not([data-highlight="default"]) {
+		background-color: var(--obsidian-highlight-swatch) !important;
+	}
+
+	.obsidian-highlight-color-swatch {
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+	}
+
+	[data-highlight="red"] { --obsidian-highlight-swatch: var(--color-red, #e93147); }
+	[data-highlight="orange"] { --obsidian-highlight-swatch: var(--color-orange, #ec7500); }
+	[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--color-yellow, #e0ac00); }
+	[data-highlight="green"] { --obsidian-highlight-swatch: var(--color-green, #08b94e); }
+	[data-highlight="blue"] { --obsidian-highlight-swatch: var(--color-blue, #086ddd); }
+	[data-highlight="purple"] { --obsidian-highlight-swatch: var(--color-purple, #7852ee); }
+
+	&.is-color-picker {
+		gap: 7px;
+		padding-inline: 7px;
+	}
+
+	button.obsidian-highlight-color-option {
+		width: 18px !important;
+		min-width: 18px !important;
+		height: 18px !important;
+		padding: 0 !important;
+		border-radius: 50% !important;
+		background-color: var(--obsidian-highlight-swatch, transparent) !important;
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28) !important;
+
+		&[data-highlight="default"] {
+			box-shadow: none !important;
+		}
+
+		&.is-active,
+		&:focus-visible {
+			outline: 2px solid #fff !important;
+			outline-offset: 2px !important;
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				transform: scale(1.15);
+				background-color: var(--obsidian-highlight-swatch, rgba(255, 255, 255, 0.12)) !important;
+			}
+		}
+	}
+
+	@media (max-width: 769px) {
+		&.is-color-picker {
+			gap: 10px;
+			padding-inline: 10px;
+		}
+
+		button.obsidian-highlight-color-option {
+			width: 24px !important;
+			min-width: 24px !important;
+			height: 24px !important;
+		}
+	}
 }
 
 // Element highlight overlay (figure, img, table, pre, picture). Always
 // visible — the hover-delete button is the primary affordance and needs
 // something to hit-test regardless of highlighter mode.
 .obsidian-highlight-overlay {
+	--obsidian-highlight-color: rgba(255, 235, 0, 0.35);
 	display: block;
 	position: absolute;
-	background-color: rgba(255, 235, 0, 0.35);
+	background-color: var(--obsidian-highlight-color);
 	border-radius: 4px;
 	mix-blend-mode: multiply;
 	pointer-events: none;
@@ -265,8 +358,33 @@ body.obsidian-highlighter-active {
 
 	&.obsidian-highlight-overlay-dark {
 		mix-blend-mode: screen;
-		background-color: rgba(255, 235, 0, 0.25);
+		opacity: 0.75;
 	}
+}
+
+.obsidian-highlight-overlay[data-highlight="red"] {
+	--obsidian-highlight-color: rgba(233, 49, 71, 0.35);
+	background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent);
+}
+.obsidian-highlight-overlay[data-highlight="orange"] {
+	--obsidian-highlight-color: rgba(236, 117, 0, 0.35);
+	background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent);
+}
+.obsidian-highlight-overlay[data-highlight="yellow"] {
+	--obsidian-highlight-color: rgba(224, 172, 0, 0.35);
+	background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent);
+}
+.obsidian-highlight-overlay[data-highlight="green"] {
+	--obsidian-highlight-color: rgba(8, 185, 78, 0.35);
+	background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent);
+}
+.obsidian-highlight-overlay[data-highlight="blue"] {
+	--obsidian-highlight-color: rgba(8, 109, 221, 0.35);
+	background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent);
+}
+.obsidian-highlight-overlay[data-highlight="purple"] {
+	--obsidian-highlight-color: rgba(120, 82, 238, 0.35);
+	background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent);
 }
 
 // CSS Custom Highlight API: paints text-type highlights without DOM mutation.
@@ -279,7 +397,32 @@ body.obsidian-highlighter-active {
 	background-color: rgba(255, 235, 0, 0.35);
 }
 
-// Shared base for floating action buttons (Remove highlight, Highlight selection).
+::highlight(obsidian-highlight-red) {
+	background-color: rgba(233, 49, 71, 0.35);
+	background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent);
+}
+::highlight(obsidian-highlight-orange) {
+	background-color: rgba(236, 117, 0, 0.35);
+	background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent);
+}
+::highlight(obsidian-highlight-yellow) {
+	background-color: rgba(224, 172, 0, 0.35);
+	background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent);
+}
+::highlight(obsidian-highlight-green) {
+	background-color: rgba(8, 185, 78, 0.35);
+	background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent);
+}
+::highlight(obsidian-highlight-blue) {
+	background-color: rgba(8, 109, 221, 0.35);
+	background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent);
+}
+::highlight(obsidian-highlight-purple) {
+	background-color: rgba(120, 82, 238, 0.35);
+	background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent);
+}
+
+// Shared base for floating highlight action toolbars.
 .obsidian-highlight-delete,
 .obsidian-selection-action {
 	position: absolute;
@@ -296,7 +439,7 @@ body.obsidian-highlighter-active {
 	font-size: 12px;
 	font-weight: 500;
 	line-height: 1;
-	cursor: pointer;
+	cursor: default;
 	z-index: 999999999;
 	pointer-events: auto;
 	user-select: none;
@@ -308,12 +451,6 @@ body.obsidian-highlighter-active {
 		margin: 0 !important;
 	}
 
-	@media (hover: hover) {
-		&:hover {
-			background: #424242;
-		}
-	}
-
 	@media (max-width: 769px) {
 		font-size: 15px;
 		padding: 6px 12px 6px 8px;
@@ -322,6 +459,119 @@ body.obsidian-highlighter-active {
 		svg {
 			width: 16px;
 			height: 16px;
+		}
+	}
+}
+
+.obsidian-selection-action,
+.obsidian-highlight-delete {
+	padding: 5px 7px;
+	gap: 7px;
+
+	button[data-highlight] {
+		appearance: none;
+		width: 18px;
+		height: 18px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: var(--obsidian-highlight-swatch, transparent);
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+		cursor: pointer;
+		flex: 0 0 auto;
+
+		&[data-highlight="default"] {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #f0f0f0;
+			box-shadow: none;
+
+			svg {
+				width: 15px;
+				height: 15px;
+			}
+		}
+
+		&[data-highlight="red"] { --obsidian-highlight-swatch: var(--color-red, #e93147); }
+		&[data-highlight="orange"] { --obsidian-highlight-swatch: var(--color-orange, #ec7500); }
+		&[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--color-yellow, #e0ac00); }
+		&[data-highlight="green"] { --obsidian-highlight-swatch: var(--color-green, #08b94e); }
+		&[data-highlight="blue"] { --obsidian-highlight-swatch: var(--color-blue, #086ddd); }
+		&[data-highlight="purple"] { --obsidian-highlight-swatch: var(--color-purple, #7852ee); }
+
+		@media (hover: hover) {
+			&:hover {
+				transform: scale(1.15);
+			}
+		}
+
+		&:focus-visible {
+			outline: 2px solid #fff;
+			outline-offset: 2px;
+		}
+
+		&.is-active {
+			outline: 2px solid #fff;
+			outline-offset: 2px;
+		}
+	}
+
+	@media (max-width: 769px) {
+		padding: 8px 10px;
+		gap: 10px;
+
+		button[data-highlight] {
+			width: 24px;
+			height: 24px;
+		}
+	}
+}
+
+.obsidian-highlight-delete {
+	.obsidian-highlight-actions-divider {
+		width: 1px;
+		height: 16px;
+		margin: 0 1px;
+		background: rgba(255, 255, 255, 0.25);
+		flex: 0 0 auto;
+	}
+
+	.obsidian-highlight-trash {
+		appearance: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		color: #f0f0f0;
+		cursor: pointer;
+		flex: 0 0 auto;
+
+		@media (hover: hover) {
+			&:hover {
+				background: rgba(255, 255, 255, 0.12);
+			}
+		}
+
+		&:focus-visible {
+			outline: 2px solid #fff;
+			outline-offset: 2px;
+		}
+	}
+
+	@media (max-width: 769px) {
+		.obsidian-highlight-actions-divider {
+			height: 22px;
+		}
+
+		.obsidian-highlight-trash {
+			width: 26px;
+			height: 26px;
 		}
 	}
 }

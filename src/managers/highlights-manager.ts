@@ -1,6 +1,6 @@
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
-import { AnyHighlightData, ElementHighlightData, HighlightsStorage, TextHighlightData, TextQuoteAnchor, buildExportedPage, collapseGroupsForExport, expandExportedEntries, normalizeUrl, reconcileLegacyUrlKey } from '../utils/highlighter';
+import { AnyHighlightData, ElementHighlightData, HighlightsStorage, TextHighlightData, TextQuoteAnchor, buildExportedPage, collapseGroupsForExport, expandExportedEntries, isHighlightColor, normalizeUrl, reconcileLegacyUrlKey } from '../utils/highlighter';
 import { showImportModal } from '../utils/import-modal';
 import dayjs from 'dayjs';
 import { getMessage } from '../utils/i18n';
@@ -78,10 +78,10 @@ function parseNotes(value: unknown, where: string): string[] | undefined {
 // fail to compile until the new field is handled there as well.
 const _textFieldsAreImported: Record<keyof TextHighlightData, true> = {
 	id: true, type: true, xpath: true, content: true, notes: true,
-	groupId: true, startOffset: true, endOffset: true, textQuote: true,
+	groupId: true, color: true, startOffset: true, endOffset: true, textQuote: true,
 };
 const _elementFieldsAreImported: Record<keyof ElementHighlightData, true> = {
-	id: true, type: true, xpath: true, content: true, notes: true, groupId: true,
+	id: true, type: true, xpath: true, content: true, notes: true, groupId: true, color: true,
 };
 
 // Validated field by field rather than trusted, since this lands in storage and
@@ -97,7 +97,7 @@ function parseHighlightRecords(value: unknown, pageIndex: number): AnyHighlightD
 		if (!record || typeof record !== 'object') {
 			throw new Error(`${where} is not an object`);
 		}
-		const { id, type, xpath, content, groupId } = record as Record<string, unknown>;
+		const { id, type, xpath, content, groupId, color } = record as Record<string, unknown>;
 		if (typeof id !== 'string' || !id) throw new Error(`${where} is missing an id`);
 		if (type !== 'text' && type !== 'element') throw new Error(`${where} has an unknown type`);
 		if (typeof xpath !== 'string') throw new Error(`${where} is missing an xpath`);
@@ -105,9 +105,19 @@ function parseHighlightRecords(value: unknown, pageIndex: number): AnyHighlightD
 		if (groupId !== undefined && typeof groupId !== 'string') {
 			throw new Error(`${where} has an invalid groupId`);
 		}
+		if (color !== undefined && !isHighlightColor(color)) {
+			throw new Error(`${where} has an invalid color`);
+		}
 		const notes = parseNotes((record as Record<string, unknown>).notes, where);
 
-		const base = { id, xpath, content, ...(notes ? { notes } : {}), ...(groupId ? { groupId } : {}) };
+		const base = {
+			id,
+			xpath,
+			content,
+			...(notes ? { notes } : {}),
+			...(groupId ? { groupId } : {}),
+			...(isHighlightColor(color) ? { color } : {}),
+		};
 		if (type === 'element') return { ...base, type };
 
 		const { startOffset, endOffset, textQuote } = record as Record<string, unknown>;

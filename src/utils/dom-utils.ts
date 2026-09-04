@@ -86,8 +86,9 @@ export function isDarkColor(color: string): boolean {
 	return brightness < 128;
 }
 
-export function wrapElementWithMark(element: Element): void {
+export function wrapElementWithMark(element: Element, color?: string): void {
 	const mark = document.createElement('mark');
+	if (color) mark.setAttribute('data-highlight', color);
 
 	while (element.firstChild) {
 		mark.appendChild(element.firstChild);
@@ -96,7 +97,7 @@ export function wrapElementWithMark(element: Element): void {
 	element.appendChild(mark);
 }
 
-export function wrapTextWithMark(element: Element, highlight: { startOffset: number; endOffset: number }): void {
+export function wrapTextWithMark(element: Element, highlight: { startOffset: number; endOffset: number; color?: string }): void {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let currentOffset = 0;
 	let startNode = null;
@@ -128,6 +129,7 @@ export function wrapTextWithMark(element: Element, highlight: { startOffset: num
 		range.setEnd(endNode, endOffset);
 		
 		const mark = document.createElement('mark');
+		if (highlight.color) mark.setAttribute('data-highlight', highlight.color);
 		range.surroundContents(mark);
 	}
 }

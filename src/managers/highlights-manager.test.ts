@@ -186,6 +186,29 @@ describe('importHighlightsFromJson', () => {
 		expect(highlights[0].textQuote).toEqual({ prefix: 'before ', suffix: ' after' });
 	});
 
+	test('restores a valid highlight color', async () => {
+		stored['https://example.com/page'] = {
+			url: 'https://example.com/page',
+			highlights: [{ id: '500', type: 'text', xpath: '/p[1]', startOffset: 0, endOffset: 3, content: 'red', color: 'red' }],
+		};
+		const json = exportedFile();
+		stored = {};
+
+		await importHighlightsFromJson(json);
+
+		expect(highlightsFor('https://example.com/page')[0].color).toBe('red');
+	});
+
+	test('rejects an unknown highlight color', async () => {
+		const json = JSON.stringify([{
+			url: 'https://example.com/page',
+			highlights: [{ text: 'one' }],
+			data: [{ id: '100', type: 'text', xpath: '/p[1]', content: 'one', startOffset: 0, endOffset: 3, color: 'pink' }],
+		}]);
+
+		await expect(importHighlightsFromJson(json)).rejects.toThrow('invalid color');
+	});
+
 	test('rejects a malformed record in the data field', async () => {
 		const withBadRecord = JSON.stringify([{
 			url: 'https://example.com/page',
