@@ -2,6 +2,7 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import browser from '../../utils/browser-polyfill';
 import type { Template } from '../../types/types';
 import type { StorageArea } from '../storage-area';
+import { redactSyncPayloadSecrets } from '../local-secrets';
 import {
 	SYNC_SCHEMA_VERSION,
 	type SyncPayload,
@@ -34,6 +35,7 @@ export class BrowserSyncProvider implements SyncProvider {
 	}
 
 	async save(payload: SyncPayload, previousPayload?: SyncPayload | null): Promise<SyncSaveResult> {
+		payload = redactSyncPayloadSecrets(payload);
 		const { items, warnings } = payloadToBrowserStorageData(payload);
 		const currentItems = await this.storage.get(null);
 		const changedItems = Object.fromEntries(

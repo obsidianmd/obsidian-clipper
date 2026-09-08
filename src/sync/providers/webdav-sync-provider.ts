@@ -6,6 +6,7 @@ import {
 	saveWebDavCache,
 	type WebDavSyncConfig,
 } from '../webdav-config';
+import { redactSyncPayloadSecrets } from '../local-secrets';
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 type ConfigLoader = () => Promise<WebDavSyncConfig | null>;
@@ -39,9 +40,10 @@ export class WebDavSyncProvider implements SyncProvider {
 	}
 
 	async save(payload: SyncPayload): Promise<void> {
-		const response = await this.request('PUT', JSON.stringify(payload));
+		const securedPayload = redactSyncPayloadSecrets(payload);
+		const response = await this.request('PUT', JSON.stringify(securedPayload));
 		await ensureSuccessfulResponse(response, 'save');
-		await this.cacheSaver(payload);
+		await this.cacheSaver(securedPayload);
 	}
 
 	async connect(): Promise<void> {
@@ -76,6 +78,7 @@ export class WebDavSyncProvider implements SyncProvider {
 				},
 				body,
 				cache: 'no-store',
+				redirect: 'error',
 				// WebDAV authentication must not inherit a Nextcloud browser session.
 				// A session cookie without DAV authentication triggers Nextcloud's CSRF check on writes.
 				credentials: 'omit',

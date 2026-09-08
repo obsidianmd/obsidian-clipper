@@ -44,8 +44,8 @@ export async function saveWebDavCache(payload: SyncPayload): Promise<void> {
 
 export function normalizeWebDavUrl(value: string): string {
 	const url = new URL(value.trim());
-	if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-		throw new Error('WebDAV URL must use HTTP or HTTPS');
+	if (url.protocol !== 'https:') {
+		throw new Error('WebDAV URL must use HTTPS');
 	}
 	if (url.username || url.password) {
 		throw new Error('Enter WebDAV credentials in the username and password fields');

@@ -1,6 +1,7 @@
 import browser from '../../utils/browser-polyfill';
 import type { StorageArea } from '../storage-area';
 import type { SyncPayload, SyncProvider, SyncStatus } from '../types';
+import { redactSyncPayloadSecrets } from '../local-secrets';
 
 export const LOCAL_SYNC_PAYLOAD_KEY = 'sync_payload';
 
@@ -17,7 +18,7 @@ export class LocalSyncProvider implements SyncProvider {
 	}
 
 	async save(payload: SyncPayload): Promise<void> {
-		await this.storage.set({ [LOCAL_SYNC_PAYLOAD_KEY]: payload });
+		await this.storage.set({ [LOCAL_SYNC_PAYLOAD_KEY]: redactSyncPayloadSecrets(payload) });
 	}
 
 	async getStatus(): Promise<SyncStatus> {

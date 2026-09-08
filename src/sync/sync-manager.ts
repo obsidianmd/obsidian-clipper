@@ -2,6 +2,7 @@ import browser from '../utils/browser-polyfill';
 import { BrowserSyncProvider } from './providers/browser-sync-provider';
 import { LocalSyncProvider } from './providers/local-sync-provider';
 import { WebDavSyncProvider } from './providers/webdav-sync-provider';
+import { hasSyncPayloadSecrets, LocalSyncSecrets } from './local-secrets';
 import {
 	SYNC_SCHEMA_VERSION,
 	createEmptySyncPayload,
@@ -21,6 +22,7 @@ const providers: Record<SyncProviderId, SyncProvider> = {
 };
 
 let operationQueue: Promise<void> = Promise.resolve();
+const localSecrets = new LocalSyncSecrets();
 
 export function getSyncProviderOptions(): Array<{ id: SyncProviderId; name: string }> {
 	return Object.values(providers).map(provider => ({ id: provider.id as SyncProviderId, name: provider.name }));
@@ -47,7 +49,8 @@ export async function testSyncProvider(id: SyncProviderId): Promise<void> {
 
 export async function loadSyncPayload(): Promise<SyncPayload | null> {
 	await operationQueue;
-	return (await getSelectedSyncProvider()).load();
+	const payload = await (await getSelectedSyncProvider()).load();
+	return payload ? localSecrets.hydrate(payload) : null;
 }
 
 export function updateSyncPayload(
@@ -55,11 +58,12 @@ export function updateSyncPayload(
 ): Promise<SyncSaveResult | void> {
 	return enqueue(async () => {
 		const provider = await getSelectedSyncProvider();
-		const current = await provider.load() ?? createEmptySyncPayload();
+		const stored = await provider.load();
+		const current = stored ? await localSecrets.hydrate(stored) : createEmptySyncPayload();
 		const updated = await update(current);
 		updated.schemaVersion = SYNC_SCHEMA_VERSION;
 		updated.updatedAt = new Date().toISOString();
-		return provider.save(updated, current);
+		return provider.save(await localSecrets.prepareForSync(updated), stored);
 	});
 }
 
@@ -70,12 +74,22 @@ export function saveSyncPayload(payload: SyncPayload): Promise<SyncSaveResult | 
 export function selectSyncProvider(id: SyncProviderId): Promise<void> {
 	return enqueue(async () => {
 		const currentId = await getSelectedSyncProviderId();
-		if (currentId === id) return;
+		const targetProvider = providers[id];
+		if (currentId === id) {
+			await migrateProviderSecrets(targetProvider);
+			return;
+		}
 
-		const sourcePayload = await providers[currentId].load();
-		const targetPayload = await providers[id].load();
-		if (!targetPayload && sourcePayload) {
-			await providers[id].save(sourcePayload);
+		const storedSource = await providers[currentId].load();
+		const sourcePayload = storedSource ? await localSecrets.hydrate(storedSource) : null;
+		const storedTarget = await targetProvider.load();
+		if (!storedTarget && sourcePayload) {
+			await targetProvider.save(await localSecrets.prepareForSync(sourcePayload));
+		} else if (storedTarget) {
+			const targetPayload = await localSecrets.hydrate(storedTarget);
+			if (hasSyncPayloadSecrets(storedTarget)) {
+				await targetProvider.save(await localSecrets.prepareForSync(targetPayload), storedTarget);
+			}
 		}
 		await browser.storage.local.set({ [SYNC_PROVIDER_PREFERENCE_KEY]: id });
 	});
@@ -84,8 +98,18 @@ export function selectSyncProvider(id: SyncProviderId): Promise<void> {
 export function repairSelectedSyncProvider(): Promise<SyncPayload | null> {
 	return enqueue(async () => {
 		const provider = await getSelectedSyncProvider();
-		return provider.repair ? provider.repair() : provider.load();
+		const payload = provider.repair ? await provider.repair() : await provider.load();
+		return payload ? localSecrets.hydrate(payload) : null;
 	});
+}
+
+async function migrateProviderSecrets(provider: SyncProvider): Promise<void> {
+	const stored = await provider.load();
+	if (!stored) return;
+	const hydrated = await localSecrets.hydrate(stored);
+	if (hasSyncPayloadSecrets(stored)) {
+		await provider.save(await localSecrets.prepareForSync(hydrated), stored);
+	}
 }
 
 function enqueue<T>(operation: () => Promise<T>): Promise<T> {
