@@ -6,11 +6,12 @@ import { generalSettings, loadSettings } from '../utils/storage-utils';
 import { addPropertyType, updatePropertyTypesList } from '../managers/property-types-manager';
 import { hideModal } from '../utils/modal-utils';
 import { showImportModal } from './import-modal';
-import browser from '../utils/browser-polyfill';
 import { saveFile } from './file-utils';
 import { copyToClipboard } from './clipboard-utils';
-import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { getMessage } from './i18n';
+import { loadSyncPayload, saveSyncPayload } from '../sync/sync-manager';
+import { browserStorageDataToPayload } from '../sync/providers/browser-sync-provider';
+import type { SyncPayload } from '../sync/types';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -326,30 +327,8 @@ export function copyTemplateToClipboard(template: Template): void {
 export async function exportAllSettings(): Promise<void> {
 	console.log('Starting exportAllSettings function');
 	try {
-		console.log('Fetching all data from browser storage');
-		const allData = await browser.storage.sync.get(null) as StorageData;
-		console.log('All data fetched:', allData);
-
-		// Create a copy of the data to modify
-		const exportData: StorageData = { ...allData };
-
-		// Decompress all templates
-		const templateIds = exportData.template_list || [];
-		for (const id of templateIds) {
-			const key = `template_${id}`;
-			if (exportData[key] && Array.isArray(exportData[key])) {
-				try {
-					// Join chunks and decompress
-					const compressedData = (exportData[key] as string[]).join('');
-					const decompressedData = decompressFromUTF16(compressedData);
-					exportData[key] = JSON.parse(decompressedData);
-				} catch (error) {
-					console.error(`Failed to decompress template ${id}:`, error);
-				}
-			}
-		}
-
-		console.log('Data prepared for export:', exportData);
+		const exportData = await loadSyncPayload();
+		if (!exportData) throw new Error('No settings found to export');
 		const content = JSON.stringify(exportData, null, 2);
 		console.log('Data stringified, length:', content.length);
 
@@ -381,43 +360,14 @@ export function importAllSettings(): void {
 
 async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 	try {
-		const settings = JSON.parse(jsonContent) as StorageData;
+		const settings = JSON.parse(jsonContent) as StorageData | SyncPayload;
 		
 		if (confirm(getMessage('confirmReplaceSettings'))) {
-			// Create a copy of the settings to modify
-			const importData: StorageData = { ...settings };
-			
-			// Compress all templates
-			const templateIds = importData.template_list || [];
-			for (const id of templateIds) {
-				const key = `template_${id}`;
-				if (importData[key]) {
-					try {
-						// Check if the data is already compressed (will be an array of strings)
-						const isAlreadyCompressed = Array.isArray(importData[key]) && 
-							importData[key].every((chunk: any) => typeof chunk === 'string');
-
-						if (!isAlreadyCompressed) {
-							// Compress the template data
-							const templateStr = JSON.stringify(importData[key]);
-							const compressedData = compressToUTF16(templateStr);
-							
-							// Split into chunks
-							const chunks: string[] = [];
-							const CHUNK_SIZE = 8000;
-							for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
-								chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
-							}
-							importData[key] = chunks;
-						}
-					} catch (error) {
-						console.error(`Failed to process template ${id}:`, error);
-					}
-				}
-			}
-
-			await browser.storage.sync.clear();
-			await browser.storage.sync.set(importData);
+			const importData = isSyncPayload(settings)
+				? settings
+				: browserStorageDataToPayload(settings);
+			if (!importData) throw new Error('The file does not contain valid settings');
+			await saveSyncPayload(importData);
 			await loadSettings();
 			await loadTemplates();
 			updateTemplateList();
@@ -428,4 +378,12 @@ async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 		console.error('Error importing all settings:', error);
 		throw new Error('Error importing settings. Please check the file and try again.');
 	}
+}
+
+function isSyncPayload(value: StorageData | SyncPayload): value is SyncPayload {
+	return typeof value.schemaVersion === 'number'
+		&& typeof value.updatedAt === 'string'
+		&& !!value.settings
+		&& typeof value.settings === 'object'
+		&& Array.isArray(value.templates);
 }

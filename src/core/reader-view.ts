@@ -1,7 +1,6 @@
 import browser from '../utils/browser-polyfill';
 import { Reader } from '../utils/reader';
 import { initializeI18n, getMessage } from '../utils/i18n';
-import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
@@ -326,8 +325,7 @@ function showUrlInput() {
 
 async function applyReaderTheme() {
 	try {
-		const data = await browser.storage.sync.get('reader_settings');
-		const settings = data.reader_settings as ReaderSettings | undefined;
+		const settings = (await loadSettings()).readerSettings;
 
 		const html = document.documentElement;
 		html.classList.add('obsidian-reader-active');

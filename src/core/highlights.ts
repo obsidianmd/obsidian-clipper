@@ -6,7 +6,9 @@ import DOMPurify from 'dompurify';
 import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { getFontCss } from '../utils/font-utils';
-import { ReaderSettings } from '../types/types';
+import { loadSettings } from '../utils/storage-utils';
+import { LOCAL_SYNC_PAYLOAD_KEY } from '../sync/providers/local-sync-provider';
+import { SYNC_PROVIDER_PREFERENCE_KEY } from '../sync/sync-manager';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { createIcons } from 'lucide';
@@ -131,7 +133,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			});
 		}
-		if (area === 'sync' && changes.reader_settings) {
+		const browserSettingsChanged = area === 'sync' && (changes.reader_settings || changes.sync_metadata);
+		const localSettingsChanged = area === 'local'
+			&& (changes[LOCAL_SYNC_PAYLOAD_KEY] || changes[SYNC_PROVIDER_PREFERENCE_KEY]);
+		if (browserSettingsChanged || localSettingsChanged) {
 			applyReaderTheme().then(() => {
 				reapplyThemeToPageGroups();
 			});
@@ -156,8 +161,7 @@ let highlightThemeClasses: string[] = [];
 let highlightThemeAttr: { name: string; value: string } | null = null;
 
 async function applyReaderTheme() {
-	const data = await browser.storage.sync.get('reader_settings');
-	const settings = data.reader_settings as ReaderSettings | undefined;
+	const settings = (await loadSettings()).readerSettings;
 
 	const isDark = settings
 		? settings.appearance === 'dark' || (settings.appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)
