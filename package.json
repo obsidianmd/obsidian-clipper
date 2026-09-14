@@ -61,7 +61,7 @@
 		"defuddle": "^0.19.2",
 		"dompurify": "^3.4.12",
 		"highlight.js": "^11.11.1",
-		"knap": "^0.2.3",
+		"knap": "^0.6.0",
 		"linkedom": "^0.18.0",
 		"lucide": "^0.359.0",
 		"lz-string": "^1.5.0"

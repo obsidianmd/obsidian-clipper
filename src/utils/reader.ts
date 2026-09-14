@@ -4,6 +4,7 @@ import { detectBrowser } from './browser-detection';
 import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
+import knapSyntax from 'knap/highlightjs';
 import { getDomain } from './string-utils';
 import type { HighlighterAPI } from './highlighter';
 import * as localHighlighter from './highlighter';
@@ -31,6 +32,8 @@ import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './iframe-resize';
 import { setElementHTML, setSVGChildren, serializeChildren } from './dom-utils';
+
+hljs.registerLanguage('knap', knapSyntax);
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';

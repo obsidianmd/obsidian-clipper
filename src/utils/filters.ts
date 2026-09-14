@@ -31,11 +31,12 @@ export const clipperFilters: Readonly<FilterRegistry<ClipperTemplateContext>> = 
 });
 
 const diagnosticFilters = new Proxy(clipperFilters, {
-	get(target, property, receiver) {
-		if (typeof property === 'string' && !Reflect.has(target, property)) {
+	getOwnPropertyDescriptor(target, property) {
+		const descriptor = Reflect.getOwnPropertyDescriptor(target, property);
+		if (typeof property === 'string' && !descriptor) {
 			console.error(`Invalid filter: ${property}`);
 		}
-		return Reflect.get(target, property, receiver);
+		return descriptor;
 	},
 });
 
