@@ -90,6 +90,48 @@ export let pageTitle: string = '';
 let activeHighlightColor: HighlightColor | undefined;
 let isChoosingHighlightColor = false;
 
+type ReaderHighlightThemeSettings = {
+	lightTheme: string;
+	darkTheme: string;
+	appearance: 'auto' | 'light' | 'dark';
+};
+
+export function resolveHighlighterTheme(
+	settings: ReaderHighlightThemeSettings,
+	prefersDark: boolean,
+): { theme: string; scheme: 'light' | 'dark' } {
+	const isDark = settings.appearance === 'dark'
+		|| (settings.appearance === 'auto' && prefersDark);
+	const selectedTheme = isDark && settings.darkTheme !== 'same'
+		? settings.darkTheme
+		: settings.lightTheme;
+	return {
+		theme: selectedTheme || 'default',
+		scheme: isDark ? 'dark' : 'light',
+	};
+}
+
+let highlighterThemeMediaQuery: MediaQueryList | null = null;
+
+export function syncHighlighterTheme(): void {
+	const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+	const { theme, scheme } = resolveHighlighterTheme(generalSettings.readerSettings, prefersDark);
+	document.documentElement.dataset.obsidianHighlighterTheme = theme;
+	document.documentElement.dataset.obsidianHighlighterScheme = scheme;
+
+	if (!highlighterThemeMediaQuery && window.matchMedia) {
+		highlighterThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		const handleChange = () => {
+			if (generalSettings.readerSettings.appearance === 'auto') syncHighlighterTheme();
+		};
+		if (highlighterThemeMediaQuery.addEventListener) {
+			highlighterThemeMediaQuery.addEventListener('change', handleChange);
+		} else {
+			highlighterThemeMediaQuery.addListener(handleChange);
+		}
+	}
+}
+
 function syncActiveHighlightColor() {
 	document.body.dataset.obsidianHighlightColor = activeHighlightColor ?? 'default';
 }
@@ -318,6 +360,7 @@ export function recolorHighlightRecords(
 export function toggleHighlighterMenu(isActive: boolean) {
 	document.body.classList.toggle('obsidian-highlighter-active', isActive);
 	if (isActive) {
+		syncHighlighterTheme();
 		syncActiveHighlightColor();
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('touchstart', handleTouchStart);
@@ -445,7 +488,7 @@ function createHighlightColorTrigger(): HTMLButtonElement {
 	trigger.addEventListener('click', event => {
 		event.preventDefault();
 		event.stopPropagation();
-		isChoosingHighlightColor = true;
+		isChoosingHighlightColor = !isChoosingHighlightColor;
 		createHighlighterMenu();
 	});
 	return trigger;
@@ -495,12 +538,7 @@ export function createHighlighterMenu() {
 	const highlightText = `${highlightCount}`;
 
 	menu.textContent = '';
-	menu.classList.toggle('is-color-picker', isChoosingHighlightColor);
 	menu.setAttribute('role', 'toolbar');
-	if (isChoosingHighlightColor) {
-		renderHighlightColorChoices(menu);
-		return;
-	}
 	menu.setAttribute('aria-label', 'Highlighter actions');
 	
 	// Add clip button or no highlights message
@@ -541,7 +579,17 @@ export function createHighlighterMenu() {
 		menu.appendChild(noHighlights);
 	}
 
-	menu.appendChild(createHighlightColorTrigger());
+	const colorTrigger = createHighlightColorTrigger();
+	colorTrigger.setAttribute('aria-haspopup', 'true');
+	colorTrigger.setAttribute('aria-expanded', String(isChoosingHighlightColor));
+	menu.appendChild(colorTrigger);
+	if (isChoosingHighlightColor) {
+		const colorPopover = document.createElement('div');
+		colorPopover.className = 'obsidian-highlight-color-popover';
+		colorPopover.setAttribute('role', 'toolbar');
+		renderHighlightColorChoices(colorPopover);
+		menu.appendChild(colorPopover);
+	}
 	
 	// Add undo button
 	const undoButton = document.createElement('button');
@@ -1355,6 +1403,10 @@ export function buildExportedPage(
 // listener will handle it. Without this, both bundles render and you get
 // duplicate overlays / delete buttons.
 browser.storage.onChanged.addListener((changes, area) => {
+	if (area === 'sync' && changes.reader_settings) {
+		void loadSettings().then(syncHighlighterTheme);
+		return;
+	}
 	if (area !== 'local' || !changes.highlights) return;
 	const bridge = window.__obsidianHighlighter;
 	if (bridge && bridge.applyHighlights !== applyHighlights) return;
@@ -1370,6 +1422,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 });
 
 export async function loadHighlights() {
+	syncHighlighterTheme();
 	const url = normalizeUrl(getPageUrl());
 	const rawUrl = getPageUrl();
 	const result = await browser.storage.local.get('highlights');
@@ -1391,6 +1444,7 @@ export async function loadHighlights() {
 		const migrated = migrateStoredHighlights();
 		bumpHighlightsVersion();
 		await loadSettings();
+		syncHighlighterTheme();
 		// Always render so the click-to-remove affordance works regardless
 		// of highlighter mode.
 		applyHighlights();

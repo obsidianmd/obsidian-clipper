@@ -403,17 +403,74 @@ function findTextHighlightAtPoint(x: number, y: number): string | null {
 	return null;
 }
 
-// --- Floating remove button ---
+// --- Floating highlight actions ---
 //
 // Shown on click/tap on any highlight, or on Alt+hover (desktop shortcut).
-// Positioned center-top above the highlight's bounding box.
+// The compact toolbar exposes the current color and remove actions; clicking
+// the color opens a separate palette above it.
 
 let highlightDeleteButton: HTMLDivElement | null = null;
 let currentDeleteTargetId: string | null = null;
 let deleteButtonShownViaAlt = false;
 
-function ensureHighlightDeleteButton(): HTMLDivElement {
-	if (highlightDeleteButton) return highlightDeleteButton;
+const ERASER_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
+
+function updateHighlightColorButton(button: HTMLButtonElement, color?: HighlightColor): void {
+	button.dataset.highlight = color || 'default';
+	button.textContent = '';
+	if (!color) setElementHTML(button, ERASER_ICON);
+	const colorName = color ? `${color[0].toUpperCase()}${color.slice(1)}` : 'Default';
+	button.setAttribute('aria-label', `${colorName} ${getMessage('highlighter').toLowerCase()}`);
+	button.title = button.getAttribute('aria-label') || '';
+}
+
+function closeHighlightColorPopover(toolbar: HTMLElement): void {
+	toolbar.querySelector('.obsidian-highlight-color-popover')?.remove();
+	toolbar.querySelector('.obsidian-highlight-color-trigger')?.setAttribute('aria-expanded', 'false');
+}
+
+function toggleHighlightColorPopover(toolbar: HTMLElement, trigger: HTMLButtonElement): void {
+	if (toolbar.querySelector('.obsidian-highlight-color-popover')) {
+		closeHighlightColorPopover(toolbar);
+		return;
+	}
+
+	const popover = document.createElement('div');
+	popover.className = 'obsidian-highlight-color-popover';
+	popover.setAttribute('role', 'toolbar');
+	popover.setAttribute('aria-label', 'Choose highlight color');
+	const target = highlights.find((highlight: AnyHighlightData) => highlight.id === currentDeleteTargetId);
+	const selected = target?.color ?? '';
+
+	for (const color of ['', ...HIGHLIGHT_COLORS] as Array<HighlightColor | ''>) {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'obsidian-highlight-color-option';
+		button.dataset.highlightChoice = color || 'default';
+		updateHighlightColorButton(button, color || undefined);
+		const active = color === selected;
+		button.classList.toggle('is-active', active);
+		button.setAttribute('aria-pressed', String(active));
+		button.addEventListener('click', e => {
+			e.stopPropagation();
+			e.preventDefault();
+			if (currentDeleteTargetId) recolorHighlightById(currentDeleteTargetId, color || undefined);
+		});
+		popover.appendChild(button);
+	}
+
+	trigger.setAttribute('aria-expanded', 'true');
+	toolbar.appendChild(popover);
+}
+
+export function ensureHighlightDeleteButton(): HTMLDivElement {
+	// Reader mode replaces the page body. If the toolbar was created before that
+	// transition, its cached element survives in memory but is no longer in the
+	// document, so clicking a highlight appears to do nothing. Recreate it in the
+	// current body whenever the cached toolbar has been detached.
+	if (highlightDeleteButton?.isConnected) return highlightDeleteButton;
+	highlightDeleteButton = null;
+	currentDeleteTargetId = null;
 	const toolbar = document.createElement('div');
 	toolbar.className = 'obsidian-highlight-delete';
 	toolbar.setAttribute('role', 'toolbar');
@@ -424,29 +481,18 @@ function ensureHighlightDeleteButton(): HTMLDivElement {
 		e.stopPropagation();
 	});
 
-	const choices: Array<HighlightColor | ''> = ['', ...HIGHLIGHT_COLORS];
-	for (const color of choices) {
-		const button = document.createElement('button');
-		button.type = 'button';
-		button.dataset.highlightChoice = color || 'default';
-		button.dataset.highlight = color || 'default';
-		const colorName = color ? `${color[0].toUpperCase()}${color.slice(1)}` : 'Default';
-		button.setAttribute('aria-label', `${colorName} ${getMessage('highlighter').toLowerCase()}`);
-		button.title = button.getAttribute('aria-label') || '';
-		if (!color) {
-			setElementHTML(button, '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>');
-		}
-		button.addEventListener('click', e => {
-			e.stopPropagation();
-			e.preventDefault();
-			if (currentDeleteTargetId) recolorHighlightById(currentDeleteTargetId, color || undefined);
-		});
-		toolbar.appendChild(button);
-	}
-
-	const divider = document.createElement('span');
-	divider.className = 'obsidian-highlight-actions-divider';
-	toolbar.appendChild(divider);
+	const colorTrigger = document.createElement('button');
+	colorTrigger.type = 'button';
+	colorTrigger.className = 'obsidian-highlight-color-trigger';
+	colorTrigger.setAttribute('aria-haspopup', 'true');
+	colorTrigger.setAttribute('aria-expanded', 'false');
+	updateHighlightColorButton(colorTrigger);
+	colorTrigger.addEventListener('click', e => {
+		e.stopPropagation();
+		e.preventDefault();
+		toggleHighlightColorPopover(toolbar, colorTrigger);
+	});
+	toolbar.appendChild(colorTrigger);
 
 	const trashButton = document.createElement('button');
 	trashButton.type = 'button';
@@ -492,14 +538,11 @@ function positionDeleteButton(id: string, centerX: number, top: number): void {
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
 	const target = highlights.find((highlight: AnyHighlightData) => highlight.id === id);
-	const selected = target?.color ?? 'default';
-	btn.querySelectorAll<HTMLButtonElement>('[data-highlight-choice]').forEach(button => {
-		const active = button.dataset.highlightChoice === selected;
-		button.classList.toggle('is-active', active);
-		button.setAttribute('aria-pressed', String(active));
-	});
+	closeHighlightColorPopover(btn);
+	const colorTrigger = btn.querySelector<HTMLButtonElement>('.obsidian-highlight-color-trigger');
+	if (colorTrigger) updateHighlightColorButton(colorTrigger, target?.color);
 	btn.style.display = 'flex';
-	const btnWidth = btn.offsetWidth || 220;
+	const btnWidth = btn.offsetWidth || 60;
 	const btnHeight = btn.offsetHeight || 30;
 	const idealLeft = centerX - btnWidth / 2;
 	const clampedLeft = Math.max(4, Math.min(idealLeft, window.innerWidth - btnWidth - 4));
@@ -523,7 +566,10 @@ function recolorHighlightById(id: string, color?: HighlightColor): void {
 }
 
 export function hideHighlightDeleteButton(): void {
-	if (highlightDeleteButton) highlightDeleteButton.style.display = 'none';
+	if (highlightDeleteButton) {
+		closeHighlightColorPopover(highlightDeleteButton);
+		highlightDeleteButton.style.display = 'none';
+	}
 	currentDeleteTargetId = null;
 }
 

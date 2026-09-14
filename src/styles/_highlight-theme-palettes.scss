@@ -1,0 +1,102 @@
+$obsidian-highlight-palettes: (
+	default: (
+		light: (red: #e93147, orange: #ec7500, yellow: #e0ac00, green: #08b94e, blue: #086ddd, purple: #7852ee),
+		dark: (red: #fb464c, orange: #e9973f, yellow: #e0de71, green: #44cf6e, blue: #54b3ff, purple: #a882ff),
+	),
+	ayu: (
+		light: (red: #f07171, orange: #fa8532, yellow: #eba400, green: #86b300, blue: #22a4e6, purple: #a37acc),
+		dark: (red: #f28779, orange: #ffa659, yellow: #ffd137, green: #d5ff80, blue: #73d0ff, purple: #dfbfff),
+	),
+	catppuccin: (
+		light: (red: #e64553, orange: #fe640c, yellow: #df8e1d, green: #40a02b, blue: #2166f6, purple: #8938ef),
+		dark: (red: #eb999c, orange: #efa076, yellow: #e5c890, green: #a6d18a, blue: #8caaee, purple: #ca9ee6),
+	),
+	everforest: (
+		light: (red: #f85552, orange: #f57d26, yellow: #dfa000, green: #8da101, blue: #3795c5, purple: #df69ba),
+		dark: (red: #e67e80, orange: #e69875, yellow: #dbbc7f, green: #a7c080, blue: #7fbbb3, purple: #d699b6),
+	),
+	gruvbox: (
+		light: (red: #cc241d, orange: #d65d0e, yellow: #d79921, green: #98971a, blue: #458588, purple: #b16286),
+		dark: (red: #fb4934, orange: #fe8019, yellow: #fabd2f, green: #b8bb26, blue: #83a598, purple: #d3869b),
+	),
+	rose-pine: (
+		light: (red: #b4637a, orange: #d7827e, yellow: #ea9d34, green: #56949f, blue: #286983, purple: #907aa9),
+		dark: (red: #eb6f92, orange: #ea9a97, yellow: #f6c177, green: #9ccfd8, blue: #3e8fb0, purple: #c4a7e7),
+	),
+	nord: (
+		dark: (red: #bf616a, orange: #d08770, yellow: #ebcb8b, green: #a3be8c, blue: #81a1c1, purple: #b48ead),
+		light: (red: #bf616a, orange: #d08770, yellow: #ebcb8b, green: #a3be8c, blue: #81a1c1, purple: #b48ead),
+	),
+	solarized: (
+		dark: (red: #dc322f, orange: #cb4b16, yellow: #b58900, green: #859900, blue: #268bd2, purple: #6c71c4),
+		light: (red: #dc322f, orange: #cb4b16, yellow: #b58900, green: #859900, blue: #268bd2, purple: #6c71c4),
+	),
+	flexoki: (
+		light: (red: #af3029, orange: #bc5215, yellow: #ad8301, green: #66800b, blue: #205ea6, purple: #5e409d),
+		dark: (red: #d14d41, orange: #da702c, yellow: #d0a215, green: #879a39, blue: #4385be, purple: #8b7ec8),
+	),
+);
+
+@mixin obsidian-highlight-palette($theme, $scheme, $include-reader-colors: false, $variable-prefix: obsidian-highlight) {
+	$palette: map-get(map-get($obsidian-highlight-palettes, $theme), $scheme);
+	@each $name, $value in $palette {
+		$name-string: "" + $name;
+		@if $include-reader-colors {
+			--color-#{$name-string}: #{$value};
+		} @else {
+			--#{$variable-prefix}-#{$name-string}: #{$value};
+		}
+	}
+}
+
+// Normal web pages receive only the six namespaced highlight variables. The
+// attributes are set from the user's effective Reader theme by highlighter.ts.
+@mixin obsidian-highlighter-theme-palette-rules {
+	// Reader already exposes the selected palette as --color-* variables.
+	:root.obsidian-reader-active {
+		--obsidian-highlight-red: var(--color-red);
+		--obsidian-highlight-orange: var(--color-orange);
+		--obsidian-highlight-yellow: var(--color-yellow);
+		--obsidian-highlight-green: var(--color-green);
+		--obsidian-highlight-blue: var(--color-blue);
+		--obsidian-highlight-purple: var(--color-purple);
+	}
+
+	// Default variables also provide a safe fallback for an unknown/legacy
+	// theme id. A named palette below overrides them when available.
+	:root:not(.obsidian-reader-active)[data-obsidian-highlighter-scheme="light"] {
+		@include obsidian-highlight-palette(default, light);
+	}
+	:root:not(.obsidian-reader-active)[data-obsidian-highlighter-scheme="dark"] {
+		@include obsidian-highlight-palette(default, dark);
+	}
+
+	@each $theme, $schemes in $obsidian-highlight-palettes {
+		@if $theme != default {
+			:root:not(.obsidian-reader-active)[data-obsidian-highlighter-theme="#{$theme}"][data-obsidian-highlighter-scheme="light"] {
+				@include obsidian-highlight-palette($theme, light);
+			}
+			:root:not(.obsidian-reader-active)[data-obsidian-highlighter-theme="#{$theme}"][data-obsidian-highlighter-scheme="dark"] {
+				@include obsidian-highlight-palette($theme, dark);
+			}
+		}
+	}
+}
+
+// Highlight controls always sit on a dark surface, independently of the page
+// or Reader appearance. Give their swatches a dedicated copy of the selected
+// theme's dark palette so a light page does not make the controls look washed
+// out. These variables remain separate from the colors painted onto the page.
+@mixin obsidian-highlight-toolbar-theme-palette-rules {
+	:root {
+		@include obsidian-highlight-palette(default, dark, false, obsidian-highlight-toolbar);
+	}
+
+	@each $theme, $schemes in $obsidian-highlight-palettes {
+		@if $theme != default {
+			:root[data-obsidian-highlighter-theme="#{$theme}"] {
+				@include obsidian-highlight-palette($theme, dark, false, obsidian-highlight-toolbar);
+			}
+		}
+	}
+}

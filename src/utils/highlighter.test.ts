@@ -7,6 +7,7 @@ import {
 	getHighlights,
 	handleTextSelection,
 	recolorHighlightRecords,
+	resolveHighlighterTheme,
 	setActiveHighlightColor,
 	updateHighlights,
 } from './highlighter';
@@ -86,6 +87,32 @@ describe('recolorHighlightRecords', () => {
 	});
 });
 
+describe('resolveHighlighterTheme', () => {
+	test('uses the configured light theme when Reader appearance is light', () => {
+		expect(resolveHighlighterTheme({
+			lightTheme: 'flexoki',
+			darkTheme: 'nord',
+			appearance: 'light',
+		}, true)).toEqual({ theme: 'flexoki', scheme: 'light' });
+	});
+
+	test('uses the separate dark theme when automatic appearance is dark', () => {
+		expect(resolveHighlighterTheme({
+			lightTheme: 'flexoki',
+			darkTheme: 'nord',
+			appearance: 'auto',
+		}, true)).toEqual({ theme: 'nord', scheme: 'dark' });
+	});
+
+	test('uses the light theme palette in dark mode when dark theme is same', () => {
+		expect(resolveHighlighterTheme({
+			lightTheme: 'rose-pine',
+			darkTheme: 'same',
+			appearance: 'dark',
+		}, false)).toEqual({ theme: 'rose-pine', scheme: 'dark' });
+	});
+});
+
 describe('highlighter color mode', () => {
 	afterEach(() => {
 		document.body.classList.remove('obsidian-highlighter-active');
@@ -94,21 +121,29 @@ describe('highlighter color mode', () => {
 		document.body.textContent = '';
 	});
 
-	test('transforms the menu into a color picker and restores it after selection', () => {
+	test('opens a separate color popover and keeps the action menu visible', () => {
 		document.body.classList.add('obsidian-highlighter-active');
+		updateHighlights([{
+			id: 'menu-highlight',
+			type: 'text',
+			xpath: '/p[1]',
+			content: 'Example',
+			startOffset: 0,
+			endOffset: 7,
+		}]);
 		createHighlighterMenu();
 
 		const trigger = document.querySelector<HTMLButtonElement>('#obsidian-highlight-color-trigger')!;
 		trigger.click();
-		expect(document.querySelector('.obsidian-highlighter-menu')?.classList.contains('is-color-picker')).toBe(true);
-		expect(document.querySelectorAll('.obsidian-highlight-color-option')).toHaveLength(7);
-		expect(document.querySelector('#obsidian-clip-button')).toBeNull();
-		expect(document.querySelector('#obsidian-back-highlight-color')).toBeNull();
+		expect(document.querySelector('.obsidian-highlight-color-popover')).not.toBeNull();
+		expect(document.querySelectorAll('.obsidian-highlight-color-popover .obsidian-highlight-color-option')).toHaveLength(7);
+		expect(document.querySelector('#obsidian-clip-button')).not.toBeNull();
+		expect(document.querySelector<HTMLButtonElement>('#obsidian-highlight-color-trigger')?.getAttribute('aria-expanded')).toBe('true');
 
 		document.querySelector<HTMLButtonElement>('.obsidian-highlight-color-option[data-highlight="green"]')!.click();
 		expect(getActiveHighlightColor()).toBe('green');
 		expect(document.body.dataset.obsidianHighlightColor).toBe('green');
-		expect(document.querySelector('.obsidian-highlighter-menu')?.classList.contains('is-color-picker')).toBe(false);
+		expect(document.querySelector('.obsidian-highlight-color-popover')).toBeNull();
 		expect(document.querySelector<HTMLButtonElement>('#obsidian-highlight-color-trigger')?.dataset.highlight).toBe('green');
 	});
 

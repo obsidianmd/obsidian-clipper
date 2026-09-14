@@ -1,3 +1,8 @@
+@import 'styles/highlight-theme-palettes';
+
+@include obsidian-highlighter-theme-palette-rules;
+@include obsidian-highlight-toolbar-theme-palette-rules;
+
 @media (max-width: 769px) {
 	.obsidian-highlighter-menu {
 		--obsidian-highlighter-menu-font-size: 15px;
@@ -135,27 +140,27 @@ body.obsidian-highlighter-active {
 	}
 	&[data-obsidian-highlight-color="red"] *::selection {
 		background-color: rgba(233, 49, 71, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-red, #e93147) 35%, transparent) !important;
 	}
 	&[data-obsidian-highlight-color="orange"] *::selection {
 		background-color: rgba(236, 117, 0, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-orange, #ec7500) 35%, transparent) !important;
 	}
 	&[data-obsidian-highlight-color="yellow"] *::selection {
 		background-color: rgba(224, 172, 0, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-yellow, #e0ac00) 35%, transparent) !important;
 	}
 	&[data-obsidian-highlight-color="green"] *::selection {
 		background-color: rgba(8, 185, 78, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-green, #08b94e) 35%, transparent) !important;
 	}
 	&[data-obsidian-highlight-color="blue"] *::selection {
 		background-color: rgba(8, 109, 221, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-blue, #086ddd) 35%, transparent) !important;
 	}
 	&[data-obsidian-highlight-color="purple"] *::selection {
 		background-color: rgba(120, 82, 238, 0.35) !important;
-		background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent) !important;
+		background-color: color-mix(in srgb, var(--obsidian-highlight-purple, #7852ee) 35%, transparent) !important;
 	}
 	.obsidian-highlight-overlay {
 		cursor: pointer;
@@ -284,23 +289,18 @@ body.obsidian-highlighter-active {
 	}
 
 	.obsidian-highlight-color-swatch {
-		width: 14px;
-		height: 14px;
+		width: 18px;
+		height: 18px;
 		border-radius: 50%;
-		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
 	}
 
-	[data-highlight="red"] { --obsidian-highlight-swatch: var(--color-red, #e93147); }
-	[data-highlight="orange"] { --obsidian-highlight-swatch: var(--color-orange, #ec7500); }
-	[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--color-yellow, #e0ac00); }
-	[data-highlight="green"] { --obsidian-highlight-swatch: var(--color-green, #08b94e); }
-	[data-highlight="blue"] { --obsidian-highlight-swatch: var(--color-blue, #086ddd); }
-	[data-highlight="purple"] { --obsidian-highlight-swatch: var(--color-purple, #7852ee); }
-
-	&.is-color-picker {
-		gap: 7px;
-		padding-inline: 7px;
-	}
+	[data-highlight="red"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-red, #e93147); }
+	[data-highlight="orange"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-orange, #ec7500); }
+	[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-yellow, #e0ac00); }
+	[data-highlight="green"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-green, #08b94e); }
+	[data-highlight="blue"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-blue, #086ddd); }
+	[data-highlight="purple"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-purple, #7852ee); }
 
 	button.obsidian-highlight-color-option {
 		width: 18px !important;
@@ -309,7 +309,7 @@ body.obsidian-highlighter-active {
 		padding: 0 !important;
 		border-radius: 50% !important;
 		background-color: var(--obsidian-highlight-swatch, transparent) !important;
-		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28) !important;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28) !important;
 
 		&[data-highlight="default"] {
 			box-shadow: none !important;
@@ -323,18 +323,12 @@ body.obsidian-highlighter-active {
 
 		@media (hover: hover) {
 			&:hover {
-				transform: scale(1.15);
 				background-color: var(--obsidian-highlight-swatch, rgba(255, 255, 255, 0.12)) !important;
 			}
 		}
 	}
 
 	@media (max-width: 769px) {
-		&.is-color-picker {
-			gap: 10px;
-			padding-inline: 10px;
-		}
-
 		button.obsidian-highlight-color-option {
 			width: 24px !important;
 			min-width: 24px !important;
@@ -364,27 +358,27 @@ body.obsidian-highlighter-active {
 
 .obsidian-highlight-overlay[data-highlight="red"] {
 	--obsidian-highlight-color: rgba(233, 49, 71, 0.35);
-	background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-red, #e93147) 35%, transparent);
 }
 .obsidian-highlight-overlay[data-highlight="orange"] {
 	--obsidian-highlight-color: rgba(236, 117, 0, 0.35);
-	background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-orange, #ec7500) 35%, transparent);
 }
 .obsidian-highlight-overlay[data-highlight="yellow"] {
 	--obsidian-highlight-color: rgba(224, 172, 0, 0.35);
-	background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-yellow, #e0ac00) 35%, transparent);
 }
 .obsidian-highlight-overlay[data-highlight="green"] {
 	--obsidian-highlight-color: rgba(8, 185, 78, 0.35);
-	background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-green, #08b94e) 35%, transparent);
 }
 .obsidian-highlight-overlay[data-highlight="blue"] {
 	--obsidian-highlight-color: rgba(8, 109, 221, 0.35);
-	background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-blue, #086ddd) 35%, transparent);
 }
 .obsidian-highlight-overlay[data-highlight="purple"] {
 	--obsidian-highlight-color: rgba(120, 82, 238, 0.35);
-	background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-purple, #7852ee) 35%, transparent);
 }
 
 // CSS Custom Highlight API: paints text-type highlights without DOM mutation.
@@ -399,27 +393,51 @@ body.obsidian-highlighter-active {
 
 ::highlight(obsidian-highlight-red) {
 	background-color: rgba(233, 49, 71, 0.35);
-	background-color: color-mix(in srgb, var(--color-red, #e93147) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-red, #e93147) 35%, transparent);
 }
 ::highlight(obsidian-highlight-orange) {
 	background-color: rgba(236, 117, 0, 0.35);
-	background-color: color-mix(in srgb, var(--color-orange, #ec7500) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-orange, #ec7500) 35%, transparent);
 }
 ::highlight(obsidian-highlight-yellow) {
 	background-color: rgba(224, 172, 0, 0.35);
-	background-color: color-mix(in srgb, var(--color-yellow, #e0ac00) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-yellow, #e0ac00) 35%, transparent);
 }
 ::highlight(obsidian-highlight-green) {
 	background-color: rgba(8, 185, 78, 0.35);
-	background-color: color-mix(in srgb, var(--color-green, #08b94e) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-green, #08b94e) 35%, transparent);
 }
 ::highlight(obsidian-highlight-blue) {
 	background-color: rgba(8, 109, 221, 0.35);
-	background-color: color-mix(in srgb, var(--color-blue, #086ddd) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-blue, #086ddd) 35%, transparent);
 }
 ::highlight(obsidian-highlight-purple) {
 	background-color: rgba(120, 82, 238, 0.35);
-	background-color: color-mix(in srgb, var(--color-purple, #7852ee) 35%, transparent);
+	background-color: color-mix(in srgb, var(--obsidian-highlight-purple, #7852ee) 35%, transparent);
+}
+
+// The color choices open above their compact trigger without replacing the
+// surrounding action toolbar.
+.obsidian-highlight-color-popover {
+	position: absolute;
+	left: 50%;
+	bottom: calc(100% + 6px);
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 5px 7px;
+	background: #353535;
+	color: #f0f0f0;
+	border: 1px solid #424242;
+	border-radius: 20px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+	line-height: 1;
+	white-space: nowrap;
+	z-index: 1;
+	pointer-events: auto;
+	user-select: none;
 }
 
 // Shared base for floating highlight action toolbars.
@@ -464,7 +482,8 @@ body.obsidian-highlighter-active {
 }
 
 .obsidian-selection-action,
-.obsidian-highlight-delete {
+.obsidian-highlight-delete,
+.obsidian-highlight-color-popover {
 	padding: 5px 7px;
 	gap: 7px;
 
@@ -476,7 +495,7 @@ body.obsidian-highlighter-active {
 		border: 0;
 		border-radius: 50%;
 		background: var(--obsidian-highlight-swatch, transparent);
-		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 		cursor: pointer;
 		flex: 0 0 auto;
 
@@ -493,18 +512,12 @@ body.obsidian-highlighter-active {
 			}
 		}
 
-		&[data-highlight="red"] { --obsidian-highlight-swatch: var(--color-red, #e93147); }
-		&[data-highlight="orange"] { --obsidian-highlight-swatch: var(--color-orange, #ec7500); }
-		&[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--color-yellow, #e0ac00); }
-		&[data-highlight="green"] { --obsidian-highlight-swatch: var(--color-green, #08b94e); }
-		&[data-highlight="blue"] { --obsidian-highlight-swatch: var(--color-blue, #086ddd); }
-		&[data-highlight="purple"] { --obsidian-highlight-swatch: var(--color-purple, #7852ee); }
-
-		@media (hover: hover) {
-			&:hover {
-				transform: scale(1.15);
-			}
-		}
+		&[data-highlight="red"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-red, #e93147); }
+		&[data-highlight="orange"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-orange, #ec7500); }
+		&[data-highlight="yellow"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-yellow, #e0ac00); }
+		&[data-highlight="green"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-green, #08b94e); }
+		&[data-highlight="blue"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-blue, #086ddd); }
+		&[data-highlight="purple"] { --obsidian-highlight-swatch: var(--obsidian-highlight-toolbar-purple, #7852ee); }
 
 		&:focus-visible {
 			outline: 2px solid #fff;
@@ -529,14 +542,6 @@ body.obsidian-highlighter-active {
 }
 
 .obsidian-highlight-delete {
-	.obsidian-highlight-actions-divider {
-		width: 1px;
-		height: 16px;
-		margin: 0 1px;
-		background: rgba(255, 255, 255, 0.25);
-		flex: 0 0 auto;
-	}
-
 	.obsidian-highlight-trash {
 		appearance: none;
 		display: flex;
@@ -565,10 +570,6 @@ body.obsidian-highlighter-active {
 	}
 
 	@media (max-width: 769px) {
-		.obsidian-highlight-actions-divider {
-			height: 22px;
-		}
-
 		.obsidian-highlight-trash {
 			width: 26px;
 			height: 26px;

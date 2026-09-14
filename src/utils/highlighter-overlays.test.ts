@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 import { describe, test, expect, beforeAll, beforeEach } from 'vitest';
-import { renderTextHighlight, clearTextHighlights } from './highlighter-overlays';
+import {
+	renderTextHighlight,
+	clearTextHighlights,
+	ensureHighlightDeleteButton,
+} from './highlighter-overlays';
 import { getElementXPath } from './dom-utils';
 
 // Capture ranges handed to the CSS Custom Highlight API (not implemented in
@@ -154,5 +158,39 @@ describe('renderTextHighlight', () => {
 			content: '<p>This sentence is not on the page.</p>',
 		});
 		expect(addedRanges).toHaveLength(0);
+	});
+});
+
+describe('highlight actions toolbar', () => {
+	test('recreates the toolbar after Reader replaces the document body', () => {
+		document.body.innerHTML = '<main>Original page</main>';
+		const original = ensureHighlightDeleteButton();
+		expect(original.isConnected).toBe(true);
+
+		// Reader.apply() replaces the body contents while keeping the same document.
+		document.body.innerHTML = '<main class="obsidian-reader-content">Reader page</main>';
+		expect(original.isConnected).toBe(false);
+
+		const recreated = ensureHighlightDeleteButton();
+		expect(recreated).not.toBe(original);
+		expect(recreated.isConnected).toBe(true);
+		expect(document.body.contains(recreated)).toBe(true);
+	});
+
+	test('keeps the toolbar compact and opens colors in a separate popover', () => {
+		const toolbar = ensureHighlightDeleteButton();
+		expect(toolbar.querySelector('.obsidian-highlight-color-trigger')).not.toBeNull();
+		expect(toolbar.querySelector('.obsidian-highlight-trash')).not.toBeNull();
+		expect(toolbar.querySelector('.obsidian-highlight-actions-divider')).toBeNull();
+		expect(toolbar.querySelector('.obsidian-highlight-color-popover')).toBeNull();
+
+		const trigger = toolbar.querySelector<HTMLButtonElement>('.obsidian-highlight-color-trigger')!;
+		trigger.click();
+		expect(trigger.getAttribute('aria-expanded')).toBe('true');
+		expect(toolbar.querySelectorAll('.obsidian-highlight-color-popover .obsidian-highlight-color-option')).toHaveLength(7);
+
+		trigger.click();
+		expect(trigger.getAttribute('aria-expanded')).toBe('false');
+		expect(toolbar.querySelector('.obsidian-highlight-color-popover')).toBeNull();
 	});
 });
