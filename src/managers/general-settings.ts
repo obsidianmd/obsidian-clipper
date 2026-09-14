@@ -126,11 +126,21 @@ export async function updateVaultList(): Promise<void> {
 		defaultLabel.textContent = getMessage('defaultFolder');
 		defaultRow.appendChild(defaultLabel);
 
-		const defaultSelect = document.createElement('select');
-		defaultSelect.className = 'vault-default-folder-select';
-		buildDefaultFolderOptions(defaultSelect, folders, defaultFolder);
-		defaultRow.appendChild(defaultSelect);
-		attachTreeSelect(defaultSelect);
+		if (supported) {
+			const defaultSelect = document.createElement('select');
+			defaultSelect.className = 'vault-default-folder-select';
+			buildDefaultFolderOptions(defaultSelect, folders, defaultFolder);
+			attachTreeSelect(defaultSelect);
+			defaultRow.appendChild(defaultSelect);
+
+			defaultSelect.addEventListener('change', () => {
+				saveSettings({ vaultDefaultFolders: setVaultDefaultFolder(vault, defaultSelect.value) });
+			});
+		} else {
+			// No folder tree in this browser: keep the plain vault list.
+			controls.style.display = 'none';
+			defaultRow.style.display = 'none';
+		}
 
 		li.appendChild(defaultRow);
 
@@ -204,10 +214,6 @@ export async function updateVaultList(): Promise<void> {
 				return;
 			}
 			await updateVaultList();
-		});
-
-		defaultSelect.addEventListener('change', () => {
-			saveSettings({ vaultDefaultFolders: setVaultDefaultFolder(vault, defaultSelect.value) });
 		});
 
 		vaultList.appendChild(li);

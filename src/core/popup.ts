@@ -850,11 +850,13 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 	if (folderSelect && pathField && pathContainer) {
 		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 		if (isDailyNote) {
-			folderSelect.style.display = 'none';
+			setFolderControlVisible(false);
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			folderSelect.style.display = '';
+			const folderTreeSupported = isFileSystemAccessSupported();
+			setFolderControlVisible(folderTreeSupported);
+			pathField.style.display = folderTreeSupported ? 'none' : '';
 			pathField.setAttribute('data-template-value', template.path);
 		}
 	}
@@ -940,7 +942,14 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 	if (folderSelect && pathField && !isDailyNote) {
 		const vault = (document.getElementById('vault-select') as HTMLSelectElement | null)?.value || '';
-		await updateFolderFieldForVault(vault, formattedPath);
+		if (isFileSystemAccessSupported()) {
+			await updateFolderFieldForVault(vault, formattedPath);
+		} else {
+			// No folder tree available: fall back to the plain path text field.
+			setFolderControlVisible(false);
+			pathField.style.display = '';
+			pathField.value = formattedPath;
+		}
 	} else if (pathField) {
 		pathField.value = formattedPath;
 	}
@@ -1058,6 +1067,13 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	return replacedTemplate;
 }
 
+function setFolderControlVisible(visible: boolean): void {
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+	if (!folderSelect) return;
+	const control = (folderSelect.closest('.tree-select') as HTMLElement | null) ?? folderSelect;
+	control.style.display = visible ? '' : 'none';
+}
+
 async function updateFolderFieldForVault(vault: string, fallbackPath = ''): Promise<void> {
 	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
@@ -1105,6 +1121,13 @@ function setupFolderFieldListeners(): void {
 	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
 	if (!folderSelect || !pathField) return;
+
+	if (!isFileSystemAccessSupported()) {
+		// Browsers without the File System Access API keep the plain path field.
+		setFolderControlVisible(false);
+		pathField.style.display = '';
+		return;
+	}
 
 	attachTreeSelect(folderSelect, { input: pathField });
 
@@ -1198,13 +1221,14 @@ function updateVaultDropdown(vaults: string[]) {
 	}
 
 	const hasVaults = vaults.length > 0;
+	const folderTreeSupported = isFileSystemAccessSupported();
 	const defaultBtn = document.getElementById('set-default-folder') as HTMLButtonElement | null;
 	if (defaultBtn) {
-		defaultBtn.style.display = hasVaults ? '' : 'none';
+		defaultBtn.style.display = hasVaults && folderTreeSupported ? '' : 'none';
 	}
 	const refreshFoldersBtn = document.getElementById('refresh-folders') as HTMLButtonElement | null;
 	if (refreshFoldersBtn) {
-		refreshFoldersBtn.style.display = hasVaults && isFileSystemAccessSupported() ? '' : 'none';
+		refreshFoldersBtn.style.display = hasVaults && folderTreeSupported ? '' : 'none';
 	}
 
 	// Add event listener to update lastSelectedVault when changed
@@ -1483,7 +1507,9 @@ async function handleClipObsidian(): Promise<void> {
 		const selectedVault = vaultDropdown.value || currentTemplate.vault || '';
 		const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
-		const path = isDailyNote ? '' : (folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : pathField?.value || '');
+		const path = isDailyNote ? '' : isFileSystemAccessSupported()
+			? (folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : pathField?.value || '')
+			: pathField?.value || '';
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();

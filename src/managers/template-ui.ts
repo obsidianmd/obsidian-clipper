@@ -3,7 +3,7 @@ import { deleteTemplate, templates, editingTemplateIndex, saveTemplateSettings, 
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { generalSettings } from '../utils/storage-utils';
-import { getVaultFolders } from '../utils/vault-folders';
+import { getVaultFolders, isFileSystemAccessSupported } from '../utils/vault-folders';
 import { setFolderField, getFolderFieldValue, handleFolderSelectChange, handleFolderInputChange } from '../utils/folder-select';
 import { attachTreeSelect } from '../utils/tree-select';
 import { updateUrl } from '../utils/routing';
@@ -165,6 +165,15 @@ function setupTemplateFolderField(vault: string, currentPath: string): void {
 	const input = document.getElementById('template-path-name') as HTMLInputElement;
 	if (!select || !input) return;
 
+	if (!isFileSystemAccessSupported()) {
+		// Browsers without the File System Access API keep the plain path field.
+		const control = (select.closest('.tree-select') as HTMLElement | null) ?? select;
+		control.style.display = 'none';
+		input.style.display = '';
+		input.value = currentPath ?? '';
+		return;
+	}
+
 	attachTreeSelect(select, { input });
 	populateTemplateFolderField(vault, currentPath);
 
@@ -298,6 +307,7 @@ export function showTemplateEditor(template: Template | null): void {
 		});
 		vaultSelect.value = editingTemplate.vault || '';
 		vaultSelect.onchange = () => {
+			if (!isFileSystemAccessSupported()) return;
 			const folderSelect = document.getElementById('template-folder-select') as HTMLSelectElement;
 			const pathField = document.getElementById('template-path-name') as HTMLInputElement;
 			const currentPath = folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : '';
