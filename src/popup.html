@@ -52,8 +52,12 @@
 					<div id="vault-container" style="display: none;">
 						<select id="vault-select"></select>
 					</div>
-					<input id="path-name-field" type="text" data-i18n="folder"/>
+					<select id="folder-select"></select>
+					<button id="refresh-folders" class="clickable-icon" type="button" data-i18n-title="refreshVaultFolders"><i data-lucide="refresh-cw"></i></button>
+					<button id="set-default-folder" class="clickable-icon" type="button" data-i18n-title="setDefaultFolder" aria-pressed="false"><i data-lucide="star"></i></button>
+					<input id="path-name-field" type="text" data-i18n="folder" style="display: none;"/>
 				</div>
+				<div id="folder-refresh-status" class="folder-refresh-status"></div>
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>
 					<div class="interpreter-controls">

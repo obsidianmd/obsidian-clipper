@@ -299,6 +299,67 @@ label {
 	.setting-item-list-remove {
 		margin-inline-start: auto;
 	}
+
+	li {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.35rem;
+		padding: 0.4rem 0;
+	}
+
+	.vault-item-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.25rem;
+
+		.vault-item-name {
+			flex-grow: 1;
+			overflow-wrap: anywhere;
+		}
+	}
+
+	.vault-folder-controls {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.35rem;
+		padding-inline-start: 1.5rem;
+		color: var(--text-muted);
+
+		.vault-folder-status {
+			flex-grow: 1;
+			font-size: var(--font-ui-smaller, 0.8em);
+		}
+
+		button:disabled {
+			opacity: 0.4;
+			cursor: default;
+		}
+	}
+
+	.vault-default-folder {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.5rem;
+		padding-inline-start: 1.5rem;
+
+		label {
+			font-size: var(--font-ui-smaller, 0.8em);
+			color: var(--text-muted);
+		}
+
+		select {
+			flex-grow: 1;
+			min-width: 0;
+		}
+
+		.tree-select {
+			flex-grow: 1;
+			min-width: 0;
+		}
+	}
 }
 
 .setting-item-list {

@@ -137,6 +137,7 @@
 								<div class="setting-item-description" data-i18n="vaultsDescription">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
 								<input type="text" id="vault-input" data-i18n="addVaultPlaceholder" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
 								<ul id="vault-list" class="setting-item-list"></ul>
+								<div class="setting-item-description" data-i18n="vaultFoldersDescription">Select a local vault folder to list your folders and set a default location for clips. Folder access is only available in Chromium-based browsers.</div>
 								</div>
 							</div>
 							<div class="setting-group" id="hotkeys-subsection">
@@ -721,9 +722,10 @@
 											<input type="text" id="note-name-format" placeholder="{{title}}" />
 										</div>
 										<div class="setting-item" id="path-name-container" style="display: none;">
-											<label for="template-path-name" data-i18n="noteLocation">Note location</label>
+											<label for="template-folder-select" data-i18n="noteLocation">Note location</label>
 											<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
-											<input type="text" id="template-path-name" placeholder="Clippings" />
+											<select id="template-folder-select"></select>
+											<input type="text" id="template-path-name" placeholder="Clippings" style="display: none;" />
 										</div>
 										<div class="setting-item">
 											<label for="template-vault" data-i18n="vault">Vault</label>

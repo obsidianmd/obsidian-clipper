@@ -3,6 +3,9 @@ import { deleteTemplate, templates, editingTemplateIndex, saveTemplateSettings, 
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { generalSettings } from '../utils/storage-utils';
+import { getVaultFolders } from '../utils/vault-folders';
+import { setFolderField, getFolderFieldValue, handleFolderSelectChange, handleFolderInputChange } from '../utils/folder-select';
+import { attachTreeSelect } from '../utils/tree-select';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
@@ -149,6 +152,31 @@ async function deleteTemplateFromList(templateId: string): Promise<void> {
 	}
 }
 
+async function populateTemplateFolderField(vault: string, currentPath: string): Promise<void> {
+	const select = document.getElementById('template-folder-select') as HTMLSelectElement;
+	const input = document.getElementById('template-path-name') as HTMLInputElement;
+	if (!select || !input) return;
+	const folders = vault ? await getVaultFolders(vault) : [];
+	setFolderField(select, input, folders, currentPath ?? '');
+}
+
+function setupTemplateFolderField(vault: string, currentPath: string): void {
+	const select = document.getElementById('template-folder-select') as HTMLSelectElement;
+	const input = document.getElementById('template-path-name') as HTMLInputElement;
+	if (!select || !input) return;
+
+	attachTreeSelect(select, { input });
+	populateTemplateFolderField(vault, currentPath);
+
+	select.onchange = () => handleFolderSelectChange(select, input);
+	input.oninput = async () => {
+		const currentVault = (document.getElementById('template-vault') as HTMLSelectElement)?.value
+			|| generalSettings.vaults[0] || '';
+		const folders = currentVault ? await getVaultFolders(currentVault) : [];
+		handleFolderInputChange(select, input, folders);
+	};
+}
+
 export function showTemplateEditor(template: Template | null): void {
 	let editingTemplate: Template;
 
@@ -195,6 +223,7 @@ export function showTemplateEditor(template: Template | null): void {
 		pathInput.value = editingTemplate.path || '';
 		validateTemplateField(pathInput, false);
 	}
+	setupTemplateFolderField(editingTemplate.vault || generalSettings.vaults[0] || '', editingTemplate.path || '');
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
@@ -268,6 +297,12 @@ export function showTemplateEditor(template: Template | null): void {
 			vaultSelect.appendChild(option);
 		});
 		vaultSelect.value = editingTemplate.vault || '';
+		vaultSelect.onchange = () => {
+			const folderSelect = document.getElementById('template-folder-select') as HTMLSelectElement;
+			const pathField = document.getElementById('template-path-name') as HTMLInputElement;
+			const currentPath = folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : '';
+			populateTemplateFolderField(vaultSelect.value || generalSettings.vaults[0] || '', currentPath);
+		};
 	}
 
 	updateUrl('templates', editingTemplate.id);
@@ -517,7 +552,12 @@ export function updateTemplateFromForm(): void {
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) template.path = pathInput.value;
+	const folderSelect = document.getElementById('template-folder-select') as HTMLSelectElement;
+	if (folderSelect && pathInput && folderSelect.options.length > 0) {
+		template.path = getFolderFieldValue(folderSelect, pathInput);
+	} else if (pathInput) {
+		template.path = pathInput.value;
+	}
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
@@ -570,6 +610,11 @@ function clearTemplateEditor(): void {
 	if (templateProperties) templateProperties.textContent = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 	if (pathInput) pathInput.value = 'Clippings';
+	const folderSelect = document.getElementById('template-folder-select') as HTMLSelectElement;
+	if (folderSelect) {
+		folderSelect.textContent = '';
+		folderSelect.value = '';
+	}
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) triggersTextarea.value = '';
 	const templateEditor = document.getElementById('template-editor');

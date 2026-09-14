@@ -3,6 +3,9 @@ import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
 import { generalSettings, loadSettings, saveSettings, setLocalStorage, getLocalStorage } from '../utils/storage-utils';
+import { isFileSystemAccessSupported, pickVaultFolder, refreshVaultFolders, getVaultFolders, hasVaultFolderAccess, removeVaultFolderData, setVaultDefaultFolder } from '../utils/vault-folders';
+import { formatFolderLabel } from '../utils/folder-select';
+import { attachTreeSelect } from '../utils/tree-select';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../managers/template-manager';
@@ -28,54 +31,215 @@ const STORE_URLS = {
 	edge: 'https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme'
 };
 
-export function updateVaultList(): void {
+function buildDefaultFolderOptions(select: HTMLSelectElement, folders: string[], currentValue: string): void {
+	select.textContent = '';
+
+	const rootOption = document.createElement('option');
+	rootOption.value = '';
+	rootOption.textContent = getMessage('vaultRootFolder');
+	select.appendChild(rootOption);
+
+	const values = [...folders];
+	if (currentValue && !values.includes(currentValue)) {
+		values.unshift(currentValue);
+	}
+
+	for (const folder of values) {
+		const option = document.createElement('option');
+		option.value = folder;
+		option.textContent = formatFolderLabel(folder);
+		select.appendChild(option);
+	}
+
+	select.value = currentValue;
+}
+
+export async function updateVaultList(): Promise<void> {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
 	if (!vaultList) return;
 
+	const supported = isFileSystemAccessSupported();
+
 	// Clear existing vaults
 	vaultList.textContent = '';
-	generalSettings.vaults.forEach((vault, index) => {
+
+	for (let index = 0; index < generalSettings.vaults.length; index++) {
+		const vault = generalSettings.vaults[index];
+		const folders = await getVaultFolders(vault);
+		const defaultFolder = generalSettings.vaultDefaultFolders?.[vault] ?? '';
+
 		const li = document.createElement('li');
 		li.dataset.index = index.toString();
 		li.draggable = true;
 
+		const row = createElementWithClass('div', 'vault-item-row');
+
 		const dragHandle = createElementWithClass('div', 'drag-handle');
 		dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
-		li.appendChild(dragHandle);
+		row.appendChild(dragHandle);
 
 		const span = document.createElement('span');
+		span.className = 'vault-item-name';
 		span.textContent = vault;
-		li.appendChild(span);
+		row.appendChild(span);
 
 		const removeBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
 		removeBtn.setAttribute('type', 'button');
 		removeBtn.setAttribute('aria-label', getMessage('removeVault'));
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-		li.appendChild(removeBtn);
+		row.appendChild(removeBtn);
 
-		li.addEventListener('dragstart', handleDragStart);
+		li.appendChild(row);
+
+		const controls = createElementWithClass('div', 'vault-folder-controls');
+
+		const pickBtn = createElementWithClass('button', 'vault-folder-pick clickable-icon');
+		pickBtn.setAttribute('type', 'button');
+		pickBtn.setAttribute('aria-label', getMessage('selectVaultFolder'));
+		pickBtn.title = getMessage('selectVaultFolder');
+		pickBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'folder-open' }));
+		controls.appendChild(pickBtn);
+
+		const hasAccess = supported && await hasVaultFolderAccess(vault);
+		const refreshBtn = createElementWithClass('button', 'vault-folder-refresh clickable-icon') as HTMLButtonElement;
+		refreshBtn.setAttribute('type', 'button');
+		refreshBtn.setAttribute('aria-label', getMessage('refreshVaultFolders'));
+		refreshBtn.title = getMessage('refreshVaultFolders');
+		refreshBtn.disabled = !hasAccess;
+		refreshBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'refresh-cw' }));
+		controls.appendChild(refreshBtn);
+
+		const status = createElementWithClass('span', 'vault-folder-status');
+		if (!supported) {
+			status.textContent = getMessage('fileSystemAccessUnsupported');
+		} else if (folders.length > 0) {
+			status.textContent = getMessage('vaultFoldersFound', [String(folders.length)]);
+		} else {
+			status.textContent = getMessage('vaultFolderNotSelected');
+		}
+		controls.appendChild(status);
+
+		li.appendChild(controls);
+
+		const defaultRow = createElementWithClass('div', 'vault-default-folder');
+		const defaultLabel = document.createElement('label');
+		defaultLabel.textContent = getMessage('defaultFolder');
+		defaultRow.appendChild(defaultLabel);
+
+		const defaultSelect = document.createElement('select');
+		defaultSelect.className = 'vault-default-folder-select';
+		buildDefaultFolderOptions(defaultSelect, folders, defaultFolder);
+		defaultRow.appendChild(defaultSelect);
+		attachTreeSelect(defaultSelect);
+
+		li.appendChild(defaultRow);
+
+		// Rows are draggable for reordering, but a drag that starts on a control
+		// (folder picker, default-folder tree, remove) must not swallow the click.
+		let pressedOnControl = false;
+		li.addEventListener('mousedown', (event) => {
+			pressedOnControl = !!(event.target as HTMLElement).closest('button, select, input, textarea, a, label');
+		});
+		li.addEventListener('dragstart', (event) => {
+			if (pressedOnControl) {
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
+			handleDragStart(event);
+		});
 		li.addEventListener('dragover', handleDragOver);
 		li.addEventListener('drop', handleDrop);
 		li.addEventListener('dragend', handleDragEnd);
+
 		removeBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
 			removeVault(index);
 		});
+
+		pickBtn.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			if (!supported) {
+				alert(getMessage('fileSystemAccessUnsupported'));
+				return;
+			}
+			const result = await pickVaultFolder(vault);
+			if (!result) return; // User dismissed the picker.
+			if (result.error) {
+				alert(result.error === 'unsupported'
+					? getMessage('fileSystemAccessUnsupported')
+					: `${getMessage('vaultFolderPickFailed')}${result.reason ? ` (${result.reason})` : ''}`);
+				return;
+			}
+
+			// Obsidian resolves the clipping target by vault name, and a vault's
+			// name is its folder name. If the typed name differs, correct it so
+			// notes land in the right vault instead of the last-used one.
+			if (result.rootName && result.rootName !== vault) {
+				if (generalSettings.vaults.includes(result.rootName)) {
+					alert(getMessage('vaultAlreadyExists'));
+				} else {
+					generalSettings.vaults[index] = result.rootName;
+					const vaultDefaultFolders = { ...(generalSettings.vaultDefaultFolders ?? {}) };
+					if (vault in vaultDefaultFolders) {
+						vaultDefaultFolders[result.rootName] = vaultDefaultFolders[vault];
+						delete vaultDefaultFolders[vault];
+					}
+					await saveSettings({ vaultDefaultFolders });
+					removeVaultFolderData(vault).catch(error => {
+						console.error('Failed to clear renamed vault folder data:', error);
+					});
+					alert(getMessage('vaultNameCorrected', [result.rootName]));
+				}
+			}
+
+			await updateVaultList();
+		});
+
+		refreshBtn.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			const result = await refreshVaultFolders(vault);
+			if (result.needsPermission) {
+				alert(getMessage('vaultFolderPermissionNeeded'));
+				return;
+			}
+			await updateVaultList();
+		});
+
+		defaultSelect.addEventListener('change', () => {
+			saveSettings({ vaultDefaultFolders: setVaultDefaultFolder(vault, defaultSelect.value) });
+		});
+
 		vaultList.appendChild(li);
-	});
+	}
 
 	initializeIcons(vaultList);
 }
 
 export function addVault(vault: string): void {
-	generalSettings.vaults.push(vault);
+	const name = vault.trim();
+	if (!name) return;
+	if (generalSettings.vaults.includes(name)) {
+		alert(getMessage('vaultAlreadyExists'));
+		return;
+	}
+	generalSettings.vaults.push(name);
 	saveSettings();
 	updateVaultList();
 }
 
 export function removeVault(index: number): void {
-	generalSettings.vaults.splice(index, 1);
-	saveSettings();
+	const [removedVault] = generalSettings.vaults.splice(index, 1);
+	if (removedVault) {
+		removeVaultFolderData(removedVault).catch(error => {
+			console.error('Failed to clear vault folder data:', error);
+		});
+		const vaultDefaultFolders = { ...(generalSettings.vaultDefaultFolders ?? {}) };
+		delete vaultDefaultFolders[removedVault];
+		saveSettings({ vaultDefaultFolders });
+	} else {
+		saveSettings();
+	}
 	updateVaultList();
 }
 
@@ -211,7 +375,7 @@ export function initializeGeneralSettings(): void {
 			}
 		}
 
-		updateVaultList();
+		await updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
 		initializeLegacyModeToggle();
