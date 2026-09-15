@@ -6,6 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
 import { incrementStat } from './utils/storage-utils';
+import { rewriteYouTubeInnertubeHeaders } from './utils/youtube-headers';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -76,33 +77,7 @@ async function enableYouTubeInnertubeRule(): Promise<void> {
 if (typeof browser !== 'undefined' && browser.webRequest?.onBeforeSendHeaders) {
 	try {
 		browser.webRequest.onBeforeSendHeaders.addListener(
-			(details) => {
-				// Only modify requests from tabs showing extension pages
-				if (details.tabId && details.tabId > 0) {
-					// Check asynchronously would be complex — instead check
-					// if the request has an extension origin or referer
-					const refHeader = details.requestHeaders?.find(h => h.name.toLowerCase() === 'referer');
-					const refValue = refHeader?.value || '';
-					const originHeader = details.requestHeaders?.find(h => h.name.toLowerCase() === 'origin');
-					const originValue = originHeader?.value || '';
-					const isFromExtension = refValue.startsWith('moz-extension://') || originValue.startsWith('moz-extension://')
-						|| refValue.startsWith('safari-web-extension://') || originValue.startsWith('safari-web-extension://');
-					if (!isFromExtension) return { requestHeaders: details.requestHeaders };
-				}
-
-				const headers = details.requestHeaders || [];
-				const setHeader = (name: string, value: string) => {
-					const existing = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
-					if (existing) {
-						existing.value = value;
-					} else {
-						headers.push({ name, value });
-					}
-				};
-				setHeader('Origin', 'https://www.youtube.com');
-				setHeader('Referer', 'https://www.youtube.com/');
-				return { requestHeaders: headers };
-			},
+			(details) => ({ requestHeaders: rewriteYouTubeInnertubeHeaders(details) }),
 			{ urls: ['*://www.youtube.com/*'] },
 			['blocking', 'requestHeaders']
 		);
