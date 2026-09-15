@@ -19,6 +19,33 @@ afterEach(() => {
 });
 
 describe('template editor form integration', () => {
+	it.each(['textarea', 'input'] as const)('ignores property row drops in a %s without blocking reorder events or ordinary text drops', tag => {
+		const input = field(tag);
+		const view = createTemplateEditor(input);
+		vi.spyOn(view, 'posAtCoords').mockReturnValue(0);
+		const save = vi.fn();
+		input.addEventListener('input', save);
+		const row = document.createElement('div');
+		row.className = 'property-editor dragging';
+		document.body.appendChild(row);
+		const reorder = vi.fn();
+		view.dom.parentElement!.addEventListener('drop', reorder);
+		const drop = (text: string) => {
+			const event = new Event('drop', { bubbles: true, cancelable: true });
+			Object.defineProperty(event, 'dataTransfer', { value: { files: [], getData: () => text } });
+			view.contentDOM.dispatchEvent(event);
+			return event;
+		};
+		expect(drop('1712345678901abc123def').defaultPrevented).toBe(true);
+		expect(input.value).toBe('{{title}}');
+		expect(save).not.toHaveBeenCalled();
+		expect(reorder).toHaveBeenCalledOnce();
+		row.remove();
+		drop('ordinary text');
+		expect(input.value).toBe('ordinary text{{title}}');
+		expect(save).toHaveBeenCalledOnce();
+	});
+
 	it.each(['textarea', 'input'] as const)('pairs typed Markdown and Knap syntax in the %s editor and saves each change', tag => {
 		const input = field(tag);
 		input.value = '';

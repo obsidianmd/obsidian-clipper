@@ -46,6 +46,18 @@ export function insertMarkdownPair(state: EditorState, text: string, multiline =
   const { from, to } = range;
   if (state.readOnly || state.selection.ranges.length !== 1 || inTemplate(state, from) || escaped(state, from)) return null;
 
+  // Whitespace immediately after an empty emphasis opener makes it literal
+  // (for example, a list bullet or multiplication), so discard its closer.
+  if (range.empty && /^\s+$/.test(text)) {
+    const pair = state.field(pairs).find(pair => '*_'.includes(pair.token) && pair.close === from && pair.open + pair.length === from);
+    if (pair && state.sliceDoc(pair.open, from) === pair.token.repeat(pair.length)) {
+      return state.update({
+        changes: { from, to: from + pair.length, insert: text }, selection: { anchor: from + text.length },
+        effects: removePair.of(pair.close), userEvent: 'input.type',
+      });
+    }
+  }
+
   if (multiline && range.empty && text === '-' && state.doc.lineAt(from).number === 1 && state.doc.lineAt(from).text === '--' && from === 2) {
     return state.update({ changes: { from, insert: '-\n\n---\n' }, selection: { anchor: from + 2 }, userEvent: 'input.type' });
   }

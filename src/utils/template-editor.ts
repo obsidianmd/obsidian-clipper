@@ -127,6 +127,11 @@ export function createTemplateEditor(field: TemplateField): EditorView {
 		}),
 		EditorView.domEventHandlers({
 			blur() { field.dispatchEvent(new Event('blur')); },
+			drop() {
+				// Property reordering uses a plain-text ID. Let the event bubble to
+				// the reorder handler, but prevent CodeMirror from inserting the ID.
+				return !!field.ownerDocument.querySelector('.property-editor.dragging');
+			},
 		}),
 	];
 	if (singleLine) {

@@ -47,6 +47,22 @@ test.each(['**bold**', '__bold__', '*italic*', '_italic_', '`code`', '[[link]]',
   expect(input.state.selection.main.head).toBe(text.length);
 });
 
+test.each(['* item', '  * nested item', '2 * 3', '_ text', '** text', '__ text', '* * * ', '_ _ _ '])('keeps whitespace after an emphasis opener literal in %j', text => {
+  const input = editor();
+  input.type(text);
+  expect(input.state.doc.toString()).toBe(text);
+  expect(input.state.selection.main.head).toBe(text.length);
+});
+
+test('does not remove existing delimiters or closers after nonempty emphasis', () => {
+  const existing = editor('**', 1);
+  existing.type(' ');
+  expect(existing.state.doc.toString()).toBe('* *');
+  const emphasis = editor();
+  emphasis.type('**two words**');
+  expect(emphasis.state.doc.toString()).toBe('**two words**');
+});
+
 test.each(['**', '__', '[[', '==', '~~', '$', '$$', '%%', '`', '(', '"'])('wraps selected text with %j and keeps it selected', text => {
   const input = editor('word', 4, 0);
   input.type(text);
