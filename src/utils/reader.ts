@@ -876,6 +876,10 @@ export class Reader {
 			return pre;
 		}
 
+		// Defuddle may normalize the source document, so preserve an explicit
+		// direction before extraction. Some pages declare it on <body> rather than
+		// <html>.
+		const sourceDir = doc.documentElement.getAttribute('dir') || doc.body?.getAttribute('dir') || undefined;
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
 
@@ -887,7 +891,8 @@ export class Reader {
 			domain: getDomain(doc.URL),
 			wordCount: defuddled.wordCount,
 			parseTime: defuddled.parseTime,
-			language: defuddled.language
+			language: defuddled.language,
+			dir: sourceDir
 		};
 	}
 

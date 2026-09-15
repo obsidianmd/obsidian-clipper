@@ -10,11 +10,26 @@ const applyDir = (doc: Document, sourceDir: string | null | undefined, language:
 		applyReaderDirection: (d: Document, s?: string | null, l?: string | null) => void;
 	}).applyReaderDirection(doc, sourceDir, language);
 
+const extractContent = (doc: Document) =>
+	(Reader as unknown as {
+		extractContent: (d: Document) => Promise<{ dir?: string }>;
+	}).extractContent(doc);
+
 function freshDoc(): Document {
 	return document.implementation.createHTMLDocument('test');
 }
 
 describe('reader direction (applyReaderDirection)', () => {
+	test('preserves a direction declared on the source body', async () => {
+		const doc = freshDoc();
+		doc.body.setAttribute('dir', 'rtl');
+		doc.body.innerHTML = '<article><h1>Title</h1><p>Article content.</p></article>';
+		Object.defineProperty(doc, 'URL', { value: 'https://example.com/article', configurable: true });
+
+		const content = await extractContent(doc);
+		expect(content.dir).toBe('rtl');
+	});
+
 	test('derives dir="rtl" from an RTL article language', () => {
 		const doc = freshDoc();
 		applyDir(doc, undefined, 'ar');

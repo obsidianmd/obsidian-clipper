@@ -16,6 +16,17 @@ describe('isRTLLanguage', () => {
 		expect(isRTLLanguage('ar-EG')).toBe(true);
 		expect(isRTLLanguage('fa-IR')).toBe(true);
 		expect(isRTLLanguage('he-IL')).toBe(true);
+		expect(isRTLLanguage('uz-AF')).toBe(true);
+	});
+
+	test('honors explicit script subtags', () => {
+		for (const code of ['az-Arab', 'ha-Arab', 'ku-Arab', 'pa-Arab', 'uz-Arab-AF']) {
+			expect(isRTLLanguage(code)).toBe(true);
+		}
+
+		for (const code of ['ar-Latn', 'ha-Latn', 'ku-Latn']) {
+			expect(isRTLLanguage(code)).toBe(false);
+		}
 	});
 
 	test('treats left-to-right and unknown languages as non-RTL', () => {
