@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { undo } from '@codemirror/commands';
 import { acceptCompletion, startCompletion } from '@codemirror/autocomplete';
+import { EditorView, runScopeHandlers } from '@codemirror/view';
 import { createTemplateEditor, destroyTemplateEditors, setTemplateEditorValue } from './template-editor';
 
 function field(tag: 'input' | 'textarea' = 'textarea') {
@@ -18,6 +19,29 @@ afterEach(() => {
 });
 
 describe('template editor form integration', () => {
+	it.each(['textarea', 'input'] as const)('pairs typed Markdown and Knap syntax in the %s editor and saves each change', tag => {
+		const input = field(tag);
+		input.value = '';
+		const view = createTemplateEditor(input);
+		const type = (text: string) => {
+			for (const char of text) {
+				const { from, to } = view.state.selection.main;
+				const insert = () => view.state.update(view.state.replaceSelection(char), { userEvent: 'input.type' });
+				if (!view.state.facet(EditorView.inputHandler).some(handler => handler(view, from, to, char, insert))) view.dispatch(insert());
+			}
+		};
+		type('**bold** [[link]] {{title}} ');
+		expect(input.value).toBe('**bold** [[link]] {{title}} ');
+		type('{%');
+		expect(input.value).toBe('**bold** [[link]] {{title}} {%%}');
+		runScopeHandlers(view, new KeyboardEvent('keydown', { key: 'Backspace' }), 'editor');
+		expect(input.value).toBe('**bold** [[link]] {{title}} ');
+		type('__');
+		expect(input.value.endsWith('____')).toBe(true);
+		runScopeHandlers(view, new KeyboardEvent('keydown', { key: 'Backspace' }), 'editor');
+		expect(input.value.endsWith('__')).toBe(true);
+	});
+
 	it('synchronizes edits and undo with bubbling autosave events', () => {
 		const input = field();
 		const save = vi.fn();

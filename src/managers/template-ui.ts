@@ -782,18 +782,20 @@ function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, sh
 }
 
 /**
- * Validate after a pause in editing, and flush any pending validation on blur.
+ * Validate on blur, optionally also after a pause in editing.
  */
-function addValidationListener(field: HTMLInputElement | HTMLTextAreaElement | null, showLineNumbers: boolean = false, appendTo?: HTMLElement): void {
+function addValidationListener(field: HTMLInputElement | HTMLTextAreaElement | null, showLineNumbers: boolean = false, appendTo?: HTMLElement, validateOnInput: boolean = false): void {
 	if (!field || validationFields.has(field)) return;
 	validationFields.add(field);
-	field.addEventListener('input', () => {
-		clearTimeout(validationTimers.get(field));
-		validationTimers.set(field, setTimeout(() => {
-			validationTimers.delete(field);
-			if (field.isConnected) validateTemplateField(field, showLineNumbers, appendTo);
-		}, 300));
-	});
+	if (validateOnInput) {
+		field.addEventListener('input', () => {
+			clearTimeout(validationTimers.get(field));
+			validationTimers.set(field, setTimeout(() => {
+				validationTimers.delete(field);
+				if (field.isConnected) validateTemplateField(field, showLineNumbers, appendTo);
+			}, 300));
+		});
+	}
 	field.addEventListener('blur', () => validateTemplateField(field, showLineNumbers, appendTo));
 }
 
@@ -803,7 +805,7 @@ function addValidationListener(field: HTMLInputElement | HTMLTextAreaElement | n
 export function initializeTemplateValidation(): void {
 	// Note content (multiline, show line numbers)
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
-	addValidationListener(noteContentFormat, true);
+	addValidationListener(noteContentFormat, true, undefined, true);
 
 	// Note name format (single line)
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;

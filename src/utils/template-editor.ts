@@ -8,6 +8,7 @@ import { knapStreamParser } from 'knap/codemirror';
 import { templateCompletions } from './template-completions';
 import { templateFilterSuggestions } from './template-filter-completions';
 import { emptyTemplatePair, pairTemplateInput } from './template-pairs';
+import { markdownPairing } from './markdown-pairs';
 
 type TemplateField = HTMLInputElement | HTMLTextAreaElement;
 const editors = new Map<TemplateField, { view: EditorView; destroy: () => void }>();
@@ -92,6 +93,7 @@ export function createTemplateEditor(field: TemplateField): EditorView {
 			view.dispatch({ changes: pair, selection: { anchor: pair.anchor }, userEvent: pair.insert ? 'input.type' : 'select' });
 			return true;
 		}),
+		markdownPairing(!singleLine),
 		autocompletion({
 			icons: false, activateOnTypingDelay: 80,
 			override: [context => {

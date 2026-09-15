@@ -30,7 +30,10 @@ export function pairTemplateInput(source: string, from: number, to: number, text
   // Braces in tag expressions and quoted filter arguments remain literal input.
   if (activeTag(source.slice(0, start))) return null;
   const closing = opener === '{{' ? '}}' : '%}';
-  return { from, to, insert: text + (after.startsWith(closing) ? '' : closing), anchor: from + text.length };
+  // A first brace may already have a CodeMirror-generated closing brace.
+  // Reuse it when growing {} into a Knap variable or logic tag.
+  const reuseBrace = text.length === 1 && after.startsWith('}') && !after.startsWith(closing);
+  return { from, to: reuseBrace ? to + 1 : to, insert: text + (after.startsWith(closing) ? '' : closing), anchor: from + text.length };
 }
 
 export function emptyTemplatePair(source: string, position: number) {

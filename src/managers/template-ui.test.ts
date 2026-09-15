@@ -42,16 +42,19 @@ it('shows and clears note content errors while the CodeMirror editor stays focus
 	expect(document.activeElement).toBe(view.contentDOM);
 });
 
-it.each(['note-name-format', 'template-path-name', 'prompt-context'])('debounces successive edits in %s', (id) => {
+it.each(['note-name-format', 'template-path-name', 'prompt-context'])('validates %s only on blur', (id) => {
 	const field = document.getElementById(id) as HTMLInputElement;
 	field.value = '{{}}';
 	field.dispatchEvent(new Event('input'));
-	vi.advanceTimersByTime(200);
+	vi.advanceTimersByTime(1000);
+	expect(document.getElementById(`${id}-validation`)).toBeNull();
+	field.dispatchEvent(new Event('blur'));
+	expect(document.getElementById(`${id}-validation`)?.classList.contains('invalid')).toBe(true);
 	field.value = '{{title}}';
 	field.dispatchEvent(new Event('input'));
-	vi.advanceTimersByTime(100);
-	expect(document.getElementById(`${id}-validation`)).toBeNull();
-	vi.advanceTimersByTime(200);
+	vi.advanceTimersByTime(1000);
+	expect(document.getElementById(`${id}-validation`)?.classList.contains('invalid')).toBe(true);
+	field.dispatchEvent(new Event('blur'));
 	expect(document.getElementById(`${id}-validation`)?.style.display).toBe('none');
 });
 
@@ -76,14 +79,20 @@ it('ignores pending validation for removed fields', () => {
 	expect(document.getElementById('template-error-summary')).toBeNull();
 });
 
-it('validates property values below their row and ignores edits pending at removal', () => {
+it('validates property values below their row only on blur', () => {
 	const row = addPropertyToEditor('description', '', 'description');
 	const field = row.querySelector('.property-value') as HTMLInputElement;
 	const view = createTemplateEditor(field);
 	view.dispatch({ changes: { from: 0, insert: '{{}}' } });
-	vi.advanceTimersByTime(300);
+	vi.advanceTimersByTime(1000);
+	expect(row.querySelector('.template-validation')).toBeNull();
+	view.contentDOM.dispatchEvent(new FocusEvent('blur'));
 	expect(row.lastElementChild?.classList.contains('invalid')).toBe(true);
 	view.dispatch({ changes: { from: 2, insert: 'title' } });
+	vi.advanceTimersByTime(1000);
+	expect(row.lastElementChild?.classList.contains('invalid')).toBe(true);
+	view.contentDOM.dispatchEvent(new FocusEvent('blur'));
+	expect((row.lastElementChild as HTMLElement).style.display).toBe('none');
 	row.querySelector<HTMLButtonElement>('.remove-property-btn')!.click();
 	vi.advanceTimersByTime(300);
 	expect(document.querySelector('.template-validation')).toBeNull();
