@@ -1,0 +1,31 @@
+// Shared presentation for action menus and editor autocomplete.
+@mixin surface {
+	border: 1px solid var(--background-modifier-border-hover);
+	background-color: var(--background-secondary);
+	box-shadow: var(--shadow-s);
+	padding: 0.25rem;
+	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+@mixin active-item {
+	background-color: var(--background-modifier-hover);
+}
+
+@mixin item {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	gap: 0.5rem;
+	padding: 0.25rem 0.5rem;
+	font-size: var(--font-ui-smaller);
+	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
+	white-space: nowrap;
+
+	&:hover {
+		@include active-item;
+	}
+}
