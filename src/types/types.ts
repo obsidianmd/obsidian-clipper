@@ -70,6 +70,7 @@ export interface ReaderSettings {
 
 export interface Settings {
 	vaults: string[];
+	vaultDefaultFolders: Record<string, string>;
 	showMoreActionsButton: boolean;
 	betaFeatures: boolean;
 	legacyMode: boolean;

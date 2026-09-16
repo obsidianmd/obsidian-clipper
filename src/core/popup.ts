@@ -6,7 +6,10 @@ import { extractPageContent, initializePageContent } from '../utils/content-extr
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
-import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
+import { getLocalStorage, setLocalStorage, loadSettings, saveSettings, generalSettings, Settings } from '../utils/storage-utils';
+import { getVaultFolders, getVaultDefaultFolder, setVaultDefaultFolder, refreshVaultFolders, hasVaultFolderAccess, isFileSystemAccessSupported } from '../utils/vault-folders';
+import { setFolderField, getFolderFieldValue, handleFolderSelectChange, handleFolderInputChange } from '../utils/folder-select';
+import { attachTreeSelect } from '../utils/tree-select';
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
@@ -781,6 +784,8 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 		}
 	}
 
+	setupFolderFieldListeners();
+
 	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 
 	const newTemplateProperties = createElementWithClass('div', 'metadata-properties');
@@ -839,14 +844,19 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 	}
 
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
-	if (pathField && pathContainer) {
+	if (folderSelect && pathField && pathContainer) {
 		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 		if (isDailyNote) {
+			setFolderControlVisible(false);
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
+			const folderTreeSupported = isFileSystemAccessSupported();
+			setFolderControlVisible(folderTreeSupported);
+			pathField.style.display = folderTreeSupported ? 'none' : '';
 			pathField.setAttribute('data-template-value', template.path);
 		}
 	}
@@ -927,8 +937,20 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 		adjustNoteNameHeight(noteNameField);
 	}
 
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-	if (pathField) {
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+	if (folderSelect && pathField && !isDailyNote) {
+		const vault = (document.getElementById('vault-select') as HTMLSelectElement | null)?.value || '';
+		if (isFileSystemAccessSupported()) {
+			await updateFolderFieldForVault(vault, formattedPath);
+		} else {
+			// No folder tree available: fall back to the plain path text field.
+			setFolderControlVisible(false);
+			pathField.style.display = '';
+			pathField.value = formattedPath;
+		}
+	} else if (pathField) {
 		pathField.value = formattedPath;
 	}
 
@@ -1047,6 +1069,131 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	return replacedTemplate;
 }
 
+function setFolderControlVisible(visible: boolean): void {
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+	if (!folderSelect) return;
+	const control = (folderSelect.closest('.tree-select') as HTMLElement | null) ?? folderSelect;
+	control.style.display = visible ? '' : 'none';
+}
+
+async function updateFolderFieldForVault(vault: string, fallbackPath = ''): Promise<void> {
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
+	if (!folderSelect || !pathField) return;
+
+	const folders = vault ? await getVaultFolders(vault) : [];
+	const value = getVaultDefaultFolder(vault) || fallbackPath;
+	setFolderField(folderSelect, pathField, folders, value);
+	updateSetDefaultButtonState();
+}
+
+function getSelectedVault(): string {
+	return (document.getElementById('vault-select') as HTMLSelectElement | null)?.value || '';
+}
+
+let folderStatusTimer: number | undefined;
+
+function showFolderStatus(messageKey: string, isError = false, substitutions?: string | string[]): void {
+	const status = document.getElementById('folder-refresh-status');
+	if (!status) return;
+
+	status.textContent = getMessage(messageKey, substitutions);
+	status.classList.add('is-visible');
+	status.classList.toggle('is-error', isError);
+
+	if (folderStatusTimer !== undefined) window.clearTimeout(folderStatusTimer);
+	folderStatusTimer = window.setTimeout(() => {
+		status.classList.remove('is-visible');
+	}, 4000);
+}
+
+function updateSetDefaultButtonState(): void {
+	const button = document.getElementById('set-default-folder') as HTMLButtonElement | null;
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
+	if (!button || !folderSelect || !pathField) return;
+
+	const vault = getSelectedVault();
+	const isDefault = !!vault && getVaultDefaultFolder(vault) === getFolderFieldValue(folderSelect, pathField);
+	button.classList.toggle('is-active', isDefault);
+	button.setAttribute('aria-pressed', isDefault ? 'true' : 'false');
+}
+
+function setupFolderFieldListeners(): void {
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
+	if (!folderSelect || !pathField) return;
+
+	if (!isFileSystemAccessSupported()) {
+		// Browsers without the File System Access API keep the plain path field.
+		setFolderControlVisible(false);
+		pathField.style.display = '';
+		return;
+	}
+
+	attachTreeSelect(folderSelect, { input: pathField });
+
+	folderSelect.onchange = () => {
+		handleFolderSelectChange(folderSelect, pathField);
+		updateSetDefaultButtonState();
+	};
+	pathField.oninput = async () => {
+		const vault = getSelectedVault();
+		const folders = vault ? await getVaultFolders(vault) : [];
+		handleFolderInputChange(folderSelect, pathField, folders);
+		updateSetDefaultButtonState();
+	};
+
+	const defaultBtn = document.getElementById('set-default-folder') as HTMLButtonElement | null;
+	if (defaultBtn) {
+		initializeIcons(defaultBtn);
+		defaultBtn.onclick = () => {
+			const vault = getSelectedVault();
+			if (!vault) return;
+			void saveSettings({ vaultDefaultFolders: setVaultDefaultFolder(vault, getFolderFieldValue(folderSelect, pathField)) });
+			updateSetDefaultButtonState();
+		};
+	}
+
+	const refreshBtn = document.getElementById('refresh-folders') as HTMLButtonElement | null;
+	if (refreshBtn) {
+		initializeIcons(refreshBtn);
+		refreshBtn.onclick = async () => {
+			const vault = getSelectedVault();
+			if (!vault) return;
+
+			if (!isFileSystemAccessSupported()) {
+				showFolderStatus('fileSystemAccessUnsupported', true);
+				return;
+			}
+
+			refreshBtn.disabled = true;
+			try {
+				if (!await hasVaultFolderAccess(vault)) {
+					showFolderStatus('vaultFolderNotConfigured', true);
+					return;
+				}
+
+				const result = await refreshVaultFolders(vault);
+				if (result.needsPermission) {
+					showFolderStatus('vaultFolderPermissionNeeded', true);
+					return;
+				}
+
+				const current = getFolderFieldValue(folderSelect, pathField);
+				const next = result.folders.includes(current)
+					? current
+					: (getVaultDefaultFolder(vault) || current);
+				setFolderField(folderSelect, pathField, result.folders, next);
+				updateSetDefaultButtonState();
+				showFolderStatus('vaultFoldersFound', false, [String(result.folders.length)]);
+			} finally {
+				refreshBtn.disabled = false;
+			}
+		};
+	}
+}
+
 function updateVaultDropdown(vaults: string[]) {
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
 	const vaultContainer = document.getElementById('vault-container');
@@ -1075,10 +1222,25 @@ function updateVaultDropdown(vaults: string[]) {
 		vaultContainer.style.display = 'none';
 	}
 
+	const hasVaults = vaults.length > 0;
+	const folderTreeSupported = isFileSystemAccessSupported();
+	const defaultBtn = document.getElementById('set-default-folder') as HTMLButtonElement | null;
+	if (defaultBtn) {
+		defaultBtn.style.display = hasVaults && folderTreeSupported ? '' : 'none';
+	}
+	const refreshFoldersBtn = document.getElementById('refresh-folders') as HTMLButtonElement | null;
+	if (refreshFoldersBtn) {
+		refreshFoldersBtn.style.display = hasVaults && folderTreeSupported ? '' : 'none';
+	}
+
 	// Add event listener to update lastSelectedVault when changed
 	vaultDropdown.addEventListener('change', () => {
 		lastSelectedVault = vaultDropdown.value;
 		setLocalStorage('lastSelectedVault', lastSelectedVault);
+		const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
+		const current = folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : '';
+		void updateFolderFieldForVault(vaultDropdown.value, current);
 	});
 }
 
@@ -1318,6 +1480,7 @@ async function handleClipObsidian(): Promise<void> {
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const folderSelect = document.getElementById('folder-select') as HTMLSelectElement | null;
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
 	if (!vaultDropdown || !noteContentField) {
@@ -1346,7 +1509,9 @@ async function handleClipObsidian(): Promise<void> {
 		const selectedVault = vaultDropdown.value || currentTemplate.vault || '';
 		const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
-		const path = isDailyNote ? '' : pathField?.value || '';
+		const path = isDailyNote ? '' : isFileSystemAccessSupported()
+			? (folderSelect && pathField ? getFolderFieldValue(folderSelect, pathField) : pathField?.value || '')
+			: pathField?.value || '';
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();

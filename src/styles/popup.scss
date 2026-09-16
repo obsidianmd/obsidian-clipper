@@ -166,6 +166,46 @@
 			min-width: 100px;
 			cursor: default;
 		}
+		#folder-select {
+			font-weight: var(--clipper-select-font-weight);
+			min-width: 100px;
+			cursor: default;
+			flex-grow: 1;
+		}
+		.tree-select {
+			flex-grow: 1;
+			min-width: 100px;
+		}
+		#path-name-field {
+			flex-grow: 1;
+			min-width: 100px;
+		}
+		#set-default-folder {
+			flex-shrink: 0;
+			&.is-active {
+				color: var(--text-accent);
+			}
+		}
+		#refresh-folders {
+			flex-shrink: 0;
+			&:disabled {
+				opacity: 0.5;
+			}
+		}
+	}
+	.folder-refresh-status {
+		display: none;
+		margin-top: 0.25rem;
+		font-size: var(--font-ui-smaller);
+		color: var(--text-muted);
+
+		&.is-visible {
+			display: block;
+		}
+
+		&.is-error {
+			color: var(--text-error, #e5534b);
+		}
 	}
 }
 
