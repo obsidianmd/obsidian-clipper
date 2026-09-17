@@ -1240,6 +1240,13 @@ export async function copyToClipboard(content: string) {
 	}
 }
 
+export function closeMoreDropdown(): void {
+	const moreDropdown = document.getElementById('more-dropdown');
+	if (moreDropdown) {
+		moreDropdown.classList.remove('show');
+	}
+}
+
 async function handleSaveToDownloads() {
 	try {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
@@ -1354,6 +1361,8 @@ async function handleClipObsidian(): Promise<void> {
 
 		lastSelectedVault = selectedVault;
 		await setLocalStorage('lastSelectedVault', lastSelectedVault);
+
+		closeMoreDropdown();
 
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);
