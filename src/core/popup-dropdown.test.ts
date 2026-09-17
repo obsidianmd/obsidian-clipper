@@ -194,3 +194,59 @@ it('does not close the side panel window after a successful save (control)', asy
 	await new Promise(resolve => setTimeout(resolve, POPUP_CLOSE_DELAY + 100));
 	expect(windowClose).not.toHaveBeenCalled();
 });
+
+it('keeps the rest of the dropdown classes when closing it after a save', async () => {
+	const quickClip = await loadPopup('/side-panel.html');
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: true });
+
+	const moreDropdown = document.getElementById('more-dropdown');
+	expect(moreDropdown?.classList.contains('show')).toBe(false);
+	expect(moreDropdown?.classList.contains('menu')).toBe(true);
+});
+
+it('closes the dropdown again when it is reopened for a second save', async () => {
+	const quickClip = await loadPopup('/side-panel.html');
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: true });
+
+	const moreDropdown = document.getElementById('more-dropdown');
+	moreDropdown?.classList.add('show');
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: true });
+
+	expect(moreDropdown?.classList.contains('show')).toBe(false);
+});
+
+it('leaves a closed more-actions dropdown closed after a save (control)', async () => {
+	const quickClip = await loadPopup('/side-panel.html');
+	document.getElementById('more-dropdown')?.classList.remove('show');
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: true });
+
+	expect(document.getElementById('more-dropdown')?.classList.contains('show')).toBe(false);
+});
+
+it('leaves the more-actions dropdown open when storing the vault fails (control)', async () => {
+	const quickClip = await loadPopup('/side-panel.html');
+	mocks.setLocalStorage.mockRejectedValueOnce(new Error('storage failed'));
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: false, error: 'storage failed' });
+
+	expect(document.getElementById('more-dropdown')?.classList.contains('show')).toBe(true);
+});
+
+it('closes the dropdown before the popup window close is scheduled', async () => {
+	const quickClip = await loadPopup('/popup.html');
+	await settleWindowClose();
+
+	let showWhenClosed: boolean | undefined;
+	windowClose.mockImplementation(() => {
+		showWhenClosed = document.getElementById('more-dropdown')?.classList.contains('show');
+	});
+
+	expect(await clipToObsidian(quickClip)).toEqual({ success: true });
+
+	await vi.waitFor(() => expect(windowClose).toHaveBeenCalled());
+	expect(showWhenClosed).toBe(false);
+});
