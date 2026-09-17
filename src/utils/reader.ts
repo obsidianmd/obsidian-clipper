@@ -2,7 +2,12 @@ import Defuddle from 'defuddle/full';
 import browser from './browser-polyfill';
 import { detectBrowser } from './browser-detection';
 import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
-import { getLocalStorage, setLocalStorage } from './storage-utils';
+import {
+	getLocalStorage,
+	loadSettings as loadGeneralSettings,
+	saveSettings as saveGeneralSettings,
+	setLocalStorage,
+} from './storage-utils';
 import hljs from 'highlight.js';
 import knapSyntax from 'knap/highlightjs';
 import { getDomain } from './string-utils';
@@ -170,8 +175,7 @@ export class Reader {
 	};
 
 	private static async loadSettings(): Promise<void> {
-		const savedSettings = await browser.storage.sync.get('reader_settings')
-			.then((data: Record<string, any>) => data['reader_settings']);
+		const savedSettings = (await loadGeneralSettings()).readerSettings;
 		if (savedSettings) {
 			this.settings = {
 				...this.settings,
@@ -181,7 +185,7 @@ export class Reader {
 	}
 
 	private static async saveSettings(): Promise<void> {
-		await browser.storage.sync.set({ reader_settings: this.settings });
+		await saveGeneralSettings({ readerSettings: this.settings });
 	}
 
 	private static injectSettingsBar(doc: Document) {

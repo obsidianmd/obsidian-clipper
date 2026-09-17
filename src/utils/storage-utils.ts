@@ -1,6 +1,8 @@
 import browser from './browser-polyfill';
 import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
 import { debugLog } from './debug';
+import { loadSyncPayload, updateSyncPayload } from '../sync/sync-manager';
+import type { SyncSettings } from '../sync/types';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
@@ -58,63 +60,8 @@ export function getLocalStorage(key: string): Promise<any> {
 	return browser.storage.local.get(key).then((result: {[key: string]: any}) => result[key]);
 }
 
-interface StorageData {
-	general_settings?: {
-		showMoreActionsButton?: boolean;
-		betaFeatures?: boolean;
-		legacyMode?: boolean;
-		silentOpen?: boolean;
-		openBehavior?: boolean | 'popup' | 'embedded';
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
-	};
-	vaults?: string[];
-	highlighter_settings?: {
-		highlighterEnabled?: boolean;
-		alwaysShowHighlights?: boolean;
-		highlightBehavior?: string;
-	};
-	reader_settings?: {
-		fontSize?: number;
-		lineHeight?: number;
-		maxWidth?: number;
-		lightTheme?: string;
-		darkTheme?: string;
-		appearance?: 'auto' | 'light' | 'dark';
-		fonts?: string[];
-		defaultFont?: string;
-		blendImages?: boolean;
-		colorLinks?: boolean;
-		followLinks?: boolean;
-		pinPlayer?: boolean;
-		autoScroll?: boolean;
-		highlightActiveLine?: boolean;
-		customCss?: string;
-	};
-	interpreter_settings?: {
-		interpreterModel?: string;
-		models?: ModelConfig[];
-		providers?: Provider[];
-		interpreterEnabled?: boolean;
-		interpreterAutoRun?: boolean;
-		defaultPromptContext?: string;
-	};
-	property_types?: PropertyType[];
-	stats?: {
-		addToObsidian: number;
-		saveFile: number;
-		copyToClipboard: number;
-		share: number;
-		readerMode?: number;
-	};
-	history?: HistoryEntry[];
-	ratings?: Rating[];
-	migrationVersion?: number;
-}
-
-const CURRENT_MIGRATION_VERSION = 1;
-
 export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get(null) as StorageData;
+	const data = (await loadSyncPayload())?.settings ?? {};
 	
 	// Load default settings first
 	const defaultSettings: Settings = {
@@ -163,62 +110,56 @@ export async function loadSettings(): Promise<Settings> {
 		ratings: [],
 	};
 
-	// Update migration version if needed
-	if (!data.migrationVersion || data.migrationVersion < CURRENT_MIGRATION_VERSION) {
-		await browser.storage.sync.set({ migrationVersion: CURRENT_MIGRATION_VERSION });
-		debugLog('Settings', `Updated migration version to ${CURRENT_MIGRATION_VERSION}`);
-	}
-
 	// Validate and sanitize data to prevent corruption
 	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
-	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
-		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
+	const sanitizedModels = Array.isArray(data.models)
+		? data.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string')
 		: [];
-	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
-		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
+	const sanitizedProviders = Array.isArray(data.providers)
+		? data.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string')
 		: [];
 
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
-		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
-		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
-		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
-		openBehavior: typeof data.general_settings?.openBehavior === 'boolean' 
-			? (data.general_settings.openBehavior ? 'embedded' : 'popup') 
-			: (data.general_settings?.openBehavior ?? defaultSettings.openBehavior),
-		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
-		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
-		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
-		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
+		showMoreActionsButton: data.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
+		betaFeatures: data.betaFeatures ?? defaultSettings.betaFeatures,
+		legacyMode: data.legacyMode ?? defaultSettings.legacyMode,
+		silentOpen: data.silentOpen ?? defaultSettings.silentOpen,
+		openBehavior: typeof data.openBehavior === 'boolean'
+			? (data.openBehavior ? 'embedded' : 'popup')
+			: (data.openBehavior ?? defaultSettings.openBehavior),
+		highlighterEnabled: data.highlighterEnabled ?? defaultSettings.highlighterEnabled,
+		alwaysShowHighlights: data.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
+		highlightBehavior: data.highlightBehavior ?? defaultSettings.highlightBehavior,
+		interpreterModel: data.interpreterModel || defaultSettings.interpreterModel,
 		models: sanitizedModels,
 		providers: sanitizedProviders,
-		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
-		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
-		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
-		propertyTypes: data.property_types || defaultSettings.propertyTypes,
+		interpreterEnabled: data.interpreterEnabled ?? defaultSettings.interpreterEnabled,
+		interpreterAutoRun: data.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
+		defaultPromptContext: data.defaultPromptContext || defaultSettings.defaultPromptContext,
+		propertyTypes: data.propertyTypes || defaultSettings.propertyTypes,
 		readerSettings: {
-			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
-			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
-			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			lightTheme: data.reader_settings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
-			darkTheme: data.reader_settings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
-			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
-			fonts: data.reader_settings?.fonts ?? defaultSettings.readerSettings.fonts,
-			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
-			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
-			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
-			followLinks: data.reader_settings?.followLinks ?? defaultSettings.readerSettings.followLinks,
-			pinPlayer: data.reader_settings?.pinPlayer ?? defaultSettings.readerSettings.pinPlayer,
-			autoScroll: data.reader_settings?.autoScroll ?? defaultSettings.readerSettings.autoScroll,
-			highlightActiveLine: data.reader_settings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
-			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
+			fontSize: data.readerSettings?.fontSize ?? defaultSettings.readerSettings.fontSize,
+			lineHeight: data.readerSettings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
+			maxWidth: data.readerSettings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
+			lightTheme: data.readerSettings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
+			darkTheme: data.readerSettings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
+			appearance: data.readerSettings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
+			fonts: data.readerSettings?.fonts ?? defaultSettings.readerSettings.fonts,
+			defaultFont: data.readerSettings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
+			blendImages: data.readerSettings?.blendImages ?? defaultSettings.readerSettings.blendImages,
+			colorLinks: data.readerSettings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
+			followLinks: data.readerSettings?.followLinks ?? defaultSettings.readerSettings.followLinks,
+			pinPlayer: data.readerSettings?.pinPlayer ?? defaultSettings.readerSettings.pinPlayer,
+			autoScroll: data.readerSettings?.autoScroll ?? defaultSettings.readerSettings.autoScroll,
+			highlightActiveLine: data.readerSettings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
+			customCss: data.readerSettings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: { ...defaultSettings.stats, ...data.stats },
-		history: data.history || defaultSettings.history,
-		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		history: defaultSettings.history,
+		ratings: defaultSettings.ratings,
+		saveBehavior: data.saveBehavior ?? defaultSettings.saveBehavior
 	};
 
 	generalSettings = loadedSettings;
@@ -228,52 +169,48 @@ export async function loadSettings(): Promise<Settings> {
 
 export async function saveSettings(settings?: Partial<Settings>): Promise<void> {
 	if (settings) {
-		generalSettings = { ...generalSettings, ...settings };
+		generalSettings = {
+			...generalSettings,
+			...settings,
+			readerSettings: settings.readerSettings
+				? { ...generalSettings.readerSettings, ...settings.readerSettings }
+				: generalSettings.readerSettings,
+			stats: settings.stats ? { ...generalSettings.stats, ...settings.stats } : generalSettings.stats,
+		};
 	}
 
-	await browser.storage.sync.set({
-		vaults: generalSettings.vaults,
-		general_settings: {
-			showMoreActionsButton: generalSettings.showMoreActionsButton,
-			betaFeatures: generalSettings.betaFeatures,
-			legacyMode: generalSettings.legacyMode,
-			silentOpen: generalSettings.silentOpen,
-			openBehavior: generalSettings.openBehavior,
-			saveBehavior: generalSettings.saveBehavior,
+	const changedSettings = settings ? toSyncSettings(settings) : toSyncSettings(generalSettings);
+	await updateSyncPayload(payload => ({
+		...payload,
+		settings: {
+			...payload.settings,
+			...changedSettings,
+			readerSettings: changedSettings.readerSettings
+				? { ...payload.settings.readerSettings, ...changedSettings.readerSettings }
+				: payload.settings.readerSettings,
+			stats: changedSettings.stats
+				? { ...payload.settings.stats, ...changedSettings.stats }
+				: payload.settings.stats,
 		},
-		highlighter_settings: {
-			highlighterEnabled: generalSettings.highlighterEnabled,
-			alwaysShowHighlights: generalSettings.alwaysShowHighlights,
-			highlightBehavior: generalSettings.highlightBehavior
-		},
-		interpreter_settings: {
-			interpreterModel: generalSettings.interpreterModel,
-			models: generalSettings.models,
-			providers: generalSettings.providers,
-			interpreterEnabled: generalSettings.interpreterEnabled,
-			interpreterAutoRun: generalSettings.interpreterAutoRun,
-			defaultPromptContext: generalSettings.defaultPromptContext
-		},
-		property_types: generalSettings.propertyTypes,
-		reader_settings: {
-			fontSize: generalSettings.readerSettings.fontSize,
-			lineHeight: generalSettings.readerSettings.lineHeight,
-			maxWidth: generalSettings.readerSettings.maxWidth,
-			lightTheme: generalSettings.readerSettings.lightTheme,
-			darkTheme: generalSettings.readerSettings.darkTheme,
-			appearance: generalSettings.readerSettings.appearance,
-			fonts: generalSettings.readerSettings.fonts,
-			defaultFont: generalSettings.readerSettings.defaultFont,
-			blendImages: generalSettings.readerSettings.blendImages,
-			colorLinks: generalSettings.readerSettings.colorLinks,
-			followLinks: generalSettings.readerSettings.followLinks,
-			pinPlayer: generalSettings.readerSettings.pinPlayer,
-			autoScroll: generalSettings.readerSettings.autoScroll,
-			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
-			customCss: generalSettings.readerSettings.customCss
-		},
-		stats: generalSettings.stats
-	});
+	}));
+}
+
+function toSyncSettings(settings: Partial<Settings>): SyncSettings {
+	const synced: SyncSettings = {};
+	const keys: Array<keyof Omit<Settings, 'history' | 'ratings' | 'readerSettings' | 'stats'>> = [
+		'vaults', 'showMoreActionsButton', 'betaFeatures', 'legacyMode', 'silentOpen', 'openBehavior',
+		'highlighterEnabled', 'alwaysShowHighlights', 'highlightBehavior', 'interpreterModel', 'models',
+		'providers', 'interpreterEnabled', 'interpreterAutoRun', 'defaultPromptContext', 'propertyTypes',
+		'saveBehavior',
+	];
+	for (const key of keys) {
+		if (settings[key] !== undefined) {
+			(synced as Record<string, unknown>)[key] = settings[key];
+		}
+	}
+	if (settings.readerSettings !== undefined) synced.readerSettings = settings.readerSettings;
+	if (settings.stats !== undefined) synced.stats = settings.stats;
+	return synced;
 }
 
 export async function setLegacyMode(enabled: boolean): Promise<void> {
@@ -339,18 +276,13 @@ declare global {
 	}
 }
 
-// Make storage accessible from console — use `window.debugStorage()` to see all sync storage, or `window.debugStorage(key)` to see a specific key
+// Make the selected provider payload accessible from the console.
 if (typeof window !== 'undefined') {
-	window.debugStorage = (key?: string) => {
-		if (key) {
-			return browser.storage.sync.get(key).then(data => {
-				console.log(`Sync storage contents for key "${key}":`, data);
-				return data;
-			});
-		}
-		return browser.storage.sync.get(null).then(data => {
-			console.log('Sync storage contents:', data);
-			return data;
-		});
+	window.debugStorage = async (key?: string) => {
+		const payload = await loadSyncPayload();
+		const data = (payload ?? {}) as Record<string, unknown>;
+		const result = key ? { [key]: data[key] } : data;
+		console.log('Selected sync provider contents:', result);
+		return result;
 	};
 }

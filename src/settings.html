@@ -211,6 +211,53 @@
 								<div class="setting-items">
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
+											<label for="sync-provider-select">Settings storage</label>
+											<div class="setting-item-description">Choose whether settings and templates stay on this device or use your browser's built-in sync.</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="sync-provider-select">
+												<option value="local">Local only</option>
+												<option value="browser">Browser sync</option>
+											</select>
+										</div>
+									</div>
+									<div id="webdav-config" hidden>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label for="webdav-url">WebDAV file URL</label>
+												<div class="setting-item-description">Full URL of the JSON file used to store Web Clipper settings. The parent folder must already exist.</div>
+											</div>
+											<div class="setting-item-control">
+												<input id="webdav-url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com/dav/obsidian-web-clipper.json" />
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info"><label for="webdav-username">Username</label></div>
+											<div class="setting-item-control">
+												<input id="webdav-username" type="text" autocomplete="username" />
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label for="webdav-password">App password</label>
+												<div class="setting-item-description">Security notice: You must use a separate, revocable app password—never your main account password. Browser extensions cannot securely use your system password manager, so this credential is stored in this browser's local extension storage. It is never included in the synchronized settings file.</div>
+											</div>
+											<div class="setting-item-control">
+												<input id="webdav-password" type="password" autocomplete="current-password" />
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<div id="webdav-status" class="setting-item-description" aria-live="polite"></div>
+											</div>
+											<div class="setting-item-control">
+												<button id="webdav-test-btn" type="button">Test connection</button>
+												<button id="webdav-activate-btn" type="button">Save and activate</button>
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
 											<label for="reset-default-template-btn" data-i18n="resetDefaultTemplate">Reset default template</label>
 											<div class="setting-item-description" data-i18n="resetDefaultTemplateDescription">Remove any changes you've made to the default&nbsp;template.</div>
 										</div>

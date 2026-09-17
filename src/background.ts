@@ -5,7 +5,9 @@ import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
-import { incrementStat } from './utils/storage-utils';
+import { incrementStat, loadSettings } from './utils/storage-utils';
+import { LOCAL_SYNC_PAYLOAD_KEY } from './sync/providers/local-sync-provider';
+import { SYNC_PROVIDER_PREFERENCE_KEY } from './sync/sync-manager';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -1052,8 +1054,7 @@ function parseOpenBehavior(raw: string | undefined): Settings['openBehavior'] {
 
 async function updateActionPopup(openBehavior?: Settings['openBehavior']): Promise<void> {
 	if (!openBehavior) {
-		const data = await browser.storage.sync.get('general_settings');
-		openBehavior = parseOpenBehavior((data.general_settings as Record<string, string>)?.openBehavior);
+		openBehavior = parseOpenBehavior((await loadSettings()).openBehavior);
 	}
 	currentOpenBehavior = openBehavior;
 	if (openBehavior === 'reader' || openBehavior === 'embedded') {
@@ -1098,8 +1099,11 @@ browser.action.onClicked.addListener(async (tab) => {
 });
 
 browser.storage.onChanged.addListener((changes, area) => {
-	if (area === 'sync' && changes.general_settings) {
-		updateActionPopup(parseOpenBehavior((changes.general_settings.newValue as Record<string, string>)?.openBehavior));
+	const browserSettingsChanged = area === 'sync' && (changes.general_settings || changes.sync_metadata);
+	const localSettingsChanged = area === 'local'
+		&& (changes[LOCAL_SYNC_PAYLOAD_KEY] || changes[SYNC_PROVIDER_PREFERENCE_KEY]);
+	if (browserSettingsChanged || localSettingsChanged) {
+		updateActionPopup();
 	}
 });
 

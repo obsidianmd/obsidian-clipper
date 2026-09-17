@@ -18,6 +18,9 @@ import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { showModal, hideModal } from '../utils/modal-utils';
+import { getSelectedSyncProviderId, getSyncProviderOptions, selectSyncProvider, testSyncProvider } from '../sync/sync-manager';
+import type { SyncProviderId } from '../sync/types';
+import { loadWebDavConfig, saveWebDavConfig } from '../sync/webdav-config';
 
 dayjs.extend(weekOfYear);
 
@@ -227,6 +230,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		await initializeSyncProviderSelect();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -236,6 +240,106 @@ export function initializeGeneralSettings(): void {
 			feedbackCloseBtn.addEventListener('click', () => hideModal(feedbackModal));
 		}
 	});
+}
+
+async function initializeSyncProviderSelect(): Promise<void> {
+	const select = document.getElementById('sync-provider-select') as HTMLSelectElement | null;
+	if (!select) return;
+	const webDavConfig = document.getElementById('webdav-config') as HTMLElement | null;
+	const webDavUrl = document.getElementById('webdav-url') as HTMLInputElement | null;
+	const webDavUsername = document.getElementById('webdav-username') as HTMLInputElement | null;
+	const webDavPassword = document.getElementById('webdav-password') as HTMLInputElement | null;
+	const webDavStatus = document.getElementById('webdav-status') as HTMLElement | null;
+	const webDavTestButton = document.getElementById('webdav-test-btn') as HTMLButtonElement | null;
+	const webDavActivateButton = document.getElementById('webdav-activate-btn') as HTMLButtonElement | null;
+
+	select.replaceChildren(...getSyncProviderOptions().map(provider => {
+		const option = document.createElement('option');
+		option.value = provider.id;
+		option.textContent = provider.name;
+		return option;
+	}));
+	const activeProviderId = await getSelectedSyncProviderId();
+	select.value = activeProviderId;
+
+	const savedWebDavConfig = await loadWebDavConfig();
+	if (savedWebDavConfig && webDavUrl && webDavUsername && webDavPassword) {
+		webDavUrl.value = savedWebDavConfig.url;
+		webDavUsername.value = savedWebDavConfig.username;
+		webDavPassword.value = savedWebDavConfig.password;
+	}
+	const showWebDavConfig = () => {
+		if (webDavConfig) webDavConfig.hidden = select.value !== 'webdav';
+	};
+	showWebDavConfig();
+
+	// WebDAV inputs are provider configuration, not synchronized general settings.
+	webDavConfig?.addEventListener('input', event => event.stopPropagation());
+	webDavConfig?.addEventListener('change', event => event.stopPropagation());
+
+	select.addEventListener('change', async (event) => {
+		event.stopPropagation();
+		showWebDavConfig();
+		if (select.value === 'webdav') {
+			if (webDavStatus) webDavStatus.textContent = savedWebDavConfig ? 'Configured locally.' : 'Enter the WebDAV connection details.';
+			return;
+		}
+		select.disabled = true;
+		try {
+			await selectSyncProvider(select.value as SyncProviderId);
+			window.location.reload();
+		} catch (error) {
+			console.error('Failed to change sync provider:', error);
+			select.value = await getSelectedSyncProviderId();
+			select.disabled = false;
+		}
+	});
+
+	const persistWebDavForm = async () => {
+		if (!webDavUrl || !webDavUsername || !webDavPassword) throw new Error('WebDAV configuration form is unavailable');
+		await saveWebDavConfig({
+			url: webDavUrl.value,
+			username: webDavUsername.value,
+			password: webDavPassword.value,
+		});
+	};
+	const setWebDavBusy = (busy: boolean) => {
+		if (webDavTestButton) webDavTestButton.disabled = busy;
+		if (webDavActivateButton) webDavActivateButton.disabled = busy;
+	};
+	const testWebDav = async (): Promise<void> => {
+		await persistWebDavForm();
+		if (webDavStatus) webDavStatus.textContent = 'Testing connection…';
+		await testSyncProvider('webdav');
+		if (webDavStatus) webDavStatus.textContent = 'Connection successful.';
+	};
+
+	webDavTestButton?.addEventListener('click', async () => {
+		setWebDavBusy(true);
+		try {
+			await testWebDav();
+		} catch (error) {
+			if (webDavStatus) webDavStatus.textContent = `Connection failed: ${getErrorMessage(error)}`;
+		} finally {
+			setWebDavBusy(false);
+		}
+	});
+	webDavActivateButton?.addEventListener('click', async () => {
+		setWebDavBusy(true);
+		try {
+			await testWebDav();
+			if (webDavStatus) webDavStatus.textContent = 'Activating WebDAV…';
+			await selectSyncProvider('webdav');
+			window.location.reload();
+		} catch (error) {
+			if (webDavStatus) webDavStatus.textContent = `Activation failed: ${getErrorMessage(error)}`;
+			setWebDavBusy(false);
+		}
+	});
+}
+
+function getErrorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
 }
 
 function initializeAutoSave(): void {
