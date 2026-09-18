@@ -1,0 +1,1069 @@
+{
+	"activity": {
+		"message": "પ્રવૃત્તિ"
+	},
+	"addModel": {
+		"message": "+ મોડલ ઉમેરો"
+	},
+	"addModelTitle": {
+		"message": "મોડલ ઉમેરો"
+	},
+	"addProperty": {
+		"message": "+ ગુણધર્મ ઉમેરો"
+	},
+	"addProvider": {
+		"message": "+ પ્રોવાઇડર ઉમેરો"
+	},
+	"addProviderTitle": {
+		"message": "પ્રોવાઇડર ઉમેરો"
+	},
+	"addToObsidian": {
+		"message": "Obsidian માં ઉમેરો"
+	},
+	"addVaultPlaceholder": {
+		"message": "વૉલ્ટ ઉમેરવા માટે enter દબાવો"
+	},
+	"advanced": {
+		"message": "અદ્યતન"
+	},
+	"allHighlights": {
+		"message": "બધી હાઇલાઇટ્સ"
+	},
+	"allProperties": {
+		"message": "બધા ગુણધર્મો"
+	},
+	"allTime": {
+		"message": "તમામ સમય"
+	},
+	"alwaysShowHighlights": {
+		"message": "હંમેશા હાઇલાઇટ્સ બતાવો"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "જ્યારે તમે પૃષ્ઠ લોડ કરો ત્યારે તમારા સાચવેલા હાઇલાઇટ્સ પ્રદર્શિત કરો. ફક્ત હાઇલાઇટર મોડ સક્રિય હોય ત્યારે જ હાઇલાઇટ્સ જોવા માટે આ બંધ કરો."
+	},
+	"apiKeyMissing": {
+		"message": "કોઈ API કી નથી"
+	},
+	"apiKeysWarning": {
+		"message": "બાહ્ય પ્રોવાઇડરનો ઉપયોગ કરીને તમે તેમની શરતો અને ગોપનીયતા નીતિ સાથે સંમત થાઓ છો. ઇન્ટરપ્રીટર વિનંતીઓ સીધી તમે પસંદ કરેલા પ્રોવાઇડરને મોકલવામાં આવે છે. Obsidian તમારી વિનંતીઓ વિશેનો કોઈ ડેટા એકત્રિત કરતું નથી કે સાચવતું નથી."
+	},
+	"appendToDaily": {
+		"message": "દૈનિક નોંધમાં ઉમેરો, તળિયે"
+	},
+	"appendToExisting": {
+		"message": "હાલની નોંધમાં ઉમેરો, તળિયે"
+	},
+	"autoRunInterpreter": {
+		"message": "આપમેળે ચલાવો"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "જો ટેમ્પ્લેટમાં કોઈ પ્રોમ્પ્ટ વેરીએબલ હોય તો તેને તરત જ ચલાવો. આ તમારા મોડલ પ્રોવાઇડર સાથે API ક્રેડિટ્સનો વપરાશ કરશે. જો તમે ફક્ત મેન્યુઅલી જ ઇન્ટરપ્રીટર ચલાવવા માંગતા હોવ તો બંધ કરો."
+	},
+	"behavior": {
+		"message": "વર્તણૂક"
+	},
+	"byDay": {
+		"message": "દિવસો"
+	},
+	"byMonth": {
+		"message": "મહિનાઓ"
+	},
+	"byWeek": {
+		"message": "અઠવાડિયાં"
+	},
+	"cancel": {
+		"message": "રદ કરો"
+	},
+	"cannotDeleteProvider": {
+		"message": "પ્રોવાઇડર \"$1\" કાઢી શકાતું નથી કારણ કે તેનો ઉપયોગ $2 મોડલ(ઓ) દ્વારા કરવામાં આવે છે."
+	},
+	"changelog": {
+		"message": "ચેન્જલોગ"
+	},
+	"chooseFile": {
+		"message": "ફાઇલ પસંદ કરો"
+	},
+	"choosePropertiesFile": {
+		"message": "ગુણધર્મો ફાઇલ પસંદ કરો"
+	},
+	"chooseSettingsFile": {
+		"message": "સેટિંગ્સ ફાઇલ પસંદ કરો"
+	},
+	"chooseTemplateFile": {
+		"message": "ટેમ્પ્લેટ ફાઇલ પસંદ કરો"
+	},
+	"clipBehavior": {
+		"message": "ક્લિપ કરવાની રીત"
+	},
+	"clipBehaviorDescription": {
+		"message": "હાઇલાઇટ કરેલી સામગ્રી Obsidian માં કેવી રીતે સાચવવામાં આવે છે તે પસંદ કરો. $strong_start${{content}}$strong_end$ ચલ વ્યાખ્યાયિત કરે છે.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian તમારા ક્લિપબોર્ડને ઍક્સેસ કરવામાં અસમર્થ છે. અહીં મુશ્કેલીનિવારણ સૂચનાઓ અજમાવો: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
+	"close": {
+		"message": "બંધ કરો"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Clipper ખોલો"
+	},
+	"commandQuickClip": {
+		"message": "ઝડપી ક્લિપ"
+	},
+	"commandToggleHighlighter": {
+		"message": "હાઇલાઇટર ચાલુ/બંધ કરો"
+	},
+	"commandToggleReader": {
+		"message": "રીડર ચાલુ/બંધ કરો"
+	},
+	"confirmDeleteTemplate": {
+		"message": "શું તમે ખરેખર ટેમ્પ્લેટ \"$1\" કાઢી નાખવા માંગો છો?"
+	},
+	"confirmReplaceSettings": {
+		"message": "આ તમારા ટેમ્પ્લેટ્સ અને ગુણધર્મો સહિત તમારા બધા વર્તમાન સેટિંગ્સને બદલશે. શું તમે ખરેખર ચાલુ રાખવા માંગો છો?"
+	},
+	"copied": {
+		"message": "કૉપિ કર્યું!"
+	},
+	"copyAsJson": {
+		"message": "JSON તરીકે કૉપિ કરો"
+	},
+	"copyToClipboard": {
+		"message": "ક્લિપબોર્ડ પર કૉપિ કરો"
+	},
+	"createNewNote": {
+		"message": "નવી નોંધ બનાવો"
+	},
+	"custom": {
+		"message": "કસ્ટમ"
+	},
+	"dailyNoteFormat": {
+		"message": "દૈનિક નોંધ ફોર્મેટ (દા.ત., YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "ડિફૉલ્ટ ઇન્ટરપ્રીટર સંદર્ભ"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "પ્રોમ્પ્ટ ચલોનું અર્થઘટન કરવા માટે વપરાતા સંદર્ભને ઓવરરાઇડ કરો. અહીં ચલોનો ઉપયોગ કરી શકાય છે."
+	},
+	"defaultTemplateName": {
+		"message": "ડિફૉલ્ટ"
+	},
+	"delete": {
+		"message": "કાઢી નાખો"
+	},
+	"deleteAllHighlightsConfirm": {
+		"message": "શું તમે ખરેખર બધી હાઇલાઇટ્સ કાઢી નાખવા માંગો છો?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "શું આ ડોમેન માટેની બધી હાઇલાઇટ્સ કાઢી નાખવી છે?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "શું આ પૃષ્ઠ માટેની બધી હાઇલાઇટ્સ કાઢી નાખવી છે?"
+	},
+	"deleteModelConfirm": {
+		"message": "શું તમે ખરેખર આ મોડલ કાઢી નાખવા માંગો છો?"
+	},
+	"deleteProviderConfirm": {
+		"message": "શું તમે ખરેખર આ પ્રોવાઇડરને કાઢી નાખવા માંગો છો?"
+	},
+	"disableHighlighter": {
+		"message": "હાઇલાઇટર બંધ કરો"
+	},
+	"disableReader": {
+		"message": "રીડર બંધ કરો"
+	},
+	"done": {
+		"message": "થઈ ગયું"
+	},
+	"dragAndDropFile": {
+		"message": "ફાઇલને અહીં ખેંચીને મૂકો"
+	},
+	"duplicate": {
+		"message": "નકલ બનાવો"
+	},
+	"earlyAccessDescription": {
+		"message": "Obsidian ના નવીનતમ $link_start$અર્લી એક્સેસ સંસ્કરણ$link_end$ ની જરૂર હોય તેવી સુવિધાઓનો ઉપયોગ કરો. હાલમાં Obsidian 1.7.2 અથવા તેથી વધુની જરૂર છે.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "અર્લી એક્સેસ સુવિધાઓ"
+	},
+	"edit": {
+		"message": "સંપાદિત કરો"
+	},
+	"editModel": {
+		"message": "મોડલ સંપાદિત કરો"
+	},
+	"editProvider": {
+		"message": "પ્રોવાઇડર સંપાદિત કરો"
+	},
+	"editTemplate": {
+		"message": "ટેમ્પ્લેટ સંપાદિત કરો"
+	},
+	"embedded": {
+		"message": "એમ્બેડેડ"
+	},
+	"enableHighlighterDescription": {
+		"message": "વેબ પૃષ્ઠો પરની સામગ્રીને હાઇલાઇટ કરો જેને તમે Obsidian માં સાચવી શકો છો."
+	},
+	"enableInterpreter": {
+		"message": "ઇન્ટરપ્રીટર સક્ષમ કરો"
+	},
+	"enableInterpreterDescription": {
+		"message": "પૃષ્ઠોમાંથી ડેટા કાઢવા માટે નેચરલ લેંગ્વેજ (સામાન્ય ભાષા) નો ઉપયોગ કરો. ઉદાહરણ તરીકે, તમે ટેમ્પ્લેટ સિન્ટેક્સ $strong_start${{\"પૃષ્ઠનો સારાંશ\"}}$strong_end$ નો ઉપયોગ કરી શકો છો. API કી અથવા નીચે રૂપરેખાંકિત કસ્ટમ મોડલ જરૂરી છે. $link_start$વધુ જાણો$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "રીડિંગ વ્યુ ખોલો"
+	},
+	"error": {
+		"message": "ભૂલ"
+	},
+	"export": {
+		"message": "નિકાસ કરો"
+	},
+	"exportAllSettings": {
+		"message": "બધા સેટિંગ્સની નિકાસ કરો"
+	},
+	"exportAllSettingsDescription": {
+		"message": "ટેમ્પ્લેટ્સ અને ગુણધર્મો સહિત તમામ સેટિંગ્સની નિકાસ કરો."
+	},
+	"exportHighlights": {
+		"message": "હાઇલાઇટ્સની નિકાસ કરો"
+	},
+	"exportHighlightsDescription": {
+		"message": "તમારા હાઇલાઇટ્સને ફાઇલમાં નિકાસ કરો."
+	},
+	"exportProperties": {
+		"message": "ગુણધર્મોની નિકાસ કરો"
+	},
+	"exportPropertiesDescription": {
+		"message": "Web Clipper ના ગુણધર્મોને $strong_start$types.json$strong_end$ ફાઇલમાં સાચવો જે તમારા Obsidian વૉલ્ટમાં અથવા અન્ય ઉપકરણો પર Web Clipper માં આયાત કરી શકાય છે.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "વેબમાંથી સામગ્રીને ખાનગી અને કાયમી ફોર્મેટમાં સાચવો જેને તમે ઑફલાઇન ઍક્સેસ કરી શકો છો. Obsidian માટે સત્તાવાર બ્રાઉઝર એક્સ્ટેંશન."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "લખાણની કૉપિ કરવામાં નિષ્ફળ"
+	},
+	"failedToDeleteTemplate": {
+		"message": "ટેમ્પ્લેટ કાઢી નાખવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "ટેમ્પ્લેટ ડુપ્લિકેટ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+	},
+	"failedToExportHighlights": {
+		"message": "હાઇલાઇટ્સની નિકાસ કરવામાં નિષ્ફળ. વધુ વિગતો માટે કૃપા કરીને કન્સોલ તપાસો."
+	},
+	"failedToExportSettings": {
+		"message": "સેટિંગ્સની નિકાસ કરવામાં નિષ્ફળ. વધુ વિગતો માટે કૃપા કરીને કન્સોલ તપાસો."
+	},
+	"failedToExtractContent": {
+		"message": "પૃષ્ઠની સામગ્રી કાઢવામાં અસમર્થ."
+	},
+	"failedToImportTemplate": {
+		"message": "ટેમ્પ્લેટ આયાત કરવામાં ભૂલ. કૃપા કરીને ફાઇલ તપાસો અને ફરી પ્રયાસ કરો."
+	},
+	"failedToInitialize": {
+		"message": "કૃપા કરીને એક્સ્ટેંશન ફરીથી લોડ કરવાનો પ્રયાસ કરો."
+	},
+	"failedToInitializeContent": {
+		"message": "પૃષ્ઠ સામગ્રીને પ્રારંભ કરવામાં અસમર્થ."
+	},
+	"failedToProcessInterpreter": {
+		"message": "ઇન્ટરપ્રીટર પ્રક્રિયા નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+	},
+	"failedToResetProviders": {
+		"message": "પ્રોવાઇડર અને મોડલ રીસેટ કરવામાં નિષ્ફળ"
+	},
+	"failedToResetTemplate": {
+		"message": "ડિફૉલ્ટ ટેમ્પ્લેટ રીસેટ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+	},
+	"failedToSave": {
+		"message": "ફાઇલ સાચવવામાં નિષ્ફળ"
+	},
+	"failedToSaveFile": {
+		"message": "ફાઇલ સાચવવામાં નિષ્ફળ"
+	},
+	"failedToSaveProvider": {
+		"message": "પ્રોવાઇડર સાચવવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+	},
+	"feedback": {
+		"message": "પ્રતિસાદ"
+	},
+	"feedbackDescription": {
+		"message": "અમે Web Clipper ને કેવી રીતે સુધારી શકીએ? કૃપા કરીને અમારા સહાય પૃષ્ઠની મુલાકાત લો, જ્યાં તમે બગ્સની જાણ કરી શકો છો, સુવિધાઓ સૂચવી શકો છો અને સામાન્ય સમસ્યાઓ માટે સહાય મેળવી શકો છો."
+	},
+	"feedbackTitle": {
+		"message": "તમારા પ્રતિસાદ બદલ આભાર"
+	},
+	"folder": {
+		"message": "ફોલ્ડર"
+	},
+	"general": {
+		"message": "સામાન્ય"
+	},
+	"generalSettings": {
+		"message": "સામાન્ય સેટિંગ્સ"
+	},
+	"getApiKeyHere": {
+		"message": "તમારી $1 API કી અહીં મેળવો."
+	},
+	"help": {
+		"message": "સહાય"
+	},
+	"helpDescription": {
+		"message": "Web Clipper નો ઉપયોગ કેવી રીતે કરવો તે શીખો અને મુશ્કેલીનિવારણમાં સહાય મેળવો."
+	},
+	"highlightInline": {
+		"message": "પૃષ્ઠની સામગ્રીને હાઇલાઇટ કરો"
+	},
+	"highlightPage": {
+		"message": "પૃષ્ઠ હાઇલાઇટ કરો"
+	},
+	"highlightSelection": {
+		"message": "હાઇલાઇટ કરો"
+	},
+	"highlighter": {
+		"message": "હાઇલાઇટર"
+	},
+	"highlighterOn": {
+		"message": "હાઇલાઇટર"
+	},
+	"highlighterSettings": {
+		"message": "હાઇલાઇટર"
+	},
+	"highlights": {
+		"message": "હાઇલાઇટ્સ"
+	},
+	"highlightsNotFound": {
+		"message": "લેખમાં હાઇલાઇટ્સ મળ્યા નથી"
+	},
+	"history": {
+		"message": "ઇતિહાસ"
+	},
+	"hotkeys": {
+		"message": "શૉર્ટકટ્સ"
+	},
+	"import": {
+		"message": "આયાત કરો"
+	},
+	"importAllSettings": {
+		"message": "બધા સેટિંગ્સ આયાત કરો"
+	},
+	"importAllSettingsDescription": {
+		"message": "ટેમ્પ્લેટ્સ અને ગુણધર્મો સહિત તમામ સેટિંગ્સ આયાત કરો. આ તમારા વર્તમાન સેટિંગ્સને બદલશે."
+	},
+	"importFailed": {
+		"message": "આયાત નિષ્ફળ. વધુ વિગતો માટે કૃપા કરીને કન્સોલ તપાસો."
+	},
+	"importModalTitle": {
+		"message": "આયાત કરો"
+	},
+	"importProperties": {
+		"message": "ગુણધર્મો આયાત કરો"
+	},
+	"importPropertiesDescription": {
+		"message": "Obsidian માંથી તમારા ગુણધર્મો આયાત કરવા માટે, તમારા વૉલ્ટની અંદર $strong_2_start$.obsidian$strong_2_end$ ફોલ્ડરમાં $strong_1_start$types.json$strong_1_end$ ફાઇલ શોધો. નોંધ લો કે આ ફોલ્ડર મોટાભાગની ઑપરેટિંગ સિસ્ટમ્સ પર ડિફૉલ્ટ રૂપે છુપાયેલ હોય છે.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "સેટિંગ્સ આયાત કરો"
+	},
+	"importTemplate": {
+		"message": "ટેમ્પ્લેટ આયાત કરો"
+	},
+	"interpret": {
+		"message": "અર્થઘટન કરો"
+	},
+	"interpreter": {
+		"message": "ઇન્ટરપ્રીટર"
+	},
+	"interpreterContext": {
+		"message": "ઇન્ટરપ્રીટર સંદર્ભ"
+	},
+	"interpreterContextDescription": {
+		"message": "પ્રોમ્પ્ટ ચલોનું અર્થઘટન કરવા માટે વપરાતો સંદર્ભ. $link_start$ઇન્ટરપ્રીટર સેટિંગ્સ$link_end$ માં વ્યાખ્યાયિત ડિફૉલ્ટ સંદર્ભને ઓવરરાઇડ કરે છે. અહીં ચલોનો ઉપયોગ કરી શકાય છે.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "ભાષા"
+	},
+	"languageDescription": {
+		"message": "એક્સ્ટેંશન ઇન્ટરફેસ માટે પ્રદર્શન ભાષા પસંદ કરો."
+	},
+	"last30Days": {
+		"message": "છેલ્લા 30 દિવસ"
+	},
+	"lastUsed": {
+		"message": "છેલ્લે વપરાયેલ"
+	},
+	"legacyMode": {
+		"message": "લિગસી મોડ"
+	},
+	"legacyModeDescription": {
+		"message": "Obsidian 1.6.7 અથવા તેનાથી જૂના સંસ્કરણો સાથે સુસંગત URI ક્લિપિંગ પદ્ધતિનો ઉપયોગ કરે છે. નોંધ લો કે તમે જે સામગ્રીને ક્લિપ કરી શકો છો તેની લંબાઈ તમારા બ્રાઉઝર અને OS દ્વારા મર્યાદિત છે. કેટલાક પૃષ્ઠો કોઈપણ ભૂલ દર્શાવ્યા વિના નિષ્ફળ થઈ શકે છે."
+	},
+	"loadArticle": {
+		"message": "લેખ વાંચો"
+	},
+	"loading": {
+		"message": "લોડ થઈ રહ્યું છે…"
+	},
+	"modelName": {
+		"message": "પ્રદર્શન નામ"
+	},
+	"modelNameDescription": {
+		"message": "મોડલનું નામ જે તમે ઇન્ટરફેસમાં પ્રદર્શિત કરવા માંગો છો."
+	},
+	"modelProvider": {
+		"message": "પ્રોવાઇડર"
+	},
+	"modelProviderDescription": {
+		"message": "આ મોડલ માટે પ્રોવાઇડર પસંદ કરો."
+	},
+	"modelProviderPlaceholder": {
+		"message": "પ્રોવાઇડર"
+	},
+	"modelRequiredFields": {
+		"message": "મોડલનું નામ, પ્રોવાઇડર અને મોડલ ID જરૂરી છે."
+	},
+	"models": {
+		"message": "મોડલ્સ"
+	},
+	"modelsListFor": {
+		"message": "મોડલ્સની સૂચિ આના માટે: $1"
+	},
+	"more": {
+		"message": "વધુ"
+	},
+	"newTemplate": {
+		"message": "નવો ટેમ્પ્લેટ"
+	},
+	"noHighlights": {
+		"message": "કંઈ કરશો નહિ"
+	},
+	"noResults": {
+		"message": "કોઈ પરિણામ મળ્યું નથી"
+	},
+	"noTemplates": {
+		"message": "કોઈ ટેમ્પ્લેટ ઉપલબ્ધ નથી. કૃપા કરીને સેટિંગ્સમાં ટેમ્પ્લેટ ઉમેરો."
+	},
+	"noUnusedProperties": {
+		"message": "કોઈ ન વપરાયેલ ગુણધર્મો મળ્યા નથી."
+	},
+	"noteContent": {
+		"message": "નોંધની સામગ્રી"
+	},
+	"noteContentDescription": {
+		"message": "નોંધની સામગ્રીને કસ્ટમાઇઝ કરો. પૃષ્ઠમાંથી ડેટા પૂર્વ-ભરવા માટે ચલોનો ઉપયોગ કરો."
+	},
+	"noteLocation": {
+		"message": "નોંધનું સ્થાન"
+	},
+	"noteLocationDescription": {
+		"message": "નોંધનું ફોલ્ડર અથવા પાથ."
+	},
+	"noteName": {
+		"message": "નોંધનું નામ"
+	},
+	"noteNameFormat": {
+		"message": "નોંધનું નામ"
+	},
+	"noteNameFormatDescription": {
+		"message": "નોંધની ફાઇલના નામ માટે ફોર્મેટ. પૃષ્ઠમાંથી ડેટા પૂર્વ-ભરવા માટે તમે {{title}}, {{date}}, અને {{published}} જેવા ચલોનો ઉપયોગ કરી શકો છો. $link_start$વધુ જાણો$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "આ પૃષ્ઠ વિશેની નોંધો..."
+	},
+	"onlyHttpSupported": {
+		"message": "આ પૃષ્ઠને ક્લિપ કરી શકાતું નથી. ફક્ત http અને https URL સમર્થિત છે."
+	},
+	"open": {
+		"message": "ખોલો"
+	},
+	"openBehaviorDescription": {
+		"message": "Web Clipper ડિફૉલ્ટ રૂપે કેવી રીતે ખુલે છે તે પસંદ કરો."
+	},
+	"openBehaviorTitle": {
+		"message": "ખોલવાની રીત"
+	},
+	"openEmbedded": {
+		"message": "પૃષ્ઠમાં ખોલો"
+	},
+	"openHighlights": {
+		"message": "હાઇલાઇટ્સ ખોલો"
+	},
+	"openReader": {
+		"message": "રીડર ખોલો"
+	},
+	"openSidePanel": {
+		"message": "સાઇડ પેનલ ખોલો"
+	},
+	"optional": {
+		"message": "(વૈકલ્પિક)"
+	},
+	"orPasteBelow": {
+		"message": "અથવા નીચે સામગ્રી પેસ્ટ કરો"
+	},
+	"overwriteNote": {
+		"message": "નોંધ પર ઓવરરાઇટ કરો"
+	},
+	"pageCannotBeClipped": {
+		"message": "આ પૃષ્ઠને ક્લિપ કરી શકાતું નથી."
+	},
+	"pageVariables": {
+		"message": "પૃષ્ઠ ચલો"
+	},
+	"pagesSaved": {
+		"message": "પૃષ્ઠ સાચવ્યું"
+	},
+	"pagesSavedPlural": {
+		"message": "પૃષ્ઠો સાચવ્યાં"
+	},
+	"pasteJsonHere": {
+		"message": "અહીં JSON પેસ્ટ કરો"
+	},
+	"pleaseReload": {
+		"message": "કૃપા કરીને પૃષ્ઠ ફરીથી લોડ કરવાનો પ્રયાસ કરો."
+	},
+	"popularModels": {
+		"message": "લોકપ્રિય મોડલ્સ"
+	},
+	"popularModelsDescription": {
+		"message": "સામાન્ય રીતે વપરાતા મોડલ્સમાંથી પસંદ કરો અથવા કસ્ટમ મોડલની વિગતો દાખલ કરો."
+	},
+	"popup": {
+		"message": "પોપઅપ"
+	},
+	"prependToDaily": {
+		"message": "દૈનિક નોંધમાં ઉમેરો, ટોચ પર"
+	},
+	"prependToExisting": {
+		"message": "હાલની નોંધમાં ઉમેરો, ટોચ પર"
+	},
+	"preview": {
+		"message": "પૂર્વાવલોકન"
+	},
+	"processing": {
+		"message": "પ્રક્રિયા થઈ રહી છે"
+	},
+	"properties": {
+		"message": "ગુણધર્મો"
+	},
+	"propertiesSettings": {
+		"message": "ગુણધર્મો"
+	},
+	"propertyName": {
+		"message": "ગુણધર્મનું નામ"
+	},
+	"propertyTypeCheckbox": {
+		"message": "ચેકબૉક્સ"
+	},
+	"propertyTypeDate": {
+		"message": "તારીખ"
+	},
+	"propertyTypeDatetime": {
+		"message": "તારીખ અને સમય"
+	},
+	"propertyTypeMultitext": {
+		"message": "સૂચિ"
+	},
+	"propertyTypeNumber": {
+		"message": "નંબર"
+	},
+	"propertyTypeText": {
+		"message": "લખાણ"
+	},
+	"propertyValue": {
+		"message": "ગુણધર્મ મૂલ્ય"
+	},
+	"provider": {
+		"message": "પ્રોવાઇડર"
+	},
+	"providerApiKey": {
+		"message": "API કી"
+	},
+	"providerApiKeyDescription": {
+		"message": "આ પ્રોવાઇડર માટે તમારી API કી."
+	},
+	"providerBaseUrl": {
+		"message": "મૂળ URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "આ પ્રોવાઇડર માટે API એન્ડપોઇન્ટ URL."
+	},
+	"providerModelId": {
+		"message": "મોડલ ID"
+	},
+	"providerModelIdDescription": {
+		"message": "તમારા પ્રોવાઇડર તરફથી મોડલનું ઓળખકર્તા. સામાન્ય રીતે ખાલી જગ્યાઓ વિનાનું ટૂંકું નામ."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "મોડલ ID"
+	},
+	"providerName": {
+		"message": "પ્રોવાઇડરનું નામ"
+	},
+	"providerNameDescription": {
+		"message": "આ પ્રોવાઇડર માટે પ્રદર્શન નામ."
+	},
+	"providerPreset": {
+		"message": "પ્રીસેટ"
+	},
+	"providerPresetDescription": {
+		"message": "પ્રોવાઇડર પસંદ કરો અથવા કસ્ટમ બનાવો."
+	},
+	"providerRequiredFields": {
+		"message": "પ્રોવાઇડરનું નામ અને મૂળ URL જરૂરી છે."
+	},
+	"providers": {
+		"message": "પ્રોવાઇડર્સ"
+	},
+	"rateExtensionDescription": {
+		"message": "શું તમે Web Clipper નો આનંદ માણી રહ્યા છો? તેને રેટિંગ આપીને અમારી સહાય કરો."
+	},
+	"reader": {
+		"message": "રીડર"
+	},
+	"readerAppearance": {
+		"message": "દેખાવ"
+	},
+	"readerAppearanceAuto": {
+		"message": "ઓટો"
+	},
+	"readerAppearanceDark": {
+		"message": "ડાર્ક"
+	},
+	"readerAppearanceDescription": {
+		"message": "આછો (Light) અથવા ઘાટો (Dark) દેખાવ પસંદ કરો."
+	},
+	"readerAppearanceLight": {
+		"message": "લાઇટ"
+	},
+	"readerAutoScroll": {
+		"message": "ઓટો-સ્ક્રૉલ"
+	},
+	"readerAutoScrollDescription": {
+		"message": "પ્લેબેકને અનુસરવા માટે ટ્રાન્સક્રિપ્ટને આપમેળે સ્ક્રૉલ કરો."
+	},
+	"readerBlendImages": {
+		"message": "છબીઓ બ્લેન્ડ કરો"
+	},
+	"readerBlendImagesDescription": {
+		"message": "પૃષ્ઠની પૃષ્ઠભૂમિ સાથે છબીઓ બ્લેન્ડ કરો."
+	},
+	"readerCloseImageViewer": {
+		"message": "ઇમેજ વ્યૂઅર બંધ કરો"
+	},
+	"readerCollapseComment": {
+		"message": "ટિપ્પણી સંકેલો"
+	},
+	"readerColorLinks": {
+		"message": "રંગીન લિંક્સ"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ડિફૉલ્ટ"
+	},
+	"readerCurrentPosition": {
+		"message": "વર્તમાન સ્થિતિ"
+	},
+	"readerCustomCss": {
+		"message": "કસ્ટમ CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "રીડિંગ વ્યુમાં આપમેળે લાગુ કરાયેલ CSS."
+	},
+	"readerDarkTheme": {
+		"message": "ડાર્ક મોડ થીમ"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ડાર્ક મોડમાં અલગ થીમનો ઉપયોગ કરો."
+	},
+	"readerError": {
+		"message": "સામગ્રી કાઢવામાં નિષ્ફળ."
+	},
+	"readerFont": {
+		"message": "ફૉન્ટ વિકલ્પો"
+	},
+	"readerFontDefault": {
+		"message": "ડિફૉલ્ટ"
+	},
+	"readerFontDescription": {
+		"message": "તમારી સિસ્ટમ પર ઇન્સ્ટોલ કરેલા ફૉન્ટ્સ ઉમેરો. ફૉન્ટ ઉમેરવા માટે enter દબાવો."
+	},
+	"readerFontNotFound": {
+		"message": "મળ્યું નથી"
+	},
+	"readerFontPlaceholder": {
+		"message": "ફૉન્ટ ઉમેરવા માટે enter દબાવો"
+	},
+	"readerFontSetDefault": {
+		"message": "ડિફૉલ્ટ સેટ કરો"
+	},
+	"readerFontSize": {
+		"message": "મૂળભૂત ફૉન્ટ કદ"
+	},
+	"readerFontSystem": {
+		"message": "સિસ્ટમ"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "ફૉન્ટ્સ"
+	},
+	"readerFootnotes": {
+		"message": "ફૂટનોટ્સ"
+	},
+	"readerHighlightActiveLine": {
+		"message": "સક્રિય લાઇનને હાઇલાઇટ કરો"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "પ્લેબેક દરમિયાન ટ્રાન્સક્રિપ્ટમાં વર્તમાન વાક્યને હાઇલાઇટ કરો."
+	},
+	"readerImages": {
+		"message": "છબીઓ"
+	},
+	"readerLineHeight": {
+		"message": "લાઇનની ઊંચાઈ"
+	},
+	"readerLineWidth": {
+		"message": "લાઇનની પહોળાઈ"
+	},
+	"readerLoadFailed": {
+		"message": "લોડ કરવામાં નિષ્ફળ. તમારા બ્રાઉઝર દ્વારા પૃષ્ઠ અવરોધિત હોઈ શકે છે."
+	},
+	"readerLoading": {
+		"message": "લોડ થઈ રહ્યું છે…"
+	},
+	"readerOn": {
+		"message": "રીડર"
+	},
+	"readerPinPlayer": {
+		"message": "પ્લેયર પિન કરો"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ટ્રાન્સક્રિપ્ટ દ્વારા સ્ક્રૉલ કરતી વખતે વિડિઓ પ્લેયરને દૃશ્યમાન રાખો."
+	},
+	"readerSettings": {
+		"message": "રીડર સેટિંગ્સ"
+	},
+	"readerTheme": {
+		"message": "થીમ"
+	},
+	"readerThemeDescription": {
+		"message": "રીડિંગ વ્યુમાં વપરાતા રંગો પસંદ કરો."
+	},
+	"readerThemeSection": {
+		"message": "થીમ"
+	},
+	"readerTranscripts": {
+		"message": "ટ્રાન્સક્રિપ્ટ્સ"
+	},
+	"readerTypography": {
+		"message": "ટાઇપોગ્રાફી"
+	},
+	"readerUrlPlaceholder": {
+		"message": "વાંચવા માટે URL પેસ્ટ કરો…"
+	},
+	"readerViewFullSize": {
+		"message": "સંપૂર્ણ કદ જુઓ"
+	},
+	"recommended": {
+		"message": "ભલામણ કરેલ"
+	},
+	"refresh": {
+		"message": "રીફ્રેશ કરો"
+	},
+	"remove": {
+		"message": "દૂર કરો"
+	},
+	"removeProperty": {
+		"message": "ગુણધર્મ દૂર કરો"
+	},
+	"removeUnusedProperties": {
+		"message": "ન વપરાયેલ ગુણધર્મો દૂર કરો"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "કોઈપણ ટેમ્પ્લેટમાં ઉપયોગમાં લેવાતા ન હોય તેવા તમામ ગુણધર્મોને દૂર કરો."
+	},
+	"removeVault": {
+		"message": "વૉલ્ટ દૂર કરો"
+	},
+	"replaceContent": {
+		"message": "પૃષ્ઠ સામગ્રીને બદલો"
+	},
+	"reset": {
+		"message": "રીસેટ કરો"
+	},
+	"resetDefaultTemplate": {
+		"message": "ડિફૉલ્ટ ટેમ્પ્લેટ રીસેટ કરો"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "તમે ડિફૉલ્ટ ટેમ્પ્લેટમાં કરેલા કોઈપણ ફેરફારોને દૂર કરો."
+	},
+	"resetProvidersAndModels": {
+		"message": "ડિફૉલ્ટ મોડલ્સ રીસેટ કરો"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "પ્રોવાઇડર્સ અને મોડલ્સને ડિફૉલ્ટ સેટિંગ્સ પર રીસેટ કરો."
+	},
+	"save": {
+		"message": "સાચવો"
+	},
+	"saveBehaviorDescription": {
+		"message": "પૃષ્ઠોને સાચવવા માટે ડિફૉલ્ટ વિકલ્પ પસંદ કરો. વૈકલ્પિક વિકલ્પો મુખ્ય બટનની બાજુના ડ્રોપડાઉન મેનૂમાં દેખાય છે."
+	},
+	"saveBehaviorLabel": {
+		"message": "સાચવવાની રીત"
+	},
+	"saveFile": {
+		"message": "ફાઇલ સાચવો..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "હાઇલાઇટ્સ શોધો…"
+	},
+	"searchVariables": {
+		"message": "ચલો શોધો..."
+	},
+	"selectProvider": {
+		"message": "પ્રોવાઇડર પસંદ કરો"
+	},
+	"selectTemplateToExport": {
+		"message": "કૃપા કરીને નિકાસ કરવા માટે ટેમ્પ્લેટ પસંદ કરો."
+	},
+	"settings": {
+		"message": "સેટિંગ્સ"
+	},
+	"settingsHeading": {
+		"message": "સેટિંગ્સ"
+	},
+	"settingsImportSuccess": {
+		"message": "બધા સેટિંગ્સ સફળતાપૂર્વક આયાત કરવામાં આવ્યા. ફેરફારો જોવા માટે કૃપા કરીને પૃષ્ઠને તાજું કરો."
+	},
+	"share": {
+		"message": "શેર કરો..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "કી અસાઇનમેન્ટ્સ બદલવા માટે, $1 પર જાઓ"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "કી અસાઇનમેન્ટ્સ બદલવા માટે, $1 પર જાઓ"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "કી અસાઇનમેન્ટ્સ બદલવા માટે, કૃપા કરીને તમારા બ્રાઉઝરની એક્સ્ટેંશન સેટિંગ્સનો સંદર્ભ લો."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "કી અસાઇનમેન્ટ્સ બદલવા માટે, $1 પર જાઓ"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "કી અસાઇનમેન્ટ્સ બદલવા માટે, $1 પર જાઓ, ગિયર આઇકન પર ક્લિક કરો અને \"Manage Extension Shortcuts\" પસંદ કરો."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "કીબોર્ડ શૉર્ટકટ્સ તમને ક્લિપર સુવિધાઓની ઝડપી ઍક્સેસ આપે છે."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "સફારી પર કીબોર્ડ શૉર્ટકટ્સ કસ્ટમાઇઝ કરી શકાતા નથી."
+	},
+	"shortcutNotSet": {
+		"message": "સેટ કરેલ નથી"
+	},
+	"showActionsButton": {
+		"message": "ક્રિયાઓ બટન બતાવો"
+	},
+	"showActionsDescription": {
+		"message": "તમને ક્લિપર મેનૂમાંથી પૃષ્ઠ ચલોની તપાસ કરવાની મંજૂરી આપે છે. ટેમ્પ્લેટ્સમાં વાપરવા માટે ઉપલબ્ધ ચલો જોવા માટે ઉપયોગી છે."
+	},
+	"showPageVariables": {
+		"message": "પૃષ્ઠ ચલો બતાવો"
+	},
+	"silentOpen": {
+		"message": "તેને ખોલ્યા વિના ક્લિપ કરેલી નોંધ સાચવો"
+	},
+	"silentOpenDescription": {
+		"message": "ક્લિપ કરેલી નોંધો સાચવવામાં આવશે પરંતુ નવા ટૅબ તરીકે ખુલશે નહીં. Obsidian હજુ પણ આગળ લાવવામાં આવશે."
+	},
+	"sort": {
+		"message": "ક્રમમાં ગોઠવો"
+	},
+	"sortAZ": {
+		"message": "A થી Z ના ક્રમમાં"
+	},
+	"sortNewOld": {
+		"message": "સૌથી નવું પ્રથમ"
+	},
+	"sortOldNew": {
+		"message": "સૌથી જૂનું પ્રથમ"
+	},
+	"sortZA": {
+		"message": "Z થી A ના ક્રમમાં"
+	},
+	"specificNoteName": {
+		"message": "ચોક્કસ નોંધનું નામ"
+	},
+	"systemDefault": {
+		"message": "સિસ્ટમ"
+	},
+	"template": {
+		"message": "ટેમ્પ્લેટ"
+	},
+	"templateCopied": {
+		"message": "ટેમ્પ્લેટ JSON ની ક્લિપબોર્ડ પર કૉપિ કરી"
+	},
+	"templateCopyError": {
+		"message": "ટેમ્પ્લેટ JSON ને ક્લિપબોર્ડ પર કૉપિ કરવામાં નિષ્ફળ"
+	},
+	"templateErrorCount": {
+		"message": "તમારા ટેમ્પ્લેટમાં ભૂલ છે."
+	},
+	"templateErrorsCount": {
+		"message": "તમારા ટેમ્પ્લેટમાં $1 ભૂલો છે."
+	},
+	"templateGroupContent": {
+		"message": "સામગ્રી"
+	},
+	"templateGroupLocation": {
+		"message": "સ્થાન"
+	},
+	"templateName": {
+		"message": "ટેમ્પ્લેટનું નામ"
+	},
+	"templateProperties": {
+		"message": "ગુણધર્મો"
+	},
+	"templatePropertiesDescription": {
+		"message": "ક્લિપ કરેલી નોંધની ટોચ પર ઉમેરવાના ગુણધર્મો. પૃષ્ઠમાંથી ડેટા પૂર્વ-ભરવા માટે ચલોનો ઉપયોગ કરો."
+	},
+	"templateTriggers": {
+		"message": "ટેમ્પ્લેટ ટ્રિગર્સ"
+	},
+	"templateTriggersDescription": {
+		"message": "જો આ ટેમ્પ્લેટ URL પેટર્ન સાથે મેળ ખાતો હોય અથવા તેમાં schema.org ડેટા હોય તો આપમેળે તેને પસંદ કરવા માટે નિયમો વ્યાખ્યાયિત કરો. લાઇન દીઠ એક નિયમ."
+	},
+	"templateValid": {
+		"message": "ટેમ્પ્લેટ સિન્ટેક્સ માન્ય છે"
+	},
+	"templatesHeading": {
+		"message": "ટેમ્પ્લેટ્સ"
+	},
+	"thinking": {
+		"message": "વિચારી રહ્યું છે"
+	},
+	"unknownProvider": {
+		"message": "અજ્ઞાત પ્રોવાઇડર"
+	},
+	"updateAvailable": {
+		"message": "અપડેટ ઉપલબ્ધ છે."
+	},
+	"usingLatestVersion": {
+		"message": "તમે નવીનતમ સંસ્કરણનો ઉપયોગ કરી રહ્યાં છો."
+	},
+	"vault": {
+		"message": "વૉલ્ટ"
+	},
+	"vaultDescription": {
+		"message": "આ ટેમ્પ્લેટ માટે ડિફૉલ્ટ વૉલ્ટ પસંદ કરો. વૉલ્ટ ઉમેરવા અથવા દૂર કરવા માટે $link_start$સામાન્ય સેટિંગ્સ$link_end$ પર જાઓ.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "વૉલ્ટ્સ"
+	},
+	"vaultsDescription": {
+		"message": "ડિફૉલ્ટ રૂપે, ક્લિપ કરેલી નોંધો વર્તમાન ખુલ્લા વૉલ્ટમાં સાચવવામાં આવે છે. જો તમે જુદા જુદા વૉલ્ટ્સમાં સાચવવાનો વિકલ્પ ઇચ્છતા હોવ તો તમે અહીં વૉલ્ટ્સ ઉમેરી શકો છો. વૉલ્ટ નામો Obsidian વૉલ્ટના નામ સાથે બરાબર મેળ ખાતા હોવા જોઈએ. વૉલ્ટ ઉમેરવા માટે $strong_start$enter$strong_end$ દબાવો.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "સંસ્કરણ"
+	}
+}
