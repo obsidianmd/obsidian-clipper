@@ -33,6 +33,9 @@ export function showSettingsSection(section: SettingsSection, templateId?: strin
 		if (templateEditor) {
 			templateEditor.style.display = 'block';
 		}
+		if (templateId) {
+			updateTemplateListActiveState(templateId);
+		}
 	}
 
 	updatePromptContextVisibility();
