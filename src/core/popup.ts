@@ -816,6 +816,9 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 			inputElement.setAttribute('data-type', propertyType);
 			inputElement.setAttribute('data-template-value', property.value);
 			inputElement.type = propertyType === 'checkbox' ? 'checkbox' : 'text';
+			if (inputElement.type === 'text') {
+				inputElement.setAttribute('dir', 'auto');
+			}
 
 			metadataPropertyValue.appendChild(inputElement);
 
