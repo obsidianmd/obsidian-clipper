@@ -35,6 +35,9 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+// Quick clip asks the popup whether it is ready before requesting a save, so it
+// cannot save while the template fields are still waiting on page extraction.
+let isPopupReady = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -244,6 +247,11 @@ function setupStorageListeners() {
 
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+		if (request.action === "isPopupReady") {
+			sendResponse({ ready: isPopupReady });
+			return true;
+		}
+
 		if (request.action === "triggerQuickClip") {
 			handleClipObsidian().then(() => {
 				sendResponse({success: true});
@@ -393,7 +401,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				}
 
 				// Initial content load
-				await refreshFields(currentTabId);
+				isPopupReady = await refreshFields(currentTabId);
 			} catch (error) {
 				console.error('Error initializing popup:', error);
 				showError(getMessage('pleaseReload'));
@@ -653,26 +661,27 @@ async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void
 	});
 }
 
-async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebuildSkeleton = true }: { checkTemplateTriggers?: boolean; rebuildSkeleton?: boolean } = {}) {
+/** Returns true once the template fields have been populated from the page. */
+async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebuildSkeleton = true }: { checkTemplateTriggers?: boolean; rebuildSkeleton?: boolean } = {}): Promise<boolean> {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('noTemplates');
-		return;
+		return false;
 	}
 
 	try {
 		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
 			showError('pageCannotBeClipped');
-			return;
+			return false;
 		}
 		if (!isValidUrl(tab.url)) {
 			showError('onlyHttpSupported');
-			return;
+			return false;
 		}
 		if (isRestrictedUrl(tab.url)) {
 			showError('pageCannotBeClipped');
-			return;
+			return false;
 		}
 
 		// Start content extraction (don't await yet)
@@ -739,10 +748,13 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 		} else {
 			throw new Error('Unable to extract page content.');
 		}
+
+		return true;
 	} catch (error) {
 		console.error('Error refreshing fields:', error);
 		const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
 		showError(errorMessage);
+		return false;
 	}
 }
 
