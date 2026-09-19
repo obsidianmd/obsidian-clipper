@@ -6,6 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
 import { incrementStat } from './utils/storage-utils';
+import { waitForPopupReady, PopupReadyResponse } from './utils/popup-readiness';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -742,6 +743,24 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 	return undefined;
 });
 
+// Ask the popup to save the current page, but only once it reports that it has
+// opened and finished extracting page content. A template whose variables
+// resolve asynchronously (a YouTube {{transcript}}) is still empty for the first
+// moments after the popup opens, and saving then produces a blank note.
+async function triggerQuickClipWhenPopupReady(): Promise<void> {
+	const ready = await waitForPopupReady(
+		() => browser.runtime.sendMessage({ action: "isPopupReady" }) as Promise<PopupReadyResponse>
+	);
+
+	if (!ready) {
+		console.error("Quick clip cancelled: the popup did not report that it was ready.");
+		return;
+	}
+
+	await browser.runtime.sendMessage({action: "triggerQuickClip"})
+		.catch(error => console.error("Failed to send quick clip message:", error));
+}
+
 browser.commands.onCommand.addListener(async (command, tab) => {
 	// Some browsers (e.g. Orion) don't pass the tab parameter, so fall back to querying
 	if (!tab?.id) {
@@ -751,11 +770,13 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 
 	if (command === 'quick_clip') {
 		if (tab?.id) {
-			openPopup();
-			setTimeout(() => {
-				browser.runtime.sendMessage({action: "triggerQuickClip"})
-					.catch(error => console.error("Failed to send quick clip message:", error));
-			}, 500);
+			try {
+				await openPopup();
+			} catch (error) {
+				console.error("Failed to open the popup for quick clip:", error);
+				return;
+			}
+			await triggerQuickClipWhenPopupReady();
 		}
 	}
 	if (command === "toggle_highlighter" && tab?.id) {
