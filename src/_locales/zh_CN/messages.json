@@ -345,6 +345,12 @@
 	"folder": {
 		"message": "文件夹"
 	},
+	"fetchVaultFolders": {
+		"message": "获取 Vault 文件夹"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "当前浏览器不支持文件夹选择。"
+	},
 	"general": {
 		"message": "常规"
 	},

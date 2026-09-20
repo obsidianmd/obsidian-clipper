@@ -345,6 +345,12 @@
 	"folder": {
 		"message": "Folder"
 	},
+	"fetchVaultFolders": {
+		"message": "Fetch vault folders"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "This browser does not support folder selection."
+	},
 	"general": {
 		"message": "General"
 	},
