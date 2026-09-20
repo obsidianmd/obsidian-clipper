@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import { detectBrowser } from './utils/browser-detection';
+import { openObsidianUrl } from './utils/obsidian-url';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage, isNormalPageUrl } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
@@ -695,26 +696,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		if (typedRequest.action === "openObsidianUrl") {
 			const url = (typedRequest as any).url;
 			if (url) {
-				browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-					const currentTab = tabs[0];
-					if (currentTab && currentTab.id) {
-						browser.tabs.update(currentTab.id, { url: url }).then(() => {
-							sendResponse({ success: true });
-						}).catch((error) => {
-							console.error('Error opening Obsidian URL:', error);
-							sendResponse({
-								success: false,
-								error: error instanceof Error ? error.message : String(error)
-							});
-						});
-					} else {
-						sendResponse({
-							success: false,
-							error: 'No active tab found'
-						});
-					}
+				openObsidianUrl(url).then(() => {
+					sendResponse({ success: true });
 				}).catch((error) => {
-					console.error('Error querying tabs:', error);
+					console.error('Error opening Obsidian URL:', error);
 					sendResponse({
 						success: false,
 						error: error instanceof Error ? error.message : String(error)
