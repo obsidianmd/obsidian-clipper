@@ -116,7 +116,7 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
-const contentScriptLoads = new Map<number, Promise<void>>();
+const contentScriptLoads = new Map<number, { url: string; promise: Promise<void> }>();
 
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
@@ -151,20 +151,20 @@ async function injectContentScript(tabId: number): Promise<void> {
 }
 
 async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
+	// Resolve the current page before reusing an in-flight load. A tab can
+	// navigate while injection is pending, and the new document must not reuse
+	// work that was started for the previous URL.
+	const tab = await browser.tabs.get(tabId);
+	if (!tab.url || !isValidUrl(tab.url)) {
+		throw new Error('Invalid URL for content script injection');
+	}
+
 	const existingLoad = contentScriptLoads.get(tabId);
-	if (existingLoad) {
-		return existingLoad;
+	if (existingLoad?.url === tab.url) {
+		return existingLoad.promise;
 	}
 
 	const load = (async () => {
-		// First, get the tab information
-		const tab = await browser.tabs.get(tabId);
-
-		// Check if the URL is valid before proceeding
-		if (!tab.url || !isValidUrl(tab.url)) {
-			throw new Error('Invalid URL for content script injection');
-		}
-
 		try {
 			// Attempt to send a message to the content script
 			await browser.tabs.sendMessage(tabId, { action: "ping" });
@@ -176,11 +176,12 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		}
 	})();
 
-	contentScriptLoads.set(tabId, load);
+	const entry = { url: tab.url, promise: load };
+	contentScriptLoads.set(tabId, entry);
 	try {
 		await load;
 	} finally {
-		if (contentScriptLoads.get(tabId) === load) {
+		if (contentScriptLoads.get(tabId) === entry) {
 			contentScriptLoads.delete(tabId);
 		}
 	}
