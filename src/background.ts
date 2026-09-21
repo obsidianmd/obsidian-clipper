@@ -6,6 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
 import { incrementStat } from './utils/storage-utils';
+import { normalizeUrl } from './utils/url-utils';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -115,6 +116,7 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
+const contentScriptLoads = new Map<number, Promise<void>>();
 
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
@@ -149,7 +151,12 @@ async function injectContentScript(tabId: number): Promise<void> {
 }
 
 async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
-	try {
+	const existingLoad = contentScriptLoads.get(tabId);
+	if (existingLoad) {
+		return existingLoad;
+	}
+
+	const load = (async () => {
 		// First, get the tab information
 		const tab = await browser.tabs.get(tabId);
 
@@ -158,19 +165,51 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 			throw new Error('Invalid URL for content script injection');
 		}
 
-		// Attempt to send a message to the content script
-		await browser.tabs.sendMessage(tabId, { action: "ping" });
-		debugLog('Clipper', 'Content script ping succeeded');
-	} catch (error) {
-		// If the error is about invalid URL, re-throw it
-		if (error instanceof Error && error.message.includes('invalid URL')) {
-			throw error;
+		try {
+			// Attempt to send a message to the content script
+			await browser.tabs.sendMessage(tabId, { action: "ping" });
+			debugLog('Clipper', 'Content script ping succeeded');
+		} catch (error) {
+			// If the message fails, the content script is not loaded, so inject it
+			debugLog('Clipper', 'Ping failed, injecting content script...', error);
+			await injectContentScript(tabId);
 		}
+	})();
 
-		// If the message fails, the content script is not loaded, so inject it
-		debugLog('Clipper', 'Ping failed, injecting content script...', error);
-		await injectContentScript(tabId);
+	contentScriptLoads.set(tabId, load);
+	try {
+		await load;
+	} finally {
+		if (contentScriptLoads.get(tabId) === load) {
+			contentScriptLoads.delete(tabId);
+		}
 	}
+}
+
+async function sendMessageToContentScript(tabId: number, message: any): Promise<any> {
+	await ensureContentScriptLoadedInBackground(tabId);
+	return browser.tabs.sendMessage(tabId, message);
+}
+
+async function loadContentScriptForHighlights(tabId: number, rawUrl: string): Promise<boolean> {
+	const [syncData, localData] = await Promise.all([
+		browser.storage.sync.get('highlighter_settings'),
+		browser.storage.local.get('highlights'),
+	]);
+	const highlighterSettings = syncData.highlighter_settings as { alwaysShowHighlights?: boolean } | undefined;
+	if ((highlighterSettings?.alwaysShowHighlights ?? true) === false) {
+		return false;
+	}
+
+	const allHighlights = (localData.highlights || {}) as Record<string, { highlights?: unknown[] }>;
+	const normalizedUrl = normalizeUrl(rawUrl);
+	const stored = allHighlights[normalizedUrl] ?? allHighlights[rawUrl];
+	if (!Array.isArray(stored?.highlights) || stored.highlights.length === 0) {
+		return false;
+	}
+
+	await ensureContentScriptLoadedInBackground(tabId);
+	return true;
 }
 
 // Route a message to a tab, handling both normal pages (via content script)
@@ -178,8 +217,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 async function routeMessageToTab(tabId: number, message: any): Promise<any> {
 	const tab = await browser.tabs.get(tabId);
 	if (isNormalPageUrl(tab.url)) {
-		await ensureContentScriptLoadedInBackground(tabId);
-		return browser.tabs.sendMessage(tabId, message);
+		return sendMessageToContentScript(tabId, message);
 	} else {
 		return browser.runtime.sendMessage({
 			action: 'extensionPageMessage',
@@ -334,15 +372,31 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
-		
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string; url?: string };
+
+		if (typedRequest.action === 'loadContentScriptForHighlights') {
+			const tabId = sender.tab?.id;
+			if (!tabId || !typedRequest.url) {
+				sendResponse({ success: false, loaded: false });
+				return true;
+			}
+			loadContentScriptForHighlights(tabId, typedRequest.url)
+				.then((loaded) => sendResponse({ success: true, loaded }))
+				.catch((error) => sendResponse({
+					success: false,
+					loaded: false,
+					error: error instanceof Error ? error.message : String(error),
+				}));
+			return true;
+		}
+
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
 			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
 				const currentTab = tabs[0];
 				if (currentTab && currentTab.id) {
 					try {
-						const response = await browser.tabs.sendMessage(currentTab.id, {
+						const response = await routeMessageToTab(currentTab.id, {
 							action: 'copy-text-to-clipboard',
 							text: typedRequest.text
 						});
@@ -492,26 +546,24 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
 			const tabId = typedRequest.tabId;
-			// Check if the tab is on the extension's reader.html page
-			exitReaderPageIfNeeded(tabId, typedRequest.readerUrl).then((wasReaderPage) => {
+			(async () => {
+				// Check if the tab is on the extension's reader.html page
+				const wasReaderPage = await exitReaderPageIfNeeded(tabId, typedRequest.readerUrl);
 				if (wasReaderPage) {
 					sendResponse({ success: true, isActive: false });
 					return;
 				}
-				injectReaderScript(tabId).then(() => {
-					browser.tabs.sendMessage(tabId, { action: "toggleReaderMode" })
-						.then((response: any) => {
-							if (response?.success) {
-								readerModeState[tabId] = response.isActive ?? false;
-								debouncedUpdateContextMenu(tabId);
-							}
-							sendResponse(response);
-						})
-						.catch(() => {
-							// Page may have reloaded before responding (reader restore)
-							sendResponse({ success: true, isActive: false });
-						});
-				});
+				await ensureContentScriptLoadedInBackground(tabId);
+				await injectReaderScript(tabId);
+				const response = await browser.tabs.sendMessage(tabId, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+				if (response?.success) {
+					readerModeState[tabId] = response.isActive ?? false;
+					debouncedUpdateContextMenu(tabId);
+				}
+				sendResponse(response);
+			})().catch(() => {
+				// Page may have reloaded before responding (reader restore)
+				sendResponse({ success: true, isActive: false });
 			});
 			return true;
 		}
@@ -759,11 +811,10 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 		}
 	}
 	if (command === "toggle_highlighter" && tab?.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		toggleHighlighterMode(tab.id);
+		await toggleHighlighterMode(tab.id);
 	}
 	if (command === "copy_to_clipboard" && tab?.id) {
-		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
+		await sendMessageToContentScript(tab.id, { action: "copyToClipboard" });
 	}
 	if (command === "toggle_reader" && tab?.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
@@ -867,21 +918,19 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	} else if ((info.menuItemId === "enter-reader" || info.menuItemId === "exit-reader") && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
-		const response = await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+		const response = await sendMessageToContentScript(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
 		if (response?.success) {
 			readerModeState[tab.id] = response.isActive ?? false;
 			debouncedUpdateContextMenu(tab.id);
 		}
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+		await sendMessageToContentScript(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
 		await ensureContentScriptLoadedInBackground(tab.id);
 	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
+		await sendMessageToContentScript(tab.id, { action: "copyMarkdownToClipboard" });
 	}
 });
 
@@ -926,8 +975,7 @@ async function paintHighlights(tabId: number) {
 			return;
 		}
 
-		await ensureContentScriptLoadedInBackground(tabId);
-		await browser.tabs.sendMessage(tabId, { action: "paintHighlights" });
+		await sendMessageToContentScript(tabId, { action: "paintHighlights" });
 
 	} catch (error) {
 		console.error('Error painting highlights:', error);
@@ -947,12 +995,8 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 			return;
 		}
 
-		// Then, ensure the content script is loaded
-		await ensureContentScriptLoadedInBackground(tabId);
-
-		// Now try to send the message
 		highlighterModeState[tabId] = activate;
-		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
+		await sendMessageToContentScript(tabId, { action: "setHighlighterMode", isActive: activate });
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: activate });
 
@@ -970,7 +1014,7 @@ async function toggleHighlighterMode(tabId: number): Promise<boolean> {
 		const currentMode = getHighlighterModeForTab(tabId);
 		const newMode = !currentMode;
 		highlighterModeState[tabId] = newMode;
-		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: newMode });
+		await sendMessageToContentScript(tabId, { action: "setHighlighterMode", isActive: newMode });
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: newMode });
 		return newMode;
@@ -989,7 +1033,7 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 		content: info.selectionText || '',
 	};
 
-	await browser.tabs.sendMessage(tabId, { 
+	await sendMessageToContentScript(tabId, {
 		action: "highlightSelection", 
 		isActive: true,
 		highlightData,
@@ -1001,7 +1045,7 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 async function highlightElement(tabId: number, info: browser.Menus.OnClickData) {
 	highlighterModeState[tabId] = true;
 
-	await browser.tabs.sendMessage(tabId, { 
+	await sendMessageToContentScript(tabId, {
 		action: "highlightElement", 
 		isActive: true,
 		targetElementInfo: {
@@ -1071,8 +1115,7 @@ async function openPopup(): Promise<void> {
 		const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 		const tab = tabs[0];
 		if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
-			await ensureContentScriptLoadedInBackground(tab.id);
-			await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+			await sendMessageToContentScript(tab.id, { action: "toggle-iframe" });
 			return;
 		}
 		// Fall through to popup if tab is invalid
@@ -1086,14 +1129,13 @@ browser.action.onClicked.addListener(async (tab) => {
 	if (currentOpenBehavior === 'reader') {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
-		const response = await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+		const response = await sendMessageToContentScript(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
 		if (response?.success) {
 			readerModeState[tab.id] = response.isActive ?? false;
 			debouncedUpdateContextMenu(tab.id);
 		}
 	} else if (currentOpenBehavior === 'embedded') {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+		await sendMessageToContentScript(tab.id, { action: "toggle-iframe" });
 	}
 });
 
