@@ -116,7 +116,17 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
-const contentScriptLoads = new Map<number, { url: string; promise: Promise<void> }>();
+const contentScriptLoads = new Map<number, { url: string; generation: number; promise: Promise<void> }>();
+const contentScriptDocumentGenerations = new Map<number, number>();
+
+// A reload can replace the document without changing its URL. Invalidate the
+// old document's pending load as soon as navigation starts so the replacement
+// document can inject independently.
+browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+	if (changeInfo.status !== 'loading') return;
+	contentScriptDocumentGenerations.set(tabId, (contentScriptDocumentGenerations.get(tabId) ?? 0) + 1);
+	contentScriptLoads.delete(tabId);
+});
 
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
@@ -159,8 +169,9 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		throw new Error('Invalid URL for content script injection');
 	}
 
+	const documentGeneration = contentScriptDocumentGenerations.get(tabId) ?? 0;
 	const existingLoad = contentScriptLoads.get(tabId);
-	if (existingLoad?.url === tab.url) {
+	if (existingLoad?.url === tab.url && existingLoad.generation === documentGeneration) {
 		return existingLoad.promise;
 	}
 
@@ -176,7 +187,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		}
 	})();
 
-	const entry = { url: tab.url, promise: load };
+	const entry = { url: tab.url, generation: documentGeneration, promise: load };
 	contentScriptLoads.set(tabId, entry);
 	try {
 		await load;
@@ -278,6 +289,8 @@ async function initialize() {
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
 			delete readerModeState[tabId];
+			contentScriptLoads.delete(tabId);
+			contentScriptDocumentGenerations.delete(tabId);
 		});
 		
 		// Initialize context menu
