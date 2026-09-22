@@ -6,7 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 import { debugLog } from './utils/debug';
 import { incrementStat } from './utils/storage-utils';
-import { normalizeUrl } from './utils/url-utils';
+import { hasStoredHighlights } from './utils/url-utils';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -116,8 +116,7 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
-const contentScriptLoads = new Map<number, { url: string; generation: number; promise: Promise<void> }>();
-const contentScriptDocumentGenerations = new Map<number, number>();
+const contentScriptLoads = new Map<number, { url: string; promise: Promise<void> }>();
 // Highlighter mode changes wait on lazy injection, so run them one at a time
 // per tab. Otherwise two quick toggles both read the same starting state.
 const highlighterModeQueues = new Map<number, Promise<unknown>>();
@@ -138,9 +137,9 @@ function queueHighlighterModeChange<T>(tabId: number, change: () => Promise<T>):
 // old document's pending load as soon as navigation starts so the replacement
 // document can inject independently.
 browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-	if (changeInfo.status !== 'loading') return;
-	contentScriptDocumentGenerations.set(tabId, (contentScriptDocumentGenerations.get(tabId) ?? 0) + 1);
-	contentScriptLoads.delete(tabId);
+	if (changeInfo.status === 'loading') {
+		contentScriptLoads.delete(tabId);
+	}
 });
 
 async function injectContentScript(tabId: number): Promise<void> {
@@ -184,9 +183,8 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		throw new Error('Invalid URL for content script injection');
 	}
 
-	const documentGeneration = contentScriptDocumentGenerations.get(tabId) ?? 0;
 	const existingLoad = contentScriptLoads.get(tabId);
-	if (existingLoad?.url === tab.url && existingLoad.generation === documentGeneration) {
+	if (existingLoad?.url === tab.url) {
 		return existingLoad.promise;
 	}
 
@@ -202,7 +200,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		}
 	})();
 
-	const entry = { url: tab.url, generation: documentGeneration, promise: load };
+	const entry = { url: tab.url, promise: load };
 	contentScriptLoads.set(tabId, entry);
 	try {
 		await load;
@@ -228,10 +226,7 @@ async function loadContentScriptForHighlights(tabId: number, rawUrl: string): Pr
 		return false;
 	}
 
-	const allHighlights = (localData.highlights || {}) as Record<string, { highlights?: unknown[] }>;
-	const normalizedUrl = normalizeUrl(rawUrl);
-	const stored = allHighlights[normalizedUrl] ?? allHighlights[rawUrl];
-	if (!Array.isArray(stored?.highlights) || stored.highlights.length === 0) {
+	if (!hasStoredHighlights(localData.highlights, rawUrl)) {
 		return false;
 	}
 
@@ -306,7 +301,6 @@ async function initialize() {
 			highlighterModeQueues.delete(tabId);
 			delete readerModeState[tabId];
 			contentScriptLoads.delete(tabId);
-			contentScriptDocumentGenerations.delete(tabId);
 		});
 		
 		// Initialize context menu
@@ -448,7 +442,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		// fetchProxy is handled by a separate listener below
 
 		if (typedRequest.action === "extractContent" && sender.tab && sender.tab.id) {
-			browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
+			sendMessageToContentScript(sender.tab.id, request).then(sendResponse);
 			return true;
 		}
 
@@ -583,14 +577,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 					sendResponse({ success: true, isActive: false });
 					return;
 				}
-				await ensureContentScriptLoadedInBackground(tabId);
-				await injectReaderScript(tabId);
-				const response = await browser.tabs.sendMessage(tabId, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
-				if (response?.success) {
-					readerModeState[tabId] = response.isActive ?? false;
-					debouncedUpdateContextMenu(tabId);
-				}
-				sendResponse(response);
+				sendResponse(await toggleReaderModeInTab(tabId));
 			})().catch(() => {
 				// Page may have reloaded before responding (reader restore)
 				sendResponse({ success: true, isActive: false });
@@ -847,9 +834,7 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 		await sendMessageToContentScript(tab.id, { action: "copyToClipboard" });
 	}
 	if (command === "toggle_reader" && tab?.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await injectReaderScript(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+		await toggleReaderModeInTab(tab.id);
 	}
 });
 
@@ -946,13 +931,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
 		await highlightElement(tab.id, info);
 	} else if ((info.menuItemId === "enter-reader" || info.menuItemId === "exit-reader") && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await injectReaderScript(tab.id);
-		const response = await sendMessageToContentScript(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
-		if (response?.success) {
-			readerModeState[tab.id] = response.isActive ?? false;
-			debouncedUpdateContextMenu(tab.id);
-		}
+		await toggleReaderModeInTab(tab.id);
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await sendMessageToContentScript(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
@@ -1094,6 +1073,17 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 	debouncedUpdateContextMenu(tabId);
 }
 
+async function toggleReaderModeInTab(tabId: number): Promise<{ success?: boolean; isActive?: boolean }> {
+	await ensureContentScriptLoadedInBackground(tabId);
+	await injectReaderScript(tabId);
+	const response = await browser.tabs.sendMessage(tabId, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+	if (response?.success) {
+		readerModeState[tabId] = response.isActive ?? false;
+		debouncedUpdateContextMenu(tabId);
+	}
+	return response;
+}
+
 async function injectReaderScript(tabId: number) {
 	try {
 		await browser.scripting.insertCSS({
@@ -1163,13 +1153,7 @@ browser.action.onClicked.addListener(async (tab) => {
 	if (!tab?.id || !tab.url || !isValidUrl(tab.url) || isBlankPage(tab.url)) return;
 
 	if (currentOpenBehavior === 'reader') {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await injectReaderScript(tab.id);
-		const response = await sendMessageToContentScript(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
-		if (response?.success) {
-			readerModeState[tab.id] = response.isActive ?? false;
-			debouncedUpdateContextMenu(tab.id);
-		}
+		await toggleReaderModeInTab(tab.id);
 	} else if (currentOpenBehavior === 'embedded') {
 		await sendMessageToContentScript(tab.id, { action: "toggle-iframe" });
 	}
