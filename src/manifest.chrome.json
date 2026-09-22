@@ -41,7 +41,7 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["browser-polyfill.min.js", "content.js"]
+			"js": ["content-loader.js"]
 		}
 	],
 	"web_accessible_resources": [
