@@ -339,11 +339,9 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 				.replace(/\\{3,}/g, '\\\\');
 		};
 
-		// First try to parse the content directly
+		// First try to parse valid JSON without modifying it
 		try {
-			const sanitizedContent = sanitizeJsonString(responseContent);
-			debugLog('Interpreter', 'Sanitized content:', sanitizedContent);
-			parsedResponse = JSON.parse(sanitizedContent);
+			parsedResponse = JSON.parse(responseContent);
 		} catch (e) {
 			// If direct parsing fails, try to extract and parse the JSON content
 			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
@@ -351,44 +349,50 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 				throw new Error('No JSON object found in response');
 			}
 
-			// Try parsing with minimal sanitization first
+			// First try the extracted JSON without modifying it
 			try {
-				const minimalSanitized = jsonMatch[0]
-					.replace(/[""]/g, '"')
-					.replace(/\r\n/g, '\\n')
-					.replace(/\n/g, '\\n');
-				parsedResponse = JSON.parse(minimalSanitized);
-			} catch (minimalError) {
-				// If minimal sanitization fails, try full sanitization
-				const sanitizedMatch = sanitizeJsonString(jsonMatch[0]);
-				debugLog('Interpreter', 'Fully sanitized match:', sanitizedMatch);
-				
+				parsedResponse = JSON.parse(jsonMatch[0]);
+			} catch {
+				// Fall back to sanitization for malformed model output
+				// Try parsing with minimal sanitization first
 				try {
-					parsedResponse = JSON.parse(sanitizedMatch);
-				} catch (fullError) {
-					// Last resort: try to manually rebuild the JSON structure
-					const prompts_responses: { [key: string]: string } = {};
+					const minimalSanitized = jsonMatch[0]
+						.replace(/[""]/g, '"')
+						.replace(/\r\n/g, '\\n')
+						.replace(/\n/g, '\\n');
+					parsedResponse = JSON.parse(minimalSanitized);
+				} catch (minimalError) {
+					// If minimal sanitization fails, try full sanitization
+					const sanitizedMatch = sanitizeJsonString(jsonMatch[0]);
+					debugLog('Interpreter', 'Fully sanitized match:', sanitizedMatch);
+				
+					try {
+						parsedResponse = JSON.parse(sanitizedMatch);
+					} catch (fullError) {
+						// Last resort: try to manually rebuild the JSON structure
+						const prompts_responses: { [key: string]: string } = {};
 					
-					// Extract each prompt response separately
-					promptVariables.forEach((variable, index) => {
-						const promptKey = `prompt_${index + 1}`;
-						const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
-						const match = promptRegex.exec(jsonMatch[0]);
-						if (match) {
-							let content = match[1]
-								.replace(/"/g, '\\"')
-								.replace(/\r\n/g, '\\n')
-								.replace(/\n/g, '\\n');
-							prompts_responses[promptKey] = content;
-						}
-					});
+						// Extract each prompt response separately
+						promptVariables.forEach((variable, index) => {
+							const promptKey = `prompt_${index + 1}`;
+							const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
+							const match = promptRegex.exec(jsonMatch[0]);
+							if (match) {
+								let content = match[1]
+									.replace(/"/g, '\\"')
+									.replace(/\r\n/g, '\\n')
+									.replace(/\n/g, '\\n');
+								prompts_responses[promptKey] = content;
+							}
+						});
 
-					const rebuiltJson = JSON.stringify({ prompts_responses });
-					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
-					parsedResponse = JSON.parse(rebuiltJson);
+						const rebuiltJson = JSON.stringify({ prompts_responses });
+						debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
+						parsedResponse = JSON.parse(rebuiltJson);
+					}
 				}
 			}
-		}
+			}
 
 		// Validate the response structure
 		if (!parsedResponse?.prompts_responses) {
