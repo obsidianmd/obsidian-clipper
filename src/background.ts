@@ -118,6 +118,21 @@ let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
 const contentScriptLoads = new Map<number, { url: string; generation: number; promise: Promise<void> }>();
 const contentScriptDocumentGenerations = new Map<number, number>();
+// Highlighter mode changes wait on lazy injection, so run them one at a time
+// per tab. Otherwise two quick toggles both read the same starting state.
+const highlighterModeQueues = new Map<number, Promise<unknown>>();
+
+function queueHighlighterModeChange<T>(tabId: number, change: () => Promise<T>): Promise<T> {
+	const previous = highlighterModeQueues.get(tabId) ?? Promise.resolve();
+	const next = previous.catch(() => {}).then(change);
+	highlighterModeQueues.set(tabId, next);
+	next.catch(() => {}).then(() => {
+		if (highlighterModeQueues.get(tabId) === next) {
+			highlighterModeQueues.delete(tabId);
+		}
+	});
+	return next;
+}
 
 // A reload can replace the document without changing its URL. Invalidate the
 // old document's pending load as soon as navigation starts so the replacement
@@ -288,6 +303,7 @@ async function initialize() {
 
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
+			highlighterModeQueues.delete(tabId);
 			delete readerModeState[tabId];
 			contentScriptLoads.delete(tabId);
 			contentScriptDocumentGenerations.delete(tabId);
@@ -996,7 +1012,11 @@ async function paintHighlights(tabId: number) {
 	}
 }
 
-async function setHighlighterMode(tabId: number, activate: boolean) {
+function setHighlighterMode(tabId: number, activate: boolean): Promise<void> {
+	return queueHighlighterModeChange(tabId, () => applyHighlighterMode(tabId, activate));
+}
+
+async function applyHighlighterMode(tabId: number, activate: boolean) {
 	try {
 		// First, check if the tab exists
 		const tab = await browser.tabs.get(tabId);
@@ -1023,7 +1043,11 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 	}
 }
 
-async function toggleHighlighterMode(tabId: number): Promise<boolean> {
+function toggleHighlighterMode(tabId: number): Promise<boolean> {
+	return queueHighlighterModeChange(tabId, () => applyHighlighterToggle(tabId));
+}
+
+async function applyHighlighterToggle(tabId: number): Promise<boolean> {
 	try {
 		const currentMode = getHighlighterModeForTab(tabId);
 		const newMode = !currentMode;
