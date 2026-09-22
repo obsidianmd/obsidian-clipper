@@ -1027,8 +1027,8 @@ async function toggleHighlighterMode(tabId: number): Promise<boolean> {
 	try {
 		const currentMode = getHighlighterModeForTab(tabId);
 		const newMode = !currentMode;
-		highlighterModeState[tabId] = newMode;
 		await sendMessageToContentScript(tabId, { action: "setHighlighterMode", isActive: newMode });
+		highlighterModeState[tabId] = newMode;
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: newMode });
 		return newMode;
@@ -1039,8 +1039,6 @@ async function toggleHighlighterMode(tabId: number): Promise<boolean> {
 }
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
-	highlighterModeState[tabId] = true;
-	
 	const highlightData: Partial<TextHighlightData> = {
 		id: Date.now().toString(),
 		type: 'text',
@@ -1052,13 +1050,12 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 		isActive: true,
 		highlightData,
 	});
+	highlighterModeState[tabId] = true;
 	hasHighlights = true;
 	debouncedUpdateContextMenu(tabId);
 }
 
 async function highlightElement(tabId: number, info: browser.Menus.OnClickData) {
-	highlighterModeState[tabId] = true;
-
 	await sendMessageToContentScript(tabId, {
 		action: "highlightElement", 
 		isActive: true,
@@ -1068,6 +1065,7 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 			pageUrl: info.pageUrl
 		}
 	});
+	highlighterModeState[tabId] = true;
 	hasHighlights = true;
 	debouncedUpdateContextMenu(tabId);
 }
