@@ -35,6 +35,9 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let lastSelectedPath: string | null = null;
+let pathHistory: string[] = [];
+let vaultFolders: string[] = [];
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -197,6 +200,18 @@ async function initializeExtension(tabId: number) {
 			lastSelectedVault = loadedSettings.vaults[0];
 		}
 		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
+
+		// Load persisted folder path state: last manual path, MRU history, vault folders
+		lastSelectedPath = await getLocalStorage('lastSelectedPath');
+		const storedHistory = await getLocalStorage('pathHistory');
+		pathHistory = Array.isArray(storedHistory)
+			? storedHistory.filter((p: unknown) => typeof p === 'string')
+			: [];
+		const storedFolders = await getLocalStorage('vaultFolders');
+		vaultFolders = Array.isArray(storedFolders)
+			? storedFolders.filter((f: unknown) => typeof f === 'string')
+			: [];
+		debugLog('Path', 'Last selected path:', lastSelectedPath, 'history:', pathHistory.length, 'vaultFolders:', vaultFolders.length);
 
 		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -368,6 +383,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 			initializeIcons(settingsButton);
 		}
 
+		// Vault folder discovery button (File System Access API — progressive enhancement)
+		const fetchFoldersBtn = document.getElementById('fetch-folders-btn');
+		if (fetchFoldersBtn) {
+			initializeIcons(fetchFoldersBtn);
+			fetchFoldersBtn.addEventListener('click', async (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				await fetchVaultFolders();
+			});
+		}
+
 		// Initialize the rest of the popup
 		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
@@ -378,6 +404,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			try {
 				// DOM-dependent initializations
 				updateVaultDropdown(loadedSettings.vaults);
+				populatePathDatalist();
 				populateTemplateDropdown();
 				setupEventListeners(currentTabId);
 				await initializeUI();
@@ -422,6 +449,18 @@ function setupEventListeners(tabId: number) {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
 			}
+		});
+	}
+
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	if (pathField) {
+		pathField.addEventListener('change', async () => {
+			const value = pathField.value.trim();
+			lastSelectedPath = value || null;
+			// Persist even when empty — a cleared path must not resurrect the
+			// previous folder on the next clip. History only gains non-empty entries.
+			await setLocalStorage('lastSelectedPath', lastSelectedPath);
+			if (value) await addToPathHistory(value);
 		});
 	}
 
@@ -929,7 +968,10 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	if (pathField) {
-		pathField.value = formattedPath;
+		// Template paths containing variables always use the compiled value;
+		// otherwise restore the user's last manually-entered path if one exists.
+		const templatePathHasVariables = /{{.*?}}/.test(template.path || '');
+		pathField.value = (!templatePathHasVariables && lastSelectedPath) ? lastSelectedPath : formattedPath;
 	}
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -1080,6 +1122,88 @@ function updateVaultDropdown(vaults: string[]) {
 		lastSelectedVault = vaultDropdown.value;
 		setLocalStorage('lastSelectedVault', lastSelectedVault);
 	});
+}
+
+function populatePathDatalist() {
+	const datalist = document.getElementById('path-history-list') as HTMLDataListElement | null;
+	if (!datalist) return;
+	datalist.textContent = '';
+	// Vault folders first (sorted), then MRU history; dedupe across both sources
+	const seen = new Set<string>();
+	for (const path of [...vaultFolders, ...pathHistory]) {
+		if (seen.has(path)) continue;
+		seen.add(path);
+		const option = document.createElement('option');
+		option.value = path;
+		datalist.appendChild(option);
+	}
+}
+
+async function addToPathHistory(path: string): Promise<void> {
+	const trimmed = path.trim();
+	if (!trimmed) return;
+	// MRU: move to front, dedupe, cap at 50
+	pathHistory = [trimmed, ...pathHistory.filter(p => p !== trimmed)].slice(0, 50);
+	await setLocalStorage('pathHistory', pathHistory);
+	populatePathDatalist();
+}
+
+// FileSystemDirectoryHandle async iteration isn't in lib.dom yet — structural type
+interface DirectoryHandleLike {
+	values(): AsyncIterableIterator<{ kind: string; name: string } & DirectoryHandleLike>;
+}
+
+// Recursively collect subdirectory names from a FileSystemDirectoryHandle.
+// Paths are relative to the picked root, '/'-separated (Obsidian convention).
+async function readDirectoryTree(
+	dirHandle: DirectoryHandleLike,
+	prefix: string,
+	maxDepth: number,
+	results: string[]
+): Promise<void> {
+	if (maxDepth < 0) return;
+	try {
+		for await (const entry of dirHandle.values()) {
+			if (entry.kind !== 'directory') continue;
+			// Skip hidden folders and common noise directories entirely —
+			// don't list them and don't recurse into them.
+			if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+			const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+			results.push(relativePath);
+			await readDirectoryTree(entry, relativePath, maxDepth - 1, results);
+		}
+	} catch {
+		// Permission or read error on a subdirectory — skip it
+	}
+}
+
+async function fetchVaultFolders(): Promise<void> {
+	// File System Access API — Chrome/Edge only; other browsers keep manual entry.
+	// Named const: lib.dom doesn't declare showDirectoryPicker yet.
+	const showDirectoryPicker = (window as { showDirectoryPicker?: (opts: { mode: string; id: string }) => Promise<DirectoryHandleLike> }).showDirectoryPicker;
+	if (typeof showDirectoryPicker !== 'function') {
+		alert(getMessage('fileSystemApiNotSupported'));
+		return;
+	}
+
+	try {
+		const dirHandle = await showDirectoryPicker({ mode: 'read', id: 'obsidian-vault' });
+
+		const folders: string[] = [];
+		// 5 levels deep — enough for any reasonable vault structure
+		await readDirectoryTree(dirHandle, '', 5, folders);
+		folders.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+		vaultFolders = folders;
+		await setLocalStorage('vaultFolders', vaultFolders);
+		populatePathDatalist();
+		debugLog('Path', `Fetched ${vaultFolders.length} vault folders`);
+	} catch (e) {
+		// User cancelled or denied permission — not an error
+		if ((e as Error).name !== 'AbortError') {
+			console.error('Failed to fetch vault folders:', e);
+		}
+	}
 }
 
 function refreshPopup() {
@@ -1354,6 +1478,13 @@ async function handleClipObsidian(): Promise<void> {
 
 		lastSelectedVault = selectedVault;
 		await setLocalStorage('lastSelectedVault', lastSelectedVault);
+
+		// Persist the path so it survives popup reopen
+		if (path) {
+			lastSelectedPath = path;
+			await setLocalStorage('lastSelectedPath', path);
+			await addToPathHistory(path);
+		}
 
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);

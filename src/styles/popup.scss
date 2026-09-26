@@ -166,6 +166,26 @@
 			min-width: 100px;
 			cursor: default;
 		}
+		#path-name-field {
+			flex-grow: 1;
+			min-width: 0;
+		}
+		.fetch-folders-btn {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: var(--input-height, 36px);
+			height: var(--input-height, 36px);
+			border-radius: var(--radius-s);
+			color: var(--text-muted);
+			@media (hover: hover) {
+				&:hover {
+					background-color: var(--background-modifier-hover);
+					color: var(--text-normal);
+				}
+			}
+		}
 	}
 }
 
