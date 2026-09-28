@@ -79,6 +79,18 @@
 			{ "id": "kimi-k2.6", "name": "Kimi K2.6" }
 		]
 	},
+  "ollamaturbo": {
+		"id": "ollamaturbo",
+		"name": "Ollama Turbo",
+    "apiKeyUrl": "https://ollama.com/settings/keys",
+		"apiKeyRequired": true,
+		"modelsList": "https://ollama.com/models",
+		"baseUrl": "https://ollama.com/api/chat",
+		"popularModels": [
+			{ "id": "gpt-oss:20b", "name": "GPT OSS 20B" },
+			{ "id": "gpt-oss:120b", "name": "GPT OSS 120B" }
+		]
+	},
 	"ollama": {
 		"id": "ollama",
 		"name": "Ollama",
