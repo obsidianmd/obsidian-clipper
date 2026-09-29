@@ -4,6 +4,7 @@ import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import DOMPurify from 'dompurify';
 import Defuddle from 'defuddle';
+import { getPreferredLanguage } from '../utils/preferred-language';
 import { createMarkdownContent } from 'defuddle/full';
 import { getFontCss } from '../utils/font-utils';
 import { ReaderSettings } from '../types/types';
@@ -1134,7 +1135,7 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 		base.href = url;
 		doc.head.prepend(base);
 
-		const defuddled = new Defuddle(doc, { url }).parse();
+		const defuddled = new Defuddle(doc, { url, language: getPreferredLanguage(doc) }).parse();
 
 		const title = defuddled.title || undefined;
 		const site = defuddled.site || undefined;
