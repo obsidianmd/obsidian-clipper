@@ -53,17 +53,15 @@ class Trie {
 		node.templates.push({ template, priority });
 	}
 
-	findLongestMatch(url: string, schemaOrgData: any): TriggerMatch | null {
+	findMatch(url: string): TriggerMatch | null {
 		let node = this.root;
 		let lastMatch: TriggerMatch | null = null;
 		for (const char of url) {
 			if (!node.children.has(char)) break;
 			node = node.children.get(char)!;
 			if (node.templates.length > 0) {
-				const matchingTemplate = node.templates.find(t => 
-					memoizedInternalMatchPattern(url.slice(0, url.indexOf(char) + 1), url, schemaOrgData)
-				);
-				if (matchingTemplate) {
+				const matchingTemplate = node.templates[0];
+				if (!lastMatch || matchingTemplate.priority > lastMatch.priority) {
 					lastMatch = matchingTemplate;
 				}
 			}
@@ -108,23 +106,22 @@ const memoizedFindMatchingTemplate = memoizeWithExpiration(
 			return undefined;
 		}
 
-		// Check URL trie first (without awaiting schema data)
-		const urlMatch = urlTrie.findLongestMatch(url, null);
-		if (urlMatch) {
-			return urlMatch.template;
-		}
+		// Compare template order across trigger types, not trigger specificity.
+		let bestMatch = urlTrie.findMatch(url);
 
-		// Then check regex triggers (no schema data needed)
-		for (const { template, regex } of regexTriggers) {
+		for (const { template, regex, priority } of regexTriggers) {
+			if (bestMatch && priority <= bestMatch.priority) break;
 			if (regex.test(url)) {
-				return template;
+				bestMatch = { template, priority };
+				break;
 			}
 		}
 
-		// Only fetch schema data if there are schema triggers to check
-		if (schemaTriggers.length > 0) {
+		// Fetch schema data only when an earlier template could still win.
+		if (schemaTriggers.length > 0 && (!bestMatch || schemaTriggers[0].priority > bestMatch.priority)) {
 			const schemaOrgData = await getSchemaOrgData();
-			for (const { template, pattern } of schemaTriggers) {
+			for (const { template, pattern, priority } of schemaTriggers) {
+				if (bestMatch && priority <= bestMatch.priority) break;
 				if (matchSchemaPattern(pattern, schemaOrgData)) {
 					console.log('Schema match found:', template);
 					return template;
@@ -132,7 +129,7 @@ const memoizedFindMatchingTemplate = memoizeWithExpiration(
 			}
 		}
 
-		return undefined;
+		return bestMatch?.template;
 	},
 	{
 		expirationMs: 30000, // Cache for 30 seconds
