@@ -140,15 +140,15 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 			updateSelectedOption(this.value, propertySelectedDiv);
 			updatePropertyType(propertyType.name, this.value, defaultValueInput.value).then(updatePropertyTypesList);
 		});
-
-		defaultValueInput.addEventListener('change', function() {
-			updatePropertyType(propertyType.name, select.value, this.value).then(updatePropertyTypesList);
-		});
 	} else {
-		// For 'tags' property, disable the select and default value input
+		// The 'tags' property must remain a list.
 		select.disabled = true;
 		listItem.classList.add('tags-property');
 	}
+
+	defaultValueInput.addEventListener('change', function() {
+		updatePropertyType(propertyType.name, select.value, this.value).then(updatePropertyTypesList);
+	});
 
 	return listItem;
 }
