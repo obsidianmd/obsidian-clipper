@@ -15,6 +15,7 @@ import 'dayjs/locale/es';
 import 'dayjs/locale/fa';
 import 'dayjs/locale/fi';
 import 'dayjs/locale/fr';
+import 'dayjs/locale/gu';
 import 'dayjs/locale/he';
 import 'dayjs/locale/hi';
 import 'dayjs/locale/hu';
@@ -81,6 +82,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'fa', name: 'فارسی' },
 		{ code: 'fi', name: 'Suomi' },
 		{ code: 'fr', name: 'Français' },
+		{ code: 'gu', name: 'ગુજરાતી' },
 		{ code: 'he', name: 'עברית' },
 		{ code: 'hi', name: 'हिन्दी' },
 		{ code: 'hu', name: 'Magyar' },
