@@ -8,6 +8,23 @@ const EPHEMERAL_PARAMS = new Set([
 	'si',                     // YouTube share tracking
 ]);
 
+export function resolveFaviconUrl(favicon: string, pageUrl: string, baseHref?: string | null): string {
+	if (!favicon) return '';
+	let baseUrl = pageUrl;
+	if (baseHref) {
+		try {
+			baseUrl = new URL(baseHref, pageUrl).href;
+		} catch {
+			// An invalid HTML base URL should fall back to the page URL.
+		}
+	}
+	try {
+		return new URL(favicon, baseUrl).href;
+	} catch {
+		return favicon;
+	}
+}
+
 export function normalizeUrl(url: string): string {
 	try {
 		const parsed = new URL(url);

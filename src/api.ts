@@ -13,6 +13,7 @@ import {
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
+import { resolveFaviconUrl } from './utils/url-utils';
 import { Template, Property } from './types/types';
 
 // ---------------------------------------------------------------------------
@@ -200,7 +201,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		url,
 		fullHtml: html,
 		description: defuddleResult.description,
-		favicon: defuddleResult.favicon,
+		favicon: resolveFaviconUrl(defuddleResult.favicon, url, doc.querySelector('base[href]')?.getAttribute('href')),
 		image: defuddleResult.image,
 		published: defuddleResult.published,
 		site: defuddleResult.site,

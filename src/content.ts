@@ -12,6 +12,7 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { resolveFaviconUrl } from './utils/url-utils';
 
 declare global {
 	interface Window {
@@ -273,7 +274,7 @@ declare global {
 					description: defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
-					favicon: defuddled.favicon,
+					favicon: resolveFaviconUrl(defuddled.favicon, document.baseURI),
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
 					image: defuddled.image,
