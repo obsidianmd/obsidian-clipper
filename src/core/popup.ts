@@ -35,6 +35,7 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let isClipping = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -1312,7 +1313,7 @@ function determineMainAction() {
 }
 
 async function handleClipObsidian(): Promise<void> {
-	if (!currentTemplate) return;
+	if (!currentTemplate || isClipping) return;
 
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -1324,6 +1325,12 @@ async function handleClipObsidian(): Promise<void> {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
 	}
+
+	isClipping = true;
+	const clipButton = document.getElementById('clip-btn') as HTMLButtonElement | null;
+	const wasDisabled = clipButton?.disabled ?? false;
+	if (clipButton) clipButton.disabled = true;
+	let closingPopup = false;
 
 	try {
 		// Handle interpreter if needed
@@ -1356,12 +1363,19 @@ async function handleClipObsidian(): Promise<void> {
 		await setLocalStorage('lastSelectedVault', lastSelectedVault);
 
 		if (!isSidePanel) {
+			// Ignore further triggers until the popup has actually closed.
+			closingPopup = true;
 			setTimeout(() => window.close(), 500);
 		}
 	} catch (error) {
 		console.error('Error in handleClipObsidian:', error);
 		showError('failedToSaveFile');
 		throw error;
+	} finally {
+		if (!closingPopup) {
+			isClipping = false;
+			if (clipButton) clipButton.disabled = wasDisabled;
+		}
 	}
 }
 
