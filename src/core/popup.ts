@@ -14,7 +14,7 @@ import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
-import { debugLog } from '../utils/debug';
+import { debugLog, isDebugMode } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 import { isBlankPage, isValidUrl, isRestrictedUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
@@ -967,8 +967,10 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 		}
 	}
 
-	const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentUrl);
-	debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+	if (isDebugMode()) {
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentUrl);
+		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+	}
 }
 
 function setupMetadataToggle() {

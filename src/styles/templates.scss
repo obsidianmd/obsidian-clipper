@@ -1,3 +1,6 @@
+@use 'menu-styles';
+@use 'reader-syntax-palette';
+
 .properties-list {
 	display: flex;
 	flex-direction: column;
@@ -39,6 +42,11 @@
 		align-items: stretch;
 		height: auto;
 		gap: 0.25rem;
+
+		// Dragging styles give each row its own stacking context.
+		&:focus-within:not(.dragging) {
+			z-index: 2;
+		}
 	}
 	.property-row {
 		display: flex;
@@ -179,7 +187,7 @@
 
 	.validation-error,
 	.validation-warning {
-		font-family: var(--font-monospace);
+		font-family: var(--font-default);
 	}
 }
 
@@ -205,4 +213,107 @@
 			color: var(--text-error);
 		}
 	}
+}
+// Form controls retain their values for autosave and validation.
+.knap-editor-source {
+	display: none !important;
+}
+
+.knap-editor {
+	@include reader-syntax-palette.light;
+
+	position: relative;
+	min-width: 0;
+	width: 100%;
+	background: var(--background-modifier-form-field);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	color: var(--text-normal);
+	font-size: var(--font-ui-smaller);
+
+	@media (prefers-color-scheme: dark) {
+		@include reader-syntax-palette.dark;
+	}
+
+	&:hover { border-color: var(--background-modifier-border-hover); }
+	&:focus-within {
+		// Keep completions above adjacent editors and property controls.
+		z-index: 3;
+		border-color: var(--background-modifier-border-focus);
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+	}
+	.cm-editor { outline: none; }
+	.cm-scroller { font-family: var(--font-default); overflow: auto; }
+	.cm-content { min-height: 6rem; padding: 6px 0; caret-color: var(--text-normal); }
+	.cm-line { padding: 0 8px; }
+	.cm-placeholder { color: var(--text-faint); }
+	.cm-gutters {
+		background: var(--background-primary-alt);
+		border: none;
+		color: var(--text-faint);
+	}
+	.cm-selectionBackground { background: var(--text-selection) !important; }
+	.cm-cursor { border-left-color: var(--text-normal); }
+	.cm-editor .cm-tooltip {
+		@include menu-styles.surface;
+		color: var(--text-normal);
+		font-family: var(--font-default);
+		font-size: var(--font-ui-smaller);
+	}
+	.cm-editor .cm-tooltip.cm-tooltip-autocomplete {
+		padding: 0;
+
+		> ul {
+			font-family: var(--font-default);
+			min-width: min(250px, calc(100vw - 2rem));
+			max-width: min(22rem, calc(100vw - 2rem));
+			padding: 0.25rem;
+			border-radius: inherit;
+
+			> li {
+				@include menu-styles.item;
+
+				+ li { margin-top: 2px; }
+
+				&[aria-selected] {
+					@include menu-styles.active-item;
+					color: var(--text-normal);
+				}
+			}
+		}
+	}
+	.cm-tooltip-autocomplete .cm-completionLabel { flex-shrink: 0; }
+	.cm-tooltip-autocomplete .cm-completionDetail {
+		font-size: var(--font-smallest);
+		min-width: 0;
+		margin-left: auto;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: right;
+		color: var(--text-muted);
+	}
+	// Flexoki syntax roles: https://stephango.com/flexoki#mappings
+	.knap-variable { color: var(--color-blue); }
+	.knap-filter { color: var(--color-orange); }
+	.knap-keyword { color: var(--color-green); }
+	.knap-constant { color: var(--color-yellow); }
+	.knap-string { color: var(--color-cyan); }
+	.knap-number { color: var(--color-purple); }
+	.knap-comment { color: var(--text-faint); }
+	.knap-punctuation { color: var(--text-muted); }
+}
+
+.knap-editor-body .cm-content { min-height: 12rem; }
+.knap-editor:not(.knap-editor-inline) .cm-scroller { max-height: 60vh; }
+.knap-editor-inline {
+	flex: 1;
+	.cm-content { min-height: 0; padding: 0; line-height: calc(var(--input-height) - 2px); }
+	.cm-scroller { scrollbar-width: none; }
+	.cm-scroller::-webkit-scrollbar { display: none; }
+}
+
+.knap-editor-validation {
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
+	margin-top: 0.5rem;
 }

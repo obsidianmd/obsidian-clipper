@@ -108,6 +108,8 @@ declare global {
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
+	let initializationPromise: Promise<void> = Promise.resolve();
+
 	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 		// If a newer generation of this content script has been injected,
 		// yield to it rather than responding from a potentially stale context.
@@ -116,7 +118,7 @@ declare global {
 		}
 
 		if (request.action === "ping") {
-			sendResponse({});
+			initializationPromise.then(() => sendResponse({}));
 			return true;
 		}
 
@@ -436,8 +438,12 @@ declare global {
 		updateHasHighlights();
 	}
 
-	// Initialize highlighter
-	initializeHighlighter();
+	// A ping should only report ready after settings and saved highlights have
+	// finished loading. This keeps the first lazy-loaded action from racing
+	// content-script initialization.
+	initializationPromise = initializeHighlighter().catch((error) => {
+		console.error('[Obsidian Clipper] Failed to initialize highlighter:', error);
+	});
 
 	// Expose highlighter API on window so reader-script.js (a separate
 	// webpack bundle injected when reader mode activates) can delegate

@@ -19,6 +19,10 @@ Documentation is available on the [Obsidian Help site](https://help.obsidian.md/
 
 ## Contribute
 
+### Documentation
+
+User documentation is maintained in the [`en/Obsidian Web Clipper` directory of obsidian-help](https://github.com/obsidianmd/obsidian-help/tree/master/en/Obsidian%20Web%20Clipper).
+
 ### Translations
 
 You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/_locales](/src/_locales) folder.

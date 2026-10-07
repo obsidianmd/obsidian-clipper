@@ -1,3 +1,5 @@
+@use 'menu-styles';
+
 .menu-btn {
 	position: relative;
 	display: inline-block;
@@ -7,22 +9,15 @@
 	}
 
 	.menu {
+		@include menu-styles.surface;
 		display: none;
 		position: absolute;
 		inset-inline-end: 0;
-		border: 1px solid var(--background-modifier-border-hover);
-		background-color: var(--background-secondary);
 		flex-direction: column;
 		min-width: 160px;
-		box-shadow: var(--shadow-s);
 		z-index: 1;
 		list-style-type: none;
-		padding: 0.25rem;
 		margin: 0.25rem 0 0 0;
-		border-radius: var(--radius-s);
-		corner-shape: var(--corner-shape);
-		user-select: none;
-		-webkit-user-select: none;
 	}
 
 	.menu.show {
@@ -31,19 +26,7 @@
 }
 
 .menu-item {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	gap: 0.5rem;
-	padding: 0.25rem 0.5rem;
-	font-size: var(--font-ui-smaller);
-	border-radius: var(--radius-s);
-	corner-shape: var(--corner-shape);
-	white-space: nowrap;
-
-	&:hover {
-		background-color: var(--background-modifier-hover);
-	}
+	@include menu-styles.item;
 }
 
 .menu-item-icon {

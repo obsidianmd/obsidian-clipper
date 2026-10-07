@@ -1,3 +1,5 @@
+@use 'reader-syntax-palette';
+
 .obsidian-reader-active[data-reader-theme="ayu"] {
 	--background-primary: #fcfcfc;
 	--background-primary-alt: #f8f9fa;
@@ -342,14 +344,7 @@
 		0px 15px 30px rgba(0, 0, 0, .07);
 	--footnote-popover-background: var(--background-primary);
 
-	--color-red: #e93147;
-	--color-orange: #ec7500;
-	--color-yellow: #e0ac00;
-	--color-green: #08b94e;
-	--color-cyan: #00bfbc;
-	--color-blue: #086ddd;
-	--color-purple: #7852ee;
-	--color-pink: #d53984;
+	@include reader-syntax-palette.light;
 	--dropdown-background-position: right .5em top 50%, 0 0;
 	--dropdown-background-size: 1em auto, 100%;
 
@@ -369,14 +364,7 @@
 			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
 			0px 15px 30px rgba(0, 0, 0, 0.3);
 		--footnote-popover-background: var(--background-primary-alt);
-		--color-red: #fb464c;
-		--color-orange: #e9973f;
-		--color-yellow: #e0de71;
-		--color-green: #44cf6e;
-		--color-cyan: #53dfdd;
-		--color-blue: #54b3ff;
-		--color-purple: #a882ff;
-		--color-pink: #fa99cd;
+		@include reader-syntax-palette.dark;
 	}
 
 }

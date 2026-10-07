@@ -12,6 +12,7 @@ import {
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import dayjs from 'dayjs';
 import { generalSettings, loadSettings } from './storage-utils';
+import { normalizeUrl } from './url-utils';
 
 /**
  * Helper function to create SVG elements
@@ -65,34 +66,7 @@ function createSVG(config: {
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData;
 
-const EPHEMERAL_PARAMS = new Set([
-	't',           // YouTube timestamp
-	'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', // UTM tracking
-	'ref', 'source', 'src',   // Referral
-	'fbclid', 'gclid', 'dclid', 'msclkid', 'twclid', // Ad click IDs
-	'mc_cid', 'mc_eid',       // Mailchimp
-	'_ga', '_gl',             // Google Analytics
-	'si',                     // YouTube share tracking
-]);
-
-export function normalizeUrl(url: string): string {
-	try {
-		const parsed = new URL(url);
-		// Strip fragment identifiers — highlights on /page#section should
-		// match /page (fixes #652).
-		parsed.hash = '';
-		const params = new URLSearchParams(parsed.search);
-		for (const key of [...params.keys()]) {
-			if (EPHEMERAL_PARAMS.has(key)) {
-				params.delete(key);
-			}
-		}
-		parsed.search = params.toString();
-		return parsed.toString();
-	} catch {
-		return url;
-	}
-}
+export { normalizeUrl } from './url-utils';
 
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
@@ -1435,4 +1409,3 @@ function findLastTextNode(element: Element): Text | null {
 	}
 	return lastNode as Text | null;
 }
-
