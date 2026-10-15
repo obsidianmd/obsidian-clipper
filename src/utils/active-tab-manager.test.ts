@@ -1,5 +1,10 @@
-import { describe, test, expect } from 'vitest';
-import { isValidUrl, isBlankPage, isRestrictedUrl } from './active-tab-manager';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
+import browser from './browser-polyfill';
+import { isValidUrl, isBlankPage, isRestrictedUrl, resolveActiveTab } from './active-tab-manager';
+
+vi.mock('./browser-polyfill', () => ({
+	default: { tabs: { query: vi.fn() }, runtime: { sendMessage: vi.fn() } }
+}));
 
 describe('isValidUrl', () => {
 	test('returns true for http URLs', () => {
@@ -80,5 +85,31 @@ describe('isRestrictedUrl', () => {
 	test('handles invalid URLs gracefully', () => {
 		expect(isRestrictedUrl('')).toBe(false);
 		expect(isRestrictedUrl('not-a-url')).toBe(false);
+	});
+});
+
+describe('resolveActiveTab', () => {
+	beforeEach(() => {
+		vi.mocked(browser.tabs.query).mockReset();
+	});
+
+	test('queries the given window when windowId is provided', async () => {
+		vi.mocked(browser.tabs.query).mockResolvedValue([{ id: 7 } as any]);
+		const tab = await resolveActiveTab(42);
+		expect(browser.tabs.query).toHaveBeenCalledWith({ active: true, windowId: 42 });
+		expect(tab?.id).toBe(7);
+	});
+
+	test('uses lastFocusedWindow, not currentWindow, without windowId', async () => {
+		vi.mocked(browser.tabs.query).mockResolvedValue([{ id: 3 } as any]);
+		await resolveActiveTab();
+		expect(browser.tabs.query).toHaveBeenCalledTimes(1);
+		expect(browser.tabs.query).toHaveBeenCalledWith({ active: true, lastFocusedWindow: true });
+	});
+
+	test('does not fall back to active tabs of other windows', async () => {
+		vi.mocked(browser.tabs.query).mockResolvedValue([]);
+		expect(await resolveActiveTab(1)).toBeUndefined();
+		expect(browser.tabs.query).toHaveBeenCalledTimes(1);
 	});
 });
