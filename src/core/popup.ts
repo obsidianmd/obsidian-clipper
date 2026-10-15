@@ -292,7 +292,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 	try {
 		// Get the active tab via background script to handle Firefox compatibility
-		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+		let windowId: number | undefined;
+		try {
+			windowId = (await browser.windows.getCurrent()).id;
+		} catch {
+			// windows API unavailable (e.g. embedded iframe); background falls back to the last focused window
+		}
+		const response = await browser.runtime.sendMessage({ action: "getActiveTab", windowId }) as { tabId?: number; error?: string };
 		if (!response || response.error || !response.tabId) {
 			showError(getMessage('pleaseReload'));
 			return;

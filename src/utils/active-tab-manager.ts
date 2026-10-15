@@ -19,6 +19,18 @@ export async function updateCurrentActiveTab(windowId: number) {
 	}
 }
 
+// Resolves the tab the user invoked the clipper from. `currentWindow` is
+// meaningless in a service worker, so use the caller's windowId when known and
+// otherwise the last focused window. Never fall back to an arbitrary window.
+export async function resolveActiveTab(windowId?: number) {
+	const query = typeof windowId === 'number'
+		? { active: true, windowId }
+		: { active: true, lastFocusedWindow: true };
+	const tabs = await browser.tabs.query(query);
+	const tab = tabs.find(t => t.id);
+	return tab;
+}
+
 export function isValidUrl(url: string | undefined): boolean {
 	if (!url) return false;
 	return url.startsWith('http://') ||
