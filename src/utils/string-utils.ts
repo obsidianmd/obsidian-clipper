@@ -14,8 +14,9 @@ export function unescapeValue(value: string): string {
 	return value.replace(/\\"/g, '"').replace(/\\n/g, '\n');
 }
 
+// Escapes a value for use inside a double-quoted YAML string
 export function escapeDoubleQuotes(str: string): string {
-	return str.replace(/"/g, '\\"');
+	return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 export function sanitizeFileName(fileName: string): string {

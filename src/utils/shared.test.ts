@@ -298,6 +298,23 @@ describe('generateFrontmatter', () => {
 		expect(result).toContain("'say \"hi\"':");
 	});
 
+	test('escapes backslashes in text values', () => {
+		const result = generateFrontmatter([
+			{ name: 'title', value: 'AC\\DC' },
+			{ name: 'path', value: 'C:\\Users\\' },
+			{ name: 'quote', value: 'say \\"hi\\"' },
+		]);
+		expect(result).toBe('---\ntitle: "AC\\\\DC"\npath: "C:\\\\Users\\\\"\nquote: "say \\\\\\"hi\\\\\\""\n---\n');
+	});
+
+	test('escapes backslashes in multitext values', () => {
+		const result = generateFrontmatter(
+			[{ name: 'aliases', value: 'a\\b, c' }],
+			{ aliases: 'multitext' }
+		);
+		expect(result).toContain('  - "a\\\\b"\n');
+	});
+
 	test('handles multitext type with JSON array', () => {
 		const result = generateFrontmatter(
 			[{ name: 'tags', value: '["tag1","tag2"]' }],
