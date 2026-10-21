@@ -83,6 +83,7 @@ declare global {
 export interface HighlighterAPI {
 	toggleHighlighterMenu: typeof toggleHighlighterMenu;
 	handleTextSelection: typeof handleTextSelection;
+	updateHighlightNotes: typeof updateHighlightNotes;
 	highlightElement: typeof highlightElement;
 	applyHighlights: typeof applyHighlights;
 	loadHighlights: typeof loadHighlights;
@@ -151,7 +152,7 @@ function bumpHighlightsVersion() { highlightsVersion++; }
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
 interface HistoryAction {
-	type: 'add' | 'remove';
+	type: 'add' | 'remove' | 'update';
 	oldHighlights: AnyHighlightData[];
 	newHighlights: AnyHighlightData[];
 }
@@ -239,6 +240,41 @@ export function reconcileLegacyUrlKey(all: HighlightsStorage, rawUrl: string): v
 	}
 	existing.title = existing.title ?? legacy.title;
 	delete all[rawUrl];
+}
+
+// Edit the existing annotation field rather than appending the editor's full
+// text to its previous value. A multi-block selection is one logical highlight:
+// keep its notes on the first member so collapseGroupsForExport emits them once.
+export function updateHighlightNotes(highlightId: string, note: string): boolean {
+	const target = highlights.find(highlight => highlight.id === highlightId);
+	if (!target) return false;
+
+	const members = target.groupId
+		? highlights.filter(highlight => highlight.groupId === target.groupId)
+		: [target];
+	const canonicalId = members[0].id;
+	const memberIds = new Set(members.map(highlight => highlight.id));
+	const notes = note.trim() ? [note] : [];
+	let changed = false;
+	const nextHighlights = highlights.map(highlight => {
+		if (!memberIds.has(highlight.id)) return highlight;
+		const nextNotes = highlight.id === canonicalId ? notes : [];
+		const previousNotes = highlight.notes ?? [];
+		if (previousNotes.length === nextNotes.length &&
+			previousNotes.every((value, index) => value === nextNotes[index])) {
+			return highlight;
+		}
+		changed = true;
+		return { ...highlight, notes: nextNotes };
+	});
+	if (!changed) return true;
+
+	const oldHighlights = [...highlights];
+	highlights = nextHighlights;
+	bumpHighlightsVersion();
+	addToHistory('update', oldHighlights, highlights);
+	commitHighlightChanges();
+	return true;
 }
 
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
@@ -1208,6 +1244,18 @@ export function buildExportedPage(
 // we're reader-script but content.js owns the bridge), we skip — content.js's
 // listener will handle it. Without this, both bundles render and you get
 // duplicate overlays / delete buttons.
+// Storage may enumerate object properties in a different order from the
+// in-memory DTOs. An echo of our own save must not redraw and hide the action
+// the user is about to click. Keep array order and compare all JSON fields.
+function serializeHighlightsForComparison(data: AnyHighlightData[]): string {
+	return JSON.stringify(data, (_key, value) => {
+		if (value && typeof value === 'object' && !Array.isArray(value)) {
+			return Object.fromEntries(Object.keys(value).sort().map(key => [key, value[key]]));
+		}
+		return value;
+	});
+}
+
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area !== 'local' || !changes.highlights) return;
 	const bridge = window.__obsidianHighlighter;
@@ -1215,7 +1263,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 	const url = normalizeUrl(getPageUrl());
 	const newAll = (changes.highlights.newValue || {}) as HighlightsStorage;
 	const newForUrl = newAll[url]?.highlights ?? [];
-	if (JSON.stringify(newForUrl) === JSON.stringify(highlights)) return;
+	if (serializeHighlightsForComparison(newForUrl) === serializeHighlightsForComparison(highlights)) return;
 	highlights = newForUrl;
 	bumpHighlightsVersion();
 	invalidateHighlightCache();
@@ -1351,7 +1399,7 @@ function exitHighlighterMode() {
 	}
 }
 
-function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {
+function addToHistory(type: 'add' | 'remove' | 'update', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {
 	highlightHistory.push({ type, oldHighlights, newHighlights });
 	if (highlightHistory.length > MAX_HISTORY_LENGTH) {
 		highlightHistory.shift();
