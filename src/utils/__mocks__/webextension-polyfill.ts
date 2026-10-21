@@ -1,4 +1,13 @@
 // Mock for webextension-polyfill in test environment
+type StorageChanges = Record<string, { newValue?: unknown; oldValue?: unknown }>;
+type StorageChangeListener = (changes: StorageChanges, area: string) => void;
+const storageChangeListeners = new Set<StorageChangeListener>();
+
+// Tests can deliver the same event shape as the browser without replacing the
+// product listener or making every storage write synchronous.
+export function emitStorageChange(changes: StorageChanges, area = 'local'): void {
+	for (const listener of storageChangeListeners) listener(changes, area);
+}
 export const runtime = {
 	getURL: (path: string) => `chrome-extension://mock-id/${path}`,
 	sendMessage: async () => ({}),
@@ -18,8 +27,8 @@ export const storage = {
 		set: async () => {},
 	},
 	onChanged: {
-		addListener: () => {},
-		removeListener: () => {},
+		addListener: (listener: StorageChangeListener) => { storageChangeListeners.add(listener); },
+		removeListener: (listener: StorageChangeListener) => { storageChangeListeners.delete(listener); },
 	},
 };
 

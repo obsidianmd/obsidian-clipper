@@ -1094,5 +1094,14 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"annotateHighlight": {
+		"message": "Annotate"
+	},
+	"annotationPlaceholder": {
+		"message": "Add your annotation here..."
+	},
+	"annotationShortcut": {
+		"message": "Shift+Enter to save · Escape to cancel"
 	}
 }

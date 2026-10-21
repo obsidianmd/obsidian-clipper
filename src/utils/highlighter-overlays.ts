@@ -10,6 +10,7 @@ import {
 	saveHighlights,
 	updateHighlights,
 	updateHighlighterMenu,
+	updateHighlightNotes,
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor, setElementHTML } from './dom-utils';
@@ -21,7 +22,7 @@ let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
 
 const IGNORED_BOUNDARY_SELECTOR =
-	'.obsidian-highlighter-menu, .obsidian-reader-settings, .transcript-segment > strong, .obsidian-highlight-delete, .obsidian-selection-action';
+	'.obsidian-highlighter-menu, .obsidian-reader-settings, .transcript-segment > strong, .obsidian-highlight-delete, .obsidian-highlight-annotate-button, .obsidian-highlight-annotation-editor, .obsidian-selection-action';
 
 // --- Custom Highlight API (for type: 'text' highlights) ---
 //
@@ -403,11 +404,16 @@ function findTextHighlightAtPoint(x: number, y: number): string | null {
 // Positioned center-top above the highlight's bounding box.
 
 let highlightDeleteButton: HTMLButtonElement | null = null;
+let highlightAnnotateButton: HTMLButtonElement | null = null;
+let annotationEditor: HTMLDivElement | null = null;
 let currentDeleteTargetId: string | null = null;
 let deleteButtonShownViaAlt = false;
 
 function ensureHighlightDeleteButton(): HTMLButtonElement {
-	if (highlightDeleteButton) return highlightDeleteButton;
+	if (highlightDeleteButton) {
+		if (!highlightDeleteButton.isConnected) document.body.appendChild(highlightDeleteButton);
+		return highlightDeleteButton;
+	}
 	const btn = document.createElement('button');
 	btn.type = 'button';
 	btn.className = 'obsidian-highlight-delete';
@@ -425,6 +431,113 @@ function ensureHighlightDeleteButton(): HTMLButtonElement {
 	document.body.appendChild(btn);
 	highlightDeleteButton = btn;
 	return btn;
+}
+
+// Continue the annotate prototype's textarea and notes storage, addressed by
+// the stable highlight id rather than the overlay's transient array index.
+function ensureHighlightAnnotateButton(): HTMLButtonElement {
+	if (highlightAnnotateButton) {
+		if (!highlightAnnotateButton.isConnected) document.body.appendChild(highlightAnnotateButton);
+		return highlightAnnotateButton;
+	}
+	const button = document.createElement('button');
+	button.type = 'button';
+	button.className = 'obsidian-highlight-annotate-button';
+	button.textContent = getMessage('annotateHighlight');
+	button.style.display = 'none';
+	button.addEventListener('mousedown', event => event.stopPropagation());
+	button.addEventListener('click', event => {
+		event.preventDefault();
+		event.stopPropagation();
+		if (currentDeleteTargetId) showAnnotationEditor(currentDeleteTargetId);
+	});
+	document.body.appendChild(button);
+	highlightAnnotateButton = button;
+	return button;
+}
+
+function closeAnnotationEditor(): void {
+	annotationEditor?.remove();
+	annotationEditor = null;
+}
+
+function positionAnnotationEditor(): void {
+	if (!annotationEditor) return;
+	// Reader scrolls inside its own container; keep the editor in the viewport.
+	const width = annotationEditor.getBoundingClientRect().width || Math.min(320, window.innerWidth - 16);
+	const height = annotationEditor.getBoundingClientRect().height || 180;
+	const anchor = highlightAnnotateButton?.getBoundingClientRect();
+	const left = Math.max(8, Math.min(anchor?.left || 8, window.innerWidth - width - 8));
+	const top = Math.max(8, Math.min(anchor?.bottom || 8, window.innerHeight - height - 8));
+	annotationEditor.style.left = left + 'px';
+	annotationEditor.style.top = top + 'px';
+}
+
+function showAnnotationEditor(id: string): void {
+	const target = highlights.find(highlight => highlight.id === id);
+	if (!target) return;
+	if (annotationEditor?.isConnected && annotationEditor.dataset.highlightId === id) {
+		annotationEditor.querySelector('textarea')?.focus();
+		return;
+	}
+	closeAnnotationEditor();
+	const editor = document.createElement('div');
+	editor.className = 'obsidian-highlight-annotation-editor';
+	editor.dataset.highlightId = id;
+	editor.setAttribute('role', 'dialog');
+	editor.setAttribute('aria-label', getMessage('annotateHighlight'));
+	const textarea = document.createElement('textarea');
+	textarea.className = 'obsidian-highlight-annotation-textarea';
+	textarea.placeholder = getMessage('annotationPlaceholder');
+	textarea.setAttribute('aria-label', getMessage('annotateHighlight'));
+	const members = target.groupId
+		? highlights.filter(highlight => highlight.groupId === target.groupId)
+		: [target];
+	textarea.value = members.flatMap(highlight => highlight.notes ?? []).join('\n');
+	const hint = document.createElement('div');
+	hint.className = 'obsidian-highlight-annotation-hint';
+	hint.textContent = getMessage('annotationShortcut');
+	const actions = document.createElement('div');
+	actions.className = 'obsidian-highlight-annotation-actions';
+	const save = document.createElement('button');
+	save.type = 'button';
+	save.dataset.action = 'save';
+	save.textContent = getMessage('save');
+	const cancel = document.createElement('button');
+	cancel.type = 'button';
+	cancel.dataset.action = 'cancel';
+	cancel.textContent = getMessage('cancel');
+	const saveNote = () => {
+		const value = textarea.value;
+		closeAnnotationEditor();
+		updateHighlightNotes(id, value);
+	};
+	save.addEventListener('click', saveNote);
+	cancel.addEventListener('click', closeAnnotationEditor);
+	textarea.addEventListener('keydown', event => {
+		if (event.isComposing) return;
+		if (event.key === 'Enter' && event.shiftKey) {
+			event.preventDefault();
+			saveNote();
+		}
+	});
+	// Escape also cancels after keyboard focus moves to Save or Cancel.
+	editor.addEventListener('keydown', event => {
+		if (!event.isComposing && event.key === 'Escape') {
+			event.preventDefault();
+			closeAnnotationEditor();
+		}
+	});
+	// Keep editor input out of article selection and Reader shortcut handlers.
+	for (const type of ['mousedown', 'mouseup', 'click', 'touchstart', 'touchend', 'keydown']) {
+		editor.addEventListener(type, event => event.stopPropagation());
+	}
+	actions.append(save, cancel);
+	editor.append(textarea, hint, actions);
+	document.body.appendChild(editor);
+	annotationEditor = editor;
+	positionAnnotationEditor();
+	textarea.focus();
 }
 
 function showHighlightDeleteButtonForText(id: string): void {
@@ -453,15 +566,23 @@ function positionDeleteButton(id: string, centerX: number, top: number): void {
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
 	btn.style.display = 'flex';
+	const annotate = ensureHighlightAnnotateButton();
+	annotate.style.display = 'flex';
 	const btnWidth = btn.offsetWidth || 80;
-	const idealLeft = centerX - btnWidth / 2;
-	const clampedLeft = Math.max(4, Math.min(idealLeft, window.innerWidth - btnWidth - 4));
-	btn.style.left = `${clampedLeft + window.scrollX}px`;
-	btn.style.top = `${top + window.scrollY - 28}px`;
+	const annotateWidth = annotate.offsetWidth || 90;
+	const width = btnWidth + annotateWidth + 4;
+	const idealLeft = centerX - width / 2;
+	const left = Math.max(4, Math.min(idealLeft, window.innerWidth - width - 4));
+	const buttonTop = Math.max(4, top - 28);
+	annotate.style.left = (left + window.scrollX) + 'px';
+	annotate.style.top = (buttonTop + window.scrollY) + 'px';
+	btn.style.left = (left + annotateWidth + 4 + window.scrollX) + 'px';
+	btn.style.top = (buttonTop + window.scrollY) + 'px';
 }
 
 export function hideHighlightDeleteButton(): void {
 	if (highlightDeleteButton) highlightDeleteButton.style.display = 'none';
+	if (highlightAnnotateButton) highlightAnnotateButton.style.display = 'none';
 	currentDeleteTargetId = null;
 }
 
@@ -475,6 +596,7 @@ async function deleteHighlightById(id: string): Promise<void> {
 		: highlights.filter((h: AnyHighlightData) => h.id !== id);
 	if (next.length === highlights.length) return;
 	updateHighlights(next);
+	closeAnnotationEditor();
 	hideHighlightDeleteButton();
 	sortHighlights();
 	applyHighlights();
@@ -500,16 +622,25 @@ function findBlockToHighlight(target: Element | null): Element | null {
 let lastHighlightCreatedAt = 0;
 export function markHighlightJustCreated(): void {
 	lastHighlightCreatedAt = Date.now();
+	// Offer Annotate as soon as a selection becomes a highlight. The trailing
+	// drag click is ignored below, so it cannot dismiss these actions.
+	const selection = window.getSelection();
+	if (!selection?.rangeCount) return;
+	const range = selection.getRangeAt(0);
+	const rect = range.getClientRects?.()[0];
+	if (!rect) return;
+	const id = findTextHighlightAtPoint((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+	if (id) showHighlightDeleteButtonForText(id);
 }
 
 function handleHighlightClick(event: MouseEvent) {
 	const target = event.target as Element | null;
 
 	// Clicking the remove button, selection button, or a link — let native behavior run.
-	if (target?.closest('.obsidian-highlight-delete, .obsidian-selection-action, a[href]')) return;
+	if (target?.closest('.obsidian-highlight-delete, .obsidian-highlight-annotate-button, .obsidian-highlight-annotation-editor, .obsidian-selection-action, a[href]')) return;
 
-	// Don't show the remove button immediately after creating a highlight —
-	// the click that ends a drag-selection shouldn't also surface "Remove".
+	// Preserve the actions just offered on selection: the trailing drag click
+	// must not dismiss or reposition them.
 	if (Date.now() - lastHighlightCreatedAt < 300) return;
 
 	const { clientX, clientY } = event;
@@ -546,6 +677,8 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
+	if (target?.closest(IGNORED_BOUNDARY_SELECTOR)) return;
+
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
 		// When the user drags past the left/right edge of the content area,
@@ -569,7 +702,7 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	}
 
 	// Delete button / selection action button — let their own handlers run.
-	if (target.closest('.obsidian-highlight-delete, .obsidian-selection-action')) return;
+	if (target.closest('.obsidian-highlight-delete, .obsidian-highlight-annotate-button, .obsidian-highlight-annotation-editor, .obsidian-selection-action')) return;
 
 	// Block-level one-click highlight (figure, img, table, pre, picture).
 	const block = findBlockToHighlight(target);
@@ -652,7 +785,7 @@ const throttledUpdateHighlights = throttle(() => {
 	if (!isApplyingHighlights) updateHighlightOverlayPositions();
 }, 100);
 
-window.addEventListener('resize', () => { throttledUpdateHighlights(); hideHighlightDeleteButton(); });
+window.addEventListener('resize', () => { throttledUpdateHighlights(); hideHighlightDeleteButton(); positionAnnotationEditor(); });
 window.addEventListener('scroll', throttledUpdateHighlights);
 
 // Mutation observer re-positions element overlays when the page reflows.
@@ -662,7 +795,7 @@ window.addEventListener('scroll', throttledUpdateHighlights);
 const observer = new MutationObserver((mutations) => {
 	if (isApplyingHighlights) return;
 	const shouldUpdate = mutations.some(m => {
-		if (!(m.target instanceof Element) || m.target.id.startsWith('obsidian-highlight')) return false;
+		if (!(m.target instanceof Element) || m.target.id.startsWith('obsidian-highlight') || m.target.closest('.obsidian-highlight-annotation-editor, .obsidian-highlight-annotate-button, .obsidian-highlight-delete')) return false;
 		return m.type === 'childList'
 			|| (m.type === 'attributes' && (m.attributeName === 'style' || m.attributeName === 'class'));
 	});
@@ -681,13 +814,14 @@ function handleHighlightHover(event: MouseEvent) {
 	hoverRafPending = true;
 	requestAnimationFrame(() => {
 		hoverRafPending = false;
+		if (target?.closest('.obsidian-highlight-annotation-editor')) return;
 		const textId = findTextHighlightAtPoint(clientX, clientY);
 		const overlay = !textId ? findOverlayAtPoint(clientX, clientY) : null;
 		const onHighlight = !!textId || !!overlay;
 		const cursor = onHighlight ? 'pointer' : '';
 		if (cursor !== lastCursor) { document.body.style.cursor = cursor; lastCursor = cursor; }
 
-		const onButton = !!target?.closest('.obsidian-highlight-delete');
+		const onButton = !!target?.closest('.obsidian-highlight-delete, .obsidian-highlight-annotate-button');
 
 		if (altKey && (onHighlight || onButton)) {
 			if (textId) showHighlightDeleteButtonForText(textId);
@@ -720,6 +854,7 @@ export function syncHoverListener(): void {
 		document.body.style.cursor = '';
 		listenersAttached = false;
 		hideHighlightDeleteButton();
+		closeAnnotationEditor();
 	}
 	if (needed && !observerAttached) {
 		observer.observe(document.body, {
@@ -738,6 +873,7 @@ export function syncHoverListener(): void {
 
 // Remove all existing highlight overlays from the page
 export function removeExistingHighlights() {
+	if (annotationEditor && !highlights.some(highlight => highlight.id === annotationEditor?.dataset.highlightId)) closeAnnotationEditor();
 	document.querySelectorAll('.obsidian-highlight-overlay').forEach(el => el.remove());
 	clearTextHighlights();
 	hideHighlightDeleteButton();
