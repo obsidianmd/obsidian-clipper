@@ -614,7 +614,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 //     pre, picture) fully inside the selection.
 // Partial selections of a block-whitelist element fall through to text
 // highlights for the text inside it (e.g. text inside a <pre> is still text).
-function getHighlightRanges(range: Range): AnyHighlightData[] {
+export function getHighlightRanges(range: Range): AnyHighlightData[] {
 	const newHighlights: AnyHighlightData[] = [];
 	if (range.collapsed) return newHighlights;
 	// Assigned below if the selection produces more than one highlight. All
@@ -1389,6 +1389,24 @@ function getClosestTextBlock(node: Node | null): Element | null {
 				}
 				return el;
 			}
+		}
+		current = current.parentElement;
+	}
+	return getClosestBlockLevelAncestor(node);
+}
+
+// Fallback for pages that don't use semantic text tags (e.g. article text in
+// <span><div><span>…</span></div></span>): the nearest ancestor that renders
+// as a block, so the text is still highlightable. Never returns <body>/<html>,
+// which would turn a stray text node into a page-wide highlight.
+function getClosestBlockLevelAncestor(node: Node | null): Element | null {
+	let current: Element | null = node?.nodeType === Node.ELEMENT_NODE
+		? node as Element
+		: node?.parentElement ?? null;
+	while (current && current !== document.body && current !== document.documentElement) {
+		const display = window.getComputedStyle(current).display;
+		if (display && !display.startsWith('inline') && display !== 'contents' && display !== 'none') {
+			return current;
 		}
 		current = current.parentElement;
 	}
