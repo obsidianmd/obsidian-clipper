@@ -130,8 +130,9 @@ export async function updateVaultList(): Promise<void> {
 			const defaultSelect = document.createElement('select');
 			defaultSelect.className = 'vault-default-folder-select';
 			buildDefaultFolderOptions(defaultSelect, folders, defaultFolder);
-			attachTreeSelect(defaultSelect);
+			// The select must be in the DOM first, so the tree control can wrap it in place.
 			defaultRow.appendChild(defaultSelect);
+			attachTreeSelect(defaultSelect);
 
 			defaultSelect.addEventListener('change', () => {
 				saveSettings({ vaultDefaultFolders: setVaultDefaultFolder(vault, defaultSelect.value) });
