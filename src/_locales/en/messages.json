@@ -1092,6 +1092,60 @@
 			}
 		}
 	},
+	"customPath": {
+		"message": "Custom path…"
+	},
+	"defaultFolder": {
+		"message": "Default folder"
+	},
+	"fileSystemAccessUnsupported": {
+		"message": "Folder access is not supported in this browser. Use a Chromium-based browser such as Chrome or Edge."
+	},
+	"notScanned": {
+		"message": "not in vault folder list"
+	},
+	"noFoldersFound": {
+		"message": "No folders found"
+	},
+	"searchFolders": {
+		"message": "Search folders"
+	},
+	"refreshVaultFolders": {
+		"message": "Refresh folder list"
+	},
+	"selectVaultFolder": {
+		"message": "Select vault folder"
+	},
+	"setDefaultFolder": {
+		"message": "Set as default folder for this vault"
+	},
+	"vaultFolderNotSelected": {
+		"message": "No vault folder selected"
+	},
+	"vaultFolderNotConfigured": {
+		"message": "No vault folder selected yet. Open Settings, then General, and pick your vault folder."
+	},
+	"vaultFolderPickFailed": {
+		"message": "Could not read that folder. Try again, and pick the vault's root folder."
+	},
+	"vaultAlreadyExists": {
+		"message": "That vault is already in the list."
+	},
+	"vaultNameCorrected": {
+		"message": "Vault name set to \"$1\" to match the selected folder."
+	},
+	"vaultFolderPermissionNeeded": {
+		"message": "Folder access needs to be granted again. Select the vault folder to continue."
+	},
+	"vaultFoldersDescription": {
+		"message": "Select a local vault folder to list your folders and set a default location for clips. Folder access is only available in Chromium-based browsers."
+	},
+	"vaultFoldersFound": {
+		"message": "$1 folders found"
+	},
+	"vaultRootFolder": {
+		"message": "Vault root"
+	},
 	"version": {
 		"message": "Version"
 	}

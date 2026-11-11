@@ -6,6 +6,7 @@ export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Ratin
 
 export let generalSettings: Settings = {
 	vaults: [],
+	vaultDefaultFolders: {},
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
@@ -68,6 +69,7 @@ interface StorageData {
 		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
+	vaultDefaultFolders?: Record<string, string>;
 	highlighter_settings?: {
 		highlighterEnabled?: boolean;
 		alwaysShowHighlights?: boolean;
@@ -119,6 +121,7 @@ export async function loadSettings(): Promise<Settings> {
 	// Load default settings first
 	const defaultSettings: Settings = {
 		vaults: [],
+		vaultDefaultFolders: {},
 		showMoreActionsButton: false,
 		betaFeatures: false,
 		legacyMode: false,
@@ -171,6 +174,12 @@ export async function loadSettings(): Promise<Settings> {
 
 	// Validate and sanitize data to prevent corruption
 	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
+	const sanitizedVaultDefaultFolders: Record<string, string> = {};
+	if (data.vaultDefaultFolders && typeof data.vaultDefaultFolders === 'object') {
+		for (const [vault, folder] of Object.entries(data.vaultDefaultFolders)) {
+			if (typeof folder === 'string') sanitizedVaultDefaultFolders[vault] = folder;
+		}
+	}
 	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
 		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
 		: [];
@@ -181,6 +190,7 @@ export async function loadSettings(): Promise<Settings> {
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
+		vaultDefaultFolders: sanitizedVaultDefaultFolders,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
@@ -233,6 +243,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 
 	await browser.storage.sync.set({
 		vaults: generalSettings.vaults,
+		vaultDefaultFolders: generalSettings.vaultDefaultFolders,
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
 			betaFeatures: generalSettings.betaFeatures,
