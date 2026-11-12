@@ -854,6 +854,16 @@ function balanceTags(html: string): string {
 
 // Calculate the text offset within a container element
 function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
+	// An element boundary point (el, n) means "before el's nth child", which
+	// the text-node walk below never matches (it would return the container's
+	// full length). Selections land on element boundaries next to images and
+	// other non-text nodes, or via selectNodeContents. Measure the text before it.
+	if (targetNode.nodeType !== Node.TEXT_NODE) {
+		const range = document.createRange();
+		range.setStart(container, 0);
+		range.setEnd(targetNode, targetOffset);
+		return range.toString().length;
+	}
 	// TreeWalker.currentNode initially points at the root element (the filter
 	// only affects traversal, not the starting position). Advance past it so
 	// we only sum actual text nodes — otherwise we add the whole container's
@@ -936,9 +946,42 @@ function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighli
 	const element2 = getElementByXPath(highlight2.xpath);
 
 	if (!element1 || !element2) return false;
+	if (!element1.contains(element2) && !element2.contains(element1)) return false;
 
-	// Check if one element contains the other
-	return element1.contains(element2) || element2.contains(element1);
+	// One anchor contains the other, which alone isn't an overlap: a text
+	// highlight covers a character range inside its anchor, not the whole
+	// element. Treating containment as overlap let a highlight on a large
+	// element (an outer list item, an article container) delete every
+	// highlight inside it, even ones whose text it didn't cover.
+	if (highlight1.type === 'text' && highlight2.type === 'text') {
+		const outer = element1.contains(element2) ? element1 : element2;
+		const range1 = rebaseTextOffsets(highlight1, element1, outer);
+		const range2 = rebaseTextOffsets(highlight2, element2, outer);
+		return !!range1 && !!range2
+			&& range1.startOffset < range2.endOffset && range2.startOffset < range1.endOffset;
+	}
+	// An element highlight covers its whole element, so it overlaps text
+	// anchored inside it, but not text whose anchor merely contains it (a
+	// paragraph with an inline image).
+	if (highlight1.type === 'element' && highlight2.type === 'text') return element1.contains(element2);
+	if (highlight2.type === 'element' && highlight1.type === 'text') return element2.contains(element1);
+	return true;
+}
+
+// Re-express a text highlight's offsets relative to `outer`, an ancestor of
+// (or the same element as) its anchor. Offsets count every descendant text
+// node, as getTextOffset does, so the anchor's text sits contiguously inside
+// the outer element's text.
+function rebaseTextOffsets(
+	highlight: TextHighlightData,
+	anchor: Element,
+	outer: Element
+): { startOffset: number; endOffset: number } | null {
+	if (anchor === outer) return { startOffset: highlight.startOffset, endOffset: highlight.endOffset };
+	const firstText = findFirstTextNode(anchor);
+	if (!firstText) return null;
+	const base = getTextOffset(outer, firstText, 0);
+	return { startOffset: base + highlight.startOffset, endOffset: base + highlight.endOffset };
 }
 
 function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
@@ -949,23 +992,25 @@ function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHigh
 }
 
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
-	let mergedHighlights: AnyHighlightData[] = [];
-	let merged = false;
+	const mergedHighlights: AnyHighlightData[] = [];
+	// Index of the highlight the new one merged into. Later overlapping
+	// highlights fold into that one, not into whatever was pushed last, which
+	// can be an unrelated highlight sitting between them in the list.
+	let mergedIndex = -1;
 
 	for (const existing of existingHighlights) {
 		if (doHighlightsOverlap(existing, newHighlight) || areHighlightsAdjacent(existing, newHighlight)) {
-			if (!merged) {
-				mergedHighlights.push(mergeHighlights(existing, newHighlight));
-				merged = true;
+			if (mergedIndex === -1) {
+				mergedIndex = mergedHighlights.push(mergeHighlights(existing, newHighlight)) - 1;
 			} else {
-				mergedHighlights[mergedHighlights.length - 1] = mergeHighlights(mergedHighlights[mergedHighlights.length - 1], existing);
+				mergedHighlights[mergedIndex] = mergeHighlights(mergedHighlights[mergedIndex], existing);
 			}
 		} else {
 			mergedHighlights.push(existing);
 		}
 	}
 
-	if (!merged) {
+	if (mergedIndex === -1) {
 		mergedHighlights.push(newHighlight);
 	}
 
@@ -1005,10 +1050,22 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 	}
 
 	// Different xpaths — reachable when one contains the other (caller only
-	// merges overlapping highlights). Outer wins; inner is absorbed.
+	// merges overlapping highlights).
 	const el1 = getElementByXPath(h1.xpath);
 	const el2 = getElementByXPath(h2.xpath);
 	if (el1 && el2) {
+		const outer = el1.contains(el2) ? el1 : el2.contains(el1) ? el2 : null;
+		// Two text highlights whose text overlaps: re-express both on the outer
+		// anchor and merge them as one range there, so neither side's text is lost.
+		if (outer && h1.type === 'text' && h2.type === 'text') {
+			const outerXPath = outer === el1 ? h1.xpath : h2.xpath;
+			const range1 = rebaseTextOffsets(h1, el1, outer);
+			const range2 = rebaseTextOffsets(h2, el2, outer);
+			if (range1 && range2) {
+				return mergeHighlights({ ...h1, ...range1, xpath: outerXPath }, { ...h2, ...range2, xpath: outerXPath });
+			}
+		}
+		// Otherwise the outer element highlight covers the inner one.
 		if (el1.contains(el2)) return h1;
 		if (el2.contains(el1)) return h2;
 	}
@@ -1395,19 +1452,39 @@ function getClosestTextBlock(node: Node | null): Element | null {
 	return getClosestBlockLevelAncestor(node);
 }
 
+function isBlockLevel(el: Element): boolean {
+	const display = window.getComputedStyle(el).display;
+	return !!display && !display.startsWith('inline') && display !== 'contents' && display !== 'none';
+}
+
+function containsBlockLevelDescendant(el: Element): boolean {
+	for (const descendant of Array.from(el.querySelectorAll('*'))) {
+		if (isBlockLevel(descendant)) return true;
+	}
+	return false;
+}
+
 // Fallback for pages that don't use semantic text tags (e.g. article text in
 // <span><div><span>…</span></div></span>): the nearest ancestor that renders
 // as a block, so the text is still highlightable. Never returns <body>/<html>,
 // which would turn a stray text node into a page-wide highlight.
+//
+// Prefer the smallest element around the text. A container that holds other
+// blocks (e.g. an article body whose paragraphs are siblings of a bare <span>)
+// would sort the highlight to the container's top and measure its offsets
+// across the whole article, so for such a container anchor on the inline
+// wrapper directly under it. Loose text with no wrapper falls back to the
+// container itself; merging compares text ranges, so that's still safe.
 function getClosestBlockLevelAncestor(node: Node | null): Element | null {
 	let current: Element | null = node?.nodeType === Node.ELEMENT_NODE
 		? node as Element
 		: node?.parentElement ?? null;
+	let inlineChild: Element | null = null;
 	while (current && current !== document.body && current !== document.documentElement) {
-		const display = window.getComputedStyle(current).display;
-		if (display && !display.startsWith('inline') && display !== 'contents' && display !== 'none') {
-			return current;
+		if (isBlockLevel(current)) {
+			return inlineChild && containsBlockLevelDescendant(current) ? inlineChild : current;
 		}
+		inlineChild = current;
 		current = current.parentElement;
 	}
 	return null;
