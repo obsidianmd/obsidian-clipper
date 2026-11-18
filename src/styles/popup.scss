@@ -268,13 +268,12 @@
 	}
 }
 
-// Android keeps the secondary actions menu, which sits on the end of the pill.
 .is-android {
 	&:not(.is-embedded) .clipper .clipper-footer {
 		padding-bottom: var(--popup-padding);
 	}
 	.action-buttons {
-		// The popup focuses the button on open; a ring isn't useful on touch.
+		// The popup focuses this button on open.
 		#clip-btn:focus {
 			box-shadow: none;
 		}
@@ -287,7 +286,6 @@
 			padding-inline: 0.5rem 0.75rem;
 		}
 	}
-	// Show the menu as a bottom sheet like other mobile menus.
 	#more-dropdown {
 		bottom: 0;
 		margin-bottom: 0;

@@ -166,7 +166,7 @@ async function initializeExtension(tabId: number) {
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
 
-		// Android browsers show the popup in a full-width sheet rather than a fixed-size bubble.
+		// Android shows the popup in a full-width sheet.
 		if ((await browser.runtime.getPlatformInfo()).os === 'android') {
 			document.documentElement.classList.add('is-android', 'is-mobile');
 		}
