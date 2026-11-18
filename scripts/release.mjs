@@ -196,6 +196,10 @@ async function safari() {
 	writeFileSync(exportOptions, exportOptionsPlist());
 	// Signs with the Apple ID in Xcode → Settings → Accounts. An App Manager API key can't use cloud signing.
 	for (const { scheme, destination, platform } of SAFARI_PLATFORMS) {
+		if (await findBuild(app.id, platform, build)) {
+			console.log(`${platform} build ${build} is already uploaded.`);
+			continue;
+		}
 		const archive = join(work, `${platform}.xcarchive`);
 		console.log(`Archiving ${scheme}…`);
 		run('xcodebuild', ['archive', '-project', XCODE_PROJECT, '-scheme', scheme, '-destination', destination, '-archivePath', archive, '-allowProvisioningUpdates']);
@@ -210,10 +214,10 @@ async function safari() {
 
 async function submitSafariVersion(appId, platform, build) {
 	const processed = await poll(`${platform} build processing`, async () => {
-		const builds = await asc('GET', `/v1/builds?filter[app]=${appId}&filter[version]=${build}&filter[preReleaseVersion.platform]=${platform}`);
-		const state = builds.data[0]?.attributes.processingState;
+		const found = await findBuild(appId, platform, build);
+		const state = found?.attributes.processingState;
 		if (state === 'FAILED' || state === 'INVALID') throw new Error(`${platform} build ${build} is ${state}`);
-		return state === 'VALID' && builds.data[0];
+		return state === 'VALID' && found;
 	}, { interval: 30_000, timeout: 60 * 60_000 });
 
 	const existing = await asc('GET', `/v1/apps/${appId}/appStoreVersions?filter[platform]=${platform}&filter[versionString]=${version}`);
@@ -254,6 +258,11 @@ async function submitSafariVersion(appId, platform, build) {
 		data: { type: 'reviewSubmissions', id: submission.id, attributes: { submitted: true } },
 	});
 	console.log(`✓ ${platform} ${version} (${build}) submitted for review.`);
+}
+
+async function findBuild(appId, platform, build) {
+	const builds = await asc('GET', `/v1/builds?filter[app]=${appId}&filter[version]=${build}&filter[preReleaseVersion.platform]=${platform}`);
+	return builds.data[0];
 }
 
 function asc(method, path, body) {
