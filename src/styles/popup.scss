@@ -15,7 +15,8 @@
 }
 .is-side-panel,
 .is-mobile-safari,
-.is-firefox-mobile {
+.is-firefox-mobile,
+.is-android {
 	--popup-height: 100vh;
 	--popup-max-height: 100vh;
 	--popup-width: 100vw;
@@ -259,12 +260,43 @@
 	}
 }
 
+// Safari replaces the secondary actions with the share sheet.
+.is-tablet,
+.is-mobile-safari {
+	.action-buttons #more-btn {
+		display: none;
+	}
+}
+
+// Android keeps the secondary actions menu, which sits on the end of the pill.
+.is-android {
+	&:not(.is-embedded) .clipper .clipper-footer {
+		padding-bottom: var(--popup-padding);
+	}
+	.action-buttons {
+		// The popup focuses the button on open; a ring isn't useful on touch.
+		#clip-btn:focus {
+			box-shadow: none;
+		}
+		.menu-btn,
+		#more-btn {
+			border-start-end-radius: 2rem;
+			border-end-end-radius: 2rem;
+		}
+		#more-btn {
+			padding-inline: 0.5rem 0.75rem;
+		}
+	}
+	// Show the menu as a bottom sheet like other mobile menus.
+	#more-dropdown {
+		bottom: 0;
+		margin-bottom: 0;
+	}
+}
+
 .is-tablet,
 .is-mobile {
 	.action-buttons {
-		#more-btn {
-			display: none;
-		}
 		.share-btn {
 			margin-inline-start: 0.25rem;
 			display: flex;
