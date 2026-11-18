@@ -238,7 +238,8 @@ async function submitSafariVersion(appId, platform, build) {
 		});
 	}
 
-	const submission = (await asc('POST', '/v1/reviewSubmissions', {
+	const open = await asc('GET', `/v1/reviewSubmissions?filter[app]=${appId}&filter[platform]=${platform}&filter[state]=READY_FOR_REVIEW`);
+	const submission = open.data[0] ?? (await asc('POST', '/v1/reviewSubmissions', {
 		data: {
 			type: 'reviewSubmissions',
 			attributes: { platform },
