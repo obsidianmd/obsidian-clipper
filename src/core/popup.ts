@@ -165,7 +165,12 @@ async function initializeExtension(tabId: number) {
 		
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
-		
+
+		// Android browsers show the popup in a full-width sheet rather than a fixed-size bubble.
+		if ((await browser.runtime.getPlatformInfo()).os === 'android') {
+			document.documentElement.classList.add('is-android', 'is-mobile');
+		}
+
 		// Set an initial large height to allow the browser to determine the maximum height
 		// This is necessary for browsers that allow scaling the popup via page zoom
 		document.documentElement.style.setProperty('--chromium-popup-height', '2000px');
