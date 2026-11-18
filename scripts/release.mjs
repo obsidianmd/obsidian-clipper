@@ -338,7 +338,15 @@ function releaseNotes(store) {
 }
 
 async function request(method, url, { headers = {}, body } = {}) {
-	const response = await fetch(url, { method, headers, body });
+	let response;
+	for (let attempt = 1; !response; attempt++) {
+		try {
+			response = await fetch(url, { method, headers, body });
+		} catch (error) {
+			if (attempt === 3) throw new Error(`${method} ${url} → ${error.cause?.message || error.message}`);
+			await new Promise(done => setTimeout(done, 2000 * attempt));
+		}
+	}
 	const text = await response.text();
 	if (!response.ok) throw new Error(`${method} ${url} → ${response.status} ${text.slice(0, 500)}`);
 	return text ? JSON.parse(text) : {};
