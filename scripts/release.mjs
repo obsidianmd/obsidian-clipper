@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync, writeFileSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHmac, createPrivateKey, randomUUID, sign } from 'node:crypto';
 import { join, dirname, resolve } from 'node:path';
@@ -182,8 +182,6 @@ function sourceZip() {
 async function safari() {
 	requireEnv('ASC_KEY_ID', 'ASC_ISSUER_ID');
 	if (!optionalEnv('ASC_PRIVATE_KEY') && !optionalEnv('ASC_KEY_PATH')) throw new Error('Missing ASC_PRIVATE_KEY or ASC_KEY_PATH in .env');
-	const keyId = env('ASC_KEY_ID');
-	const issuer = env('ASC_ISSUER_ID');
 	const build = currentProjectVersion();
 	buildZip('safari');
 
@@ -196,21 +194,13 @@ async function safari() {
 	const work = mkdtempSync(join(tmpdir(), 'clipper-safari-'));
 	const exportOptions = join(work, 'ExportOptions.plist');
 	writeFileSync(exportOptions, exportOptionsPlist());
-	// xcodebuild only accepts the key as a file.
-	const keyFile = optionalEnv('ASC_KEY_PATH');
-	const keyPath = keyFile || join(work, `AuthKey_${keyId}.p8`);
-	if (!keyFile) writeFileSync(keyPath, ascPrivateKey(), { mode: 0o600 });
-	const auth = ['-allowProvisioningUpdates', '-authenticationKeyPath', keyPath, '-authenticationKeyID', keyId, '-authenticationKeyIssuerID', issuer];
-	try {
-		for (const { scheme, destination, platform } of SAFARI_PLATFORMS) {
-			const archive = join(work, `${platform}.xcarchive`);
-			console.log(`Archiving ${scheme}…`);
-			run('xcodebuild', ['archive', '-project', XCODE_PROJECT, '-scheme', scheme, '-destination', destination, '-archivePath', archive, ...auth]);
-			console.log(`Uploading ${scheme}…`);
-			run('xcodebuild', ['-exportArchive', '-archivePath', archive, '-exportOptionsPlist', exportOptions, '-exportPath', join(work, platform), ...auth]);
-		}
-	} finally {
-		if (!keyFile) rmSync(keyPath, { force: true });
+	// Signs with the Apple ID in Xcode → Settings → Accounts. An App Manager API key can't use cloud signing.
+	for (const { scheme, destination, platform } of SAFARI_PLATFORMS) {
+		const archive = join(work, `${platform}.xcarchive`);
+		console.log(`Archiving ${scheme}…`);
+		run('xcodebuild', ['archive', '-project', XCODE_PROJECT, '-scheme', scheme, '-destination', destination, '-archivePath', archive, '-allowProvisioningUpdates']);
+		console.log(`Uploading ${scheme}…`);
+		run('xcodebuild', ['-exportArchive', '-archivePath', archive, '-exportOptionsPlist', exportOptions, '-exportPath', join(work, platform), '-allowProvisioningUpdates']);
 	}
 
 	for (const { platform } of SAFARI_PLATFORMS) {

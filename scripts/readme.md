@@ -87,6 +87,6 @@ ASC_ISSUER_ID=op://<vault>/App Store Connect API/issuer_id
 ASC_PRIVATE_KEY=op://<vault>/App Store Connect API/private_key
 ```
 
-`ASC_PRIVATE_KEY` is the text of the `.p8` file. To use the file itself, set `ASC_KEY_PATH` to its absolute path instead. A key given as text is written to a temporary file for `xcodebuild` and deleted afterwards.
+`ASC_PRIVATE_KEY` is the text of the `.p8` file. To use the file itself, set `ASC_KEY_PATH` to its absolute path instead. The key is only used to submit for review: Xcode signs and uploads the builds with the Apple ID in Xcode → Settings → Accounts.
 
 Edge uses the Chrome zip. Safari archives both Xcode schemes with the App Store Connect key, uploads them, waits for processing, then submits each platform for review with the changelog as "What's New" in every localization.
