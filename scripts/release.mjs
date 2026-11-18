@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-// Upload the current version to the browser stores and submit it for review.
-// Usage: node scripts/release.mjs [chrome] [edge] [firefox] [safari] [--dry-run]
-// Credentials come from .env; see scripts/readme.md.
-
-import { readFileSync, existsSync, writeFileSync, mkdtempSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHmac, createPrivateKey, randomUUID, sign } from 'node:crypto';
 import { join, dirname, resolve } from 'node:path';
@@ -45,7 +41,6 @@ for (const name of selected.length ? selected : Object.keys(STORES)) {
 }
 process.exit(failed ? 1 : 0);
 
-// Chrome Web Store API v2: https://developer.chrome.com/docs/webstore/using-api
 async function chrome() {
 	requireEnv('CHROME_PUBLISHER_ID', 'CHROME_EXTENSION_ID', 'CHROME_CLIENT_ID', 'CHROME_CLIENT_SECRET', 'CHROME_REFRESH_TOKEN');
 	const publisher = env('CHROME_PUBLISHER_ID');
@@ -92,14 +87,13 @@ async function googleAccessToken() {
 	return response.access_token;
 }
 
-// Edge Add-ons API v1.1: https://learn.microsoft.com/en-us/microsoft-edge/extensions/update/api/using-addons-api
 async function edge() {
 	requireEnv('EDGE_PRODUCT_ID', 'EDGE_CLIENT_ID', 'EDGE_API_KEY');
 	const product = env('EDGE_PRODUCT_ID');
 	const headers = { Authorization: `ApiKey ${env('EDGE_API_KEY')}`, 'X-ClientID': env('EDGE_CLIENT_ID') };
 	const file = buildZip('chrome');
 	const base = `https://api.addons.microsoftedge.microsoft.com/v1/products/${product}/submissions`;
-	// The API has no read-only call to check credentials without an operation ID.
+	// Edge has no read-only call to check credentials.
 	if (dryRun) return console.log(`Would upload ${file} and submit for review.`);
 
 	const uploadOperation = await requestOperation('POST', `${base}/draft/package`, {
@@ -125,7 +119,6 @@ async function pollEdgeOperation(url, headers, label) {
 	if (result.status !== 'Succeeded') throw new Error(`${label} ${result.status}: ${JSON.stringify(result)}`);
 }
 
-// AMO API v5: https://mozilla.github.io/addons-server/topics/api/addons.html
 async function firefox() {
 	requireEnv('AMO_JWT_ISSUER', 'AMO_JWT_SECRET');
 	const file = buildZip('firefox');
@@ -167,7 +160,7 @@ function amoToken() {
 	return `${header}.${payload}.${signature}`;
 }
 
-// AMO reviewers rebuild from this archive, so it must match the commit the build came from.
+// AMO reviewers rebuild from this archive, so it must match the build.
 function sourceZip() {
 	const dirty = git('status', '--porcelain', '--untracked-files=no').trim();
 	if (dirty) throw new Error('Commit or stash changes first: the source zip comes from HEAD.');
@@ -176,11 +169,9 @@ function sourceZip() {
 	return file;
 }
 
-// Xcode export: https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases
-// Review: https://developer.apple.com/documentation/appstoreconnectapi/review-submissions
 async function safari() {
-	requireEnv('ASC_KEY_PATH', 'ASC_KEY_ID', 'ASC_ISSUER_ID');
-	const keyPath = env('ASC_KEY_PATH');
+	requireEnv('ASC_KEY_ID', 'ASC_ISSUER_ID');
+	if (!optionalEnv('ASC_PRIVATE_KEY') && !optionalEnv('ASC_KEY_PATH')) throw new Error('Missing ASC_PRIVATE_KEY or ASC_KEY_PATH in .env');
 	const keyId = env('ASC_KEY_ID');
 	const issuer = env('ASC_ISSUER_ID');
 	const build = currentProjectVersion();
@@ -195,13 +186,21 @@ async function safari() {
 	const work = mkdtempSync(join(tmpdir(), 'clipper-safari-'));
 	const exportOptions = join(work, 'ExportOptions.plist');
 	writeFileSync(exportOptions, exportOptionsPlist());
+	// xcodebuild only accepts the key as a file.
+	const keyFile = optionalEnv('ASC_KEY_PATH');
+	const keyPath = keyFile || join(work, `AuthKey_${keyId}.p8`);
+	if (!keyFile) writeFileSync(keyPath, ascPrivateKey(), { mode: 0o600 });
 	const auth = ['-allowProvisioningUpdates', '-authenticationKeyPath', keyPath, '-authenticationKeyID', keyId, '-authenticationKeyIssuerID', issuer];
-	for (const { scheme, destination, platform } of SAFARI_PLATFORMS) {
-		const archive = join(work, `${platform}.xcarchive`);
-		console.log(`Archiving ${scheme}…`);
-		run('xcodebuild', ['archive', '-project', XCODE_PROJECT, '-scheme', scheme, '-destination', destination, '-archivePath', archive, ...auth]);
-		console.log(`Uploading ${scheme}…`);
-		run('xcodebuild', ['-exportArchive', '-archivePath', archive, '-exportOptionsPlist', exportOptions, '-exportPath', join(work, platform), ...auth]);
+	try {
+		for (const { scheme, destination, platform } of SAFARI_PLATFORMS) {
+			const archive = join(work, `${platform}.xcarchive`);
+			console.log(`Archiving ${scheme}…`);
+			run('xcodebuild', ['archive', '-project', XCODE_PROJECT, '-scheme', scheme, '-destination', destination, '-archivePath', archive, ...auth]);
+			console.log(`Uploading ${scheme}…`);
+			run('xcodebuild', ['-exportArchive', '-archivePath', archive, '-exportOptionsPlist', exportOptions, '-exportPath', join(work, platform), ...auth]);
+		}
+	} finally {
+		if (!keyFile) rmSync(keyPath, { force: true });
 	}
 
 	for (const { platform } of SAFARI_PLATFORMS) {
@@ -268,13 +267,21 @@ function ascToken() {
 	const now = Math.floor(Date.now() / 1000);
 	const header = base64url(JSON.stringify({ alg: 'ES256', kid: env('ASC_KEY_ID'), typ: 'JWT' }));
 	const payload = base64url(JSON.stringify({ iss: env('ASC_ISSUER_ID'), iat: now, exp: now + 1200, aud: 'appstoreconnect-v1' }));
-	const key = createPrivateKey(readFileSync(env('ASC_KEY_PATH')));
+	const key = createPrivateKey(ascPrivateKey());
 	const signature = base64url(sign('sha256', Buffer.from(`${header}.${payload}`), { key, dsaEncoding: 'ieee-p1363' }));
 	return `${header}.${payload}.${signature}`;
 }
 
+// Pasted keys can lose their PEM line breaks.
+function ascPrivateKey() {
+	const text = optionalEnv('ASC_PRIVATE_KEY');
+	if (!text) return readFileSync(env('ASC_KEY_PATH'), 'utf8');
+	const body = text.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+	return `-----BEGIN PRIVATE KEY-----\n${body.match(/.{1,64}/g).join('\n')}\n-----END PRIVATE KEY-----\n`;
+}
+
 function exportOptionsPlist() {
-	// manageAppVersionAndBuildNumber would override the numbers set by bump-version.sh.
+	// Otherwise Xcode overrides the numbers from bump-version.sh.
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -326,7 +333,6 @@ async function request(method, url, { headers = {}, body } = {}) {
 	return text ? JSON.parse(text) : {};
 }
 
-// Edge returns the operation ID in the Location header of a 202 response.
 async function requestOperation(method, url, options) {
 	const response = await fetch(url, { method, ...options });
 	if (response.status !== 202) throw new Error(`${method} ${url} → ${response.status} ${(await response.text()).slice(0, 500)}`);
@@ -353,14 +359,25 @@ function loadEnv(file) {
 }
 
 function requireEnv(...names) {
-	const missing = names.filter(name => !process.env[name]);
+	const missing = names.filter(name => !optionalEnv(name));
 	if (missing.length) throw new Error(`Missing ${missing.join(', ')} in .env`);
 }
 
 function env(name) {
-	const value = process.env[name];
+	const value = optionalEnv(name);
 	if (!value) throw new Error(`Missing ${name} in .env`);
 	return value;
+}
+
+function optionalEnv(name) {
+	const value = process.env[name];
+	if (!value?.startsWith('op://')) return value ?? '';
+	try {
+		process.env[name] = execFileSync('op', ['read', '--no-newline', value], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+	} catch (error) {
+		throw new Error(`Couldn't read ${name} from 1Password: ${error.stderr?.toString().trim() || error.message}`);
+	}
+	return process.env[name];
 }
 
 function fileBlob(file) {
