@@ -58,8 +58,9 @@ npm run release:chrome
 - Uploads the current version to the Chrome Web Store, Edge Add-ons, Firefox Add-ons and the App Store (Safari on iOS and macOS), and submits it for review
 - `npm run release` runs every store; `release:<store>` runs one
 - `--dry-run` checks the build, changelog and credentials (read-only calls for Chrome, Firefox and Safari) without uploading
-- Release notes come from `changelogs/<version>.md`
-- Run `bump-version.sh`, `generate-changelog.sh` and `npm run build` first, and commit, because the Firefox source zip is a `git archive` of `HEAD`
+- Release notes come from `changelogs/<version>.md`. A store-specific file such as `changelogs/<version>-firefox.md` replaces it for that store
+- Firefox gets the source code for its reviewers' rebuild: the same zip as "Source code (zip)" on the GitHub release, so tag the release commit first
+- Run `bump-version.sh`, `generate-changelog.sh` and `npm run build` first, then commit and tag
 
 Add the credentials to `.env`, either as values or as [1Password secret references](https://developer.1password.com/docs/cli/secret-reference-syntax/). A value that starts with `op://` is read with `op read` when the script needs it, so the secret never touches the disk. With two 1Password accounts on one Mac, set `OP_ACCOUNT` so `op` knows which to use.
 

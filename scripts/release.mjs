@@ -27,7 +27,6 @@ if (unknown.length) {
 
 loadEnv(join(ROOT, '.env'));
 const version = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
-const notes = releaseNotes(version);
 
 let failed = false;
 for (const name of selected.length ? selected : Object.keys(STORES)) {
@@ -105,7 +104,7 @@ async function edge() {
 
 	const submitOperation = await requestOperation('POST', base, {
 		headers: { ...headers, 'Content-Type': 'application/json' },
-		body: JSON.stringify({ notes: `Web Clipper ${version}\n\n${notes}`.slice(0, 2000) }),
+		body: JSON.stringify({ notes: `Web Clipper ${version}\n\n${releaseNotes('edge')}`.slice(0, 2000) }),
 	});
 	await pollEdgeOperation(`${base}/operations/${submitOperation}`, headers, 'Edge submission');
 	console.log('✓ Submitted for review.');
@@ -128,8 +127,16 @@ async function firefox() {
 
 	const current = await request('GET', `${addon}/`, { headers: headers() });
 	console.log(`Current listed version: ${current.current_version?.version}`);
+	const notes = releaseNotes('firefox');
+	if (dryRun) {
+		try {
+			console.log(`Would upload ${file} with source ${sourceZip()} and submit for review.`);
+		} catch (error) {
+			console.log(`Would upload ${file} and submit for review. Source zip not ready: ${error.message}`);
+		}
+		return;
+	}
 	const source = sourceZip();
-	if (dryRun) return console.log(`Would upload ${file} with source ${source} and submit for review.`);
 
 	const form = new FormData();
 	form.append('upload', fileBlob(file), `firefox-${version}.zip`);
@@ -161,11 +168,14 @@ function amoToken() {
 }
 
 // AMO reviewers rebuild from this archive, so it must match the build.
+// Same archive as the "Source code (zip)" on the GitHub release.
 function sourceZip() {
 	const dirty = git('status', '--porcelain', '--untracked-files=no').trim();
-	if (dirty) throw new Error('Commit or stash changes first: the source zip comes from HEAD.');
-	const file = join(ROOT, 'builds', `obsidian-web-clipper-${version}-source.zip`);
-	git('archive', '--format=zip', '-o', file, 'HEAD');
+	if (dirty) throw new Error('Commit or stash changes first: the source zip must match the build.');
+	const tagged = git('tag', '--points-at', 'HEAD').split('\n').includes(version);
+	if (!tagged) throw new Error(`Tag HEAD as ${version} first: the source zip is the archive of that tag.`);
+	const file = join(ROOT, 'builds', `obsidian-clipper-${version}.zip`);
+	git('archive', '--format=zip', `--prefix=obsidian-clipper-${version}/`, '-o', file, version);
 	return file;
 }
 
@@ -230,7 +240,7 @@ async function submitSafariVersion(appId, platform, build) {
 	const localizations = await asc('GET', `/v1/appStoreVersions/${appVersion.id}/appStoreVersionLocalizations`);
 	for (const localization of localizations.data) {
 		await asc('PATCH', `/v1/appStoreVersionLocalizations/${localization.id}`, {
-			data: { type: 'appStoreVersionLocalizations', id: localization.id, attributes: { whatsNew: notes.slice(0, 4000) } },
+			data: { type: 'appStoreVersionLocalizations', id: localization.id, attributes: { whatsNew: releaseNotes('safari').slice(0, 4000) } },
 		});
 	}
 
@@ -313,8 +323,10 @@ function buildZip(browser) {
 	return file;
 }
 
-function releaseNotes(forVersion) {
-	const file = join(ROOT, 'changelogs', `${forVersion}.md`);
+// A store-specific changelog, like changelogs/1.8.0-firefox.md, replaces the shared one.
+function releaseNotes(store) {
+	const storeFile = join(ROOT, 'changelogs', `${version}-${store}.md`);
+	const file = existsSync(storeFile) ? storeFile : join(ROOT, 'changelogs', `${version}.md`);
 	if (!existsSync(file)) {
 		const available = existsSync(join(ROOT, 'changelogs')) ? readdirSync(join(ROOT, 'changelogs')).join(', ') : 'none';
 		throw new Error(`Missing ${file} (found: ${available}). Run scripts/generate-changelog.sh.`);
