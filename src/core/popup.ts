@@ -719,7 +719,9 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || '',
-				extractedData.metaTags
+				extractedData.metaTags,
+				extractedData.rawContentHtml,
+				currentTemplate || undefined
 			);
 			if (initializedContent) {
 				currentVariables = initializedContent.currentVariables;

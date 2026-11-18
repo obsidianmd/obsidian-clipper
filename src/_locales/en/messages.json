@@ -1,4 +1,10 @@
 {
+	"academicMode": {
+		"message": "Academic preservation mode"
+	},
+	"academicModeDescription": {
+		"message": "Automatically preserve citation links, bibliography anchors, math, complex tables, and figures on scholarly articles."
+	},
 	"activity": {
 		"message": "Activity"
 	},

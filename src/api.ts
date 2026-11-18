@@ -3,7 +3,6 @@
 // The caller provides a DocumentParser for their environment.
 
 import DefuddleClass from 'defuddle';
-import { createMarkdownContent } from 'defuddle/full';
 import {
 	compileTemplate,
 	type AsyncResolver,
@@ -13,7 +12,17 @@ import {
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
-import { Template, Property } from './types/types';
+import { Template, Property, AcademicOptions } from './types/types';
+import {
+	resolveAcademicOptions,
+	mergeAcademicOptions,
+	prepareDocumentForAcademicClip,
+	restoreAcademicHtml,
+	createAcademicMarkdownContent,
+	extractRawArticleHtml,
+	countHtmlWords,
+	withDocumentParserAsync,
+} from './utils/academic';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -23,7 +32,7 @@ export interface DocumentParser {
 	parseFromString(html: string, mimeType: string): any;
 }
 
-export interface ClipOptions {
+export interface ClipOptions extends AcademicOptions {
 	html: string;
 	url: string;
 	template: Template;
@@ -38,6 +47,7 @@ export interface ClipResult {
 	frontmatter: string;
 	content: string;
 	fullContent: string;
+	rawContentHtml: string;
 	properties: Property[];
 	variables: Record<string, string>;
 }
@@ -183,20 +193,66 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 	// Use pre-parsed document if provided, otherwise parse
 	const doc = parsedDocument ?? documentParser.parseFromString(html, 'text/html');
 
+	// Resolve academic preservation options (ClipOptions override Template options)
+	const mergedAcademicOpts = mergeAcademicOptions(options, template);
+	const resolvedAcademic = resolveAcademicOptions(mergedAcademicOpts, { doc, url });
+
+	// Clone document before academic DOM shielding so selector resolvers see untouched DOM
+	const extractDoc = resolvedAcademic.anyEnabled ? doc.cloneNode(true) : doc;
+	const academicState = resolvedAcademic.anyEnabled
+		? prepareDocumentForAcademicClip(extractDoc, url, resolvedAcademic, documentParser)
+		: null;
+
+	const rawContentHtml = academicState?.rawContentHtml || extractRawArticleHtml(doc, url);
+
 	// Extract content with defuddle
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(doc as unknown as Document, { url });
+	const defuddle = new DefuddleClass(extractDoc as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
 
+	// Re-resolve academic options if Defuddle uncovered scholarly schemaOrgData or metaTags
+	const postResolvedAcademic = academicState
+		? academicState.options
+		: resolveAcademicOptions(mergedAcademicOpts, {
+			doc,
+			url,
+			schemaOrgData: defuddleResult.schemaOrgData,
+			metaTags: defuddleResult.metaTags,
+		});
+
+	let contentHtml = defuddleResult.content;
+	if (academicState) {
+		contentHtml = restoreAcademicHtml(contentHtml, academicState, documentParser);
+	}
+
+	const wordCount = academicState
+		? countHtmlWords(contentHtml)
+		: defuddleResult.wordCount;
+
 	// Convert to markdown
-	const markdownContent = createMarkdownContent(defuddleResult.content, url);
+	const markdownContent = createAcademicMarkdownContent(
+		contentHtml,
+		url,
+		postResolvedAcademic.anyEnabled
+			? {
+				academicMode: postResolvedAcademic.academicMode,
+				preserveCitationLinks: postResolvedAcademic.preserveCitationLinks,
+				preserveReferenceAnchors: postResolvedAcademic.preserveReferenceAnchors,
+				preserveMath: postResolvedAcademic.preserveMath,
+				preserveComplexTables: postResolvedAcademic.preserveComplexTables,
+				preserveFigures: postResolvedAcademic.preserveFigures,
+			}
+			: { academicMode: false },
+		documentParser
+	);
 
 	// Build template variables
 	const variables = buildVariables({
 		title: defuddleResult.title,
 		author: defuddleResult.author,
 		content: markdownContent,
-		contentHtml: defuddleResult.content,
+		contentHtml,
+		rawContentHtml,
 		url,
 		fullHtml: html,
 		description: defuddleResult.description,
@@ -205,7 +261,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		published: defuddleResult.published,
 		site: defuddleResult.site,
 		language: defuddleResult.language,
-		wordCount: defuddleResult.wordCount,
+		wordCount,
 		schemaOrgData: defuddleResult.schemaOrgData,
 		metaTags: defuddleResult.metaTags,
 		extractedContent: defuddleResult.variables,
@@ -218,36 +274,48 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 	const compile = (text: string) =>
 		compileTemplate(0, text, variables, url, asyncResolver, selectorProcessor);
 
-	// Compile note name
-	const compiledNoteName = await compile(template.noteNameFormat);
-	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
+	const { noteName, frontmatter, content, compiledProperties } = await withDocumentParserAsync(
+		documentParser,
+		async () => {
+			// Compile note name
+			const compiledNoteName = await compile(template.noteNameFormat);
+			const resolvedNoteName = sanitizeFileName(compiledNoteName) || 'Untitled';
 
-	// Compile and format each property
-	const compiledProperties: Property[] = await Promise.all(
-		template.properties.map(async (prop) => {
-			let value = await compile(prop.value);
-			const propType = prop.type || 'text';
-			value = formatPropertyValue(value, propType, prop.value);
-			return { name: prop.name, value, type: prop.type };
-		})
-	);
+			// Compile and format each property
+			const props: Property[] = await Promise.all(
+				template.properties.map(async (prop) => {
+					let value = await compile(prop.value);
+					const propType = prop.type || 'text';
+					value = formatPropertyValue(value, propType, prop.value);
+					return { name: prop.name, value, type: prop.type };
+				})
+			);
 
-	// Build property type map
-	const typeMap: Record<string, string> = {};
-	for (const prop of template.properties) {
-		if (prop.type) {
-			typeMap[prop.name] = prop.type;
+			// Build property type map
+			const typeMap: Record<string, string> = {};
+			for (const prop of template.properties) {
+				if (prop.type) {
+					typeMap[prop.name] = prop.type;
+				}
+			}
+			if (propertyTypes) {
+				Object.assign(typeMap, propertyTypes);
+			}
+
+			// Generate frontmatter
+			const resolvedFrontmatter = generateFrontmatter(props, typeMap);
+
+			// Compile note content
+			const resolvedContent = await compile(template.noteContentFormat);
+
+			return {
+				noteName: resolvedNoteName,
+				frontmatter: resolvedFrontmatter,
+				content: resolvedContent,
+				compiledProperties: props,
+			};
 		}
-	}
-	if (propertyTypes) {
-		Object.assign(typeMap, propertyTypes);
-	}
-
-	// Generate frontmatter
-	const frontmatter = generateFrontmatter(compiledProperties, typeMap);
-
-	// Compile note content
-	const content = await compile(template.noteContentFormat);
+	);
 
 	// Assemble full content
 	const fullContent = frontmatter ? frontmatter + content : content;
@@ -257,10 +325,11 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		frontmatter,
 		content,
 		fullContent,
+		rawContentHtml,
 		properties: compiledProperties,
 		variables,
 	};
 }
 
 // Re-export types that consumers may need
-export type { Template, Property } from './types/types';
+export type { Template, Property, AcademicOptions } from './types/types';

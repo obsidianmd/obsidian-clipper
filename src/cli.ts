@@ -21,6 +21,7 @@ interface CliArgs {
 	uri: boolean;
 	propertyTypesPath?: string;
 	htmlPath?: string;
+	academicMode?: boolean;
 }
 
 function printUsage(): void {
@@ -37,6 +38,8 @@ Options:
       --uri                    Use URI scheme instead of Obsidian CLI
       --silent                 Suppress Obsidian focus (URI mode)
       --property-types <path>  JSON mapping property names to types
+      --academic               Force academic preservation mode on
+      --no-academic            Disable academic preservation mode
   -h, --help                   Show this help message
 `.trim();
 	console.log(usage);
@@ -53,6 +56,7 @@ function parseArgs(argv: string[]): CliArgs {
 	let uri = false;
 	let propertyTypesPath: string | undefined;
 	let htmlPath: string | undefined;
+	let academicMode: boolean | undefined;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
@@ -93,6 +97,12 @@ function parseArgs(argv: string[]): CliArgs {
 				if (i + 1 >= args.length) { console.error('Error: --property-types requires a value'); process.exit(1); }
 				propertyTypesPath = args[++i];
 				break;
+			case '--academic':
+				academicMode = true;
+				break;
+			case '--no-academic':
+				academicMode = false;
+				break;
 			default:
 				if (!arg.startsWith('-') && !url) {
 					url = arg;
@@ -116,7 +126,7 @@ function parseArgs(argv: string[]): CliArgs {
 		process.exit(1);
 	}
 
-	return { url, templatePath, outputPath, vault, open, silent, uri, propertyTypesPath, htmlPath };
+	return { url, templatePath, outputPath, vault, open, silent, uri, propertyTypesPath, htmlPath, academicMode };
 }
 
 // ---------------------------------------------------------------------------
@@ -235,6 +245,7 @@ async function main(): Promise<void> {
 		documentParser: linkedomParser,
 		propertyTypes,
 		parsedDocument,
+		...(args.academicMode !== undefined ? { academicMode: args.academicMode } : {}),
 	});
 
 	// Output

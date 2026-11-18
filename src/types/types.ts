@@ -1,4 +1,13 @@
-export interface Template {
+export interface AcademicOptions {
+	academicMode?: boolean | 'auto';
+	preserveCitationLinks?: boolean;
+	preserveReferenceAnchors?: boolean;
+	preserveMath?: boolean;
+	preserveComplexTables?: boolean;
+	preserveFigures?: boolean | 'html';
+}
+
+export interface Template extends AcademicOptions {
 	id: string;
 	name: string;
 	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily' | 'overwrite';
@@ -74,6 +83,7 @@ export interface Settings {
 	betaFeatures: boolean;
 	legacyMode: boolean;
 	silentOpen: boolean;
+	academicMode: boolean;
 	openBehavior: 'popup' | 'embedded' | 'reader';
 	highlighterEnabled: boolean;
 	alwaysShowHighlights: boolean;

@@ -5,13 +5,20 @@ import { loadSettings, generalSettings } from './utils/storage-utils';
 import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
 import Defuddle from 'defuddle';
-import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
-import { serializeChildren } from './utils/dom-utils';
+import { serializeChildren, setElementHTML } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import {
+	resolveAcademicOptions,
+	prepareDocumentForAcademicClip,
+	restoreAcademicHtml,
+	createAcademicMarkdownContent,
+	extractRawArticleHtml,
+	countHtmlWords,
+} from './utils/academic';
 
 declare global {
 	interface Window {
@@ -89,6 +96,7 @@ declare global {
 
 	interface ContentResponse {
 		content: string;
+		rawContentHtml: string;
 		selectedHtml: string;
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
@@ -106,6 +114,22 @@ declare global {
 		wordCount: number;
 		language: string;
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
+	}
+
+	function expandShadowAttributes(clonedDoc: Document): void {
+		const hosts = clonedDoc.querySelectorAll('[data-defuddle-shadow]');
+		hosts.forEach(host => {
+			const shadowHtml = host.getAttribute('data-defuddle-shadow');
+			host.removeAttribute('data-defuddle-shadow');
+			if (!shadowHtml) return;
+			if (host.tagName.includes('-')) {
+				const div = clonedDoc.createElement('div');
+				setElementHTML(div, shadowHtml);
+				host.replaceWith(div);
+			} else {
+				setElementHTML(host, shadowHtml);
+			}
+		});
 	}
 
 	let initializationPromise: Promise<void> = Promise.resolve();
@@ -155,10 +179,11 @@ declare global {
 		if (request.action === "copyMarkdownToClipboard") {
 			flattenShadowDom(document).then(() => {
 				try {
-					const defuddled = parseForClip(document);
+					const academicOpts = { academicMode: generalSettings.academicMode ? ('auto' as const) : false };
+					const defuddled = parseForClip(document, academicOpts);
 
 					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createAcademicMarkdownContent(defuddled.content, document.URL, academicOpts);
 
 					// Copy to clipboard
 					const textArea = document.createElement("textarea");
@@ -180,8 +205,9 @@ declare global {
 		if (request.action === "saveMarkdownToFile") {
 			flattenShadowDom(document).then(async () => {
 				try {
-					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const academicOpts = { academicMode: generalSettings.academicMode ? ('auto' as const) : false };
+					const defuddled = parseForClip(document, academicOpts);
+					const markdown = createAcademicMarkdownContent(defuddled.content, document.URL, academicOpts);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
@@ -213,9 +239,22 @@ declare global {
 					selectedHtml = serializeChildren(div);
 				}
 
+				const academicOpts = { academicMode: generalSettings.academicMode ? ('auto' as const) : false };
+				const resolvedAcademic = resolveAcademicOptions(academicOpts, { doc: document, url: document.URL });
+				let extractDoc: Document = document;
+				let academicState = null;
+
+				if (resolvedAcademic.anyEnabled) {
+					extractDoc = document.cloneNode(true) as Document;
+					expandShadowAttributes(extractDoc);
+					academicState = prepareDocumentForAcademicClip(extractDoc, document.URL, resolvedAcademic);
+				}
+
+				const rawContentHtml = academicState?.rawContentHtml || extractRawArticleHtml(document, document.URL);
+
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
-				const defuddle = new Defuddle(document, { url: document.URL });
+				const defuddle = new Defuddle(extractDoc, { url: document.URL });
 				const parseTimeout = new Promise<never>((_, reject) =>
 					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
 				);
@@ -224,6 +263,13 @@ declare global {
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
+
+				const contentHtml = academicState
+					? restoreAcademicHtml(defuddled.content, academicState)
+					: defuddled.content;
+				const wordCount = academicState
+					? countHtmlWords(contentHtml)
+					: defuddled.wordCount;
 
 				// Create a new DOMParser
 				const parser = new DOMParser();
@@ -269,7 +315,8 @@ declare global {
 
 				const response: ContentResponse = {
 					author: defuddled.author,
-					content: defuddled.content,
+					content: contentHtml,
+					rawContentHtml: rawContentHtml,
 					description: defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
@@ -284,7 +331,7 @@ declare global {
 					selectedHtml: selectedHtml,
 					site: defuddled.site,
 					title: defuddled.title,
-					wordCount: defuddled.wordCount,
+					wordCount: wordCount,
 					metaTags: defuddled.metaTags || []
 				};
 				if (defuddled.title) {

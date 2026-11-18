@@ -1,5 +1,5 @@
-import { ExtractedContent } from '../types/types';
-import { createMarkdownContent } from 'defuddle/full';
+import { ExtractedContent, AcademicOptions } from '../types/types';
+import { createAcademicMarkdownContent, mergeAcademicOptions, resolveAcademicOptions } from './academic';
 import { sanitizeFileName } from './string-utils';
 import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
@@ -45,6 +45,7 @@ function normalizeText(html: string): string {
 
 interface ContentResponse {
 	content: string;
+	rawContentHtml?: string;
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
@@ -141,15 +142,37 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	rawContentHtml?: string,
+	academicOptions?: AcademicOptions
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
+		const effectiveAcademicOpts = mergeAcademicOptions(
+			academicOptions,
+			{ academicMode: generalSettings.academicMode ? 'auto' : false }
+		);
+		const resolvedAcademic = resolveAcademicOptions(effectiveAcademicOpts, {
+			url: currentUrl,
+			schemaOrgData,
+			metaTags,
+		});
+		const markdownOpts: AcademicOptions = resolvedAcademic.anyEnabled
+			? {
+				academicMode: resolvedAcademic.academicMode,
+				preserveCitationLinks: resolvedAcademic.preserveCitationLinks,
+				preserveReferenceAnchors: resolvedAcademic.preserveReferenceAnchors,
+				preserveMath: resolvedAcademic.preserveMath,
+				preserveComplexTables: resolvedAcademic.preserveComplexTables,
+				preserveFigures: resolvedAcademic.preserveFigures,
+			}
+			: { academicMode: effectiveAcademicOpts.academicMode ?? 'auto' };
+
 		let selectedMarkdown = '';
 		if (selectedHtml) {
 			content = selectedHtml;
-			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
+			selectedMarkdown = createAcademicMarkdownContent(selectedHtml, currentUrl, markdownOpts);
 		}
 
 		// Process highlights after getting the base content
@@ -157,9 +180,9 @@ export async function initializePageContent(
 			content = processHighlights(content, highlights);
 		}
 
-		const markdownBody = createMarkdownContent(content, currentUrl);
+		const markdownBody = createAcademicMarkdownContent(content, currentUrl, markdownOpts);
 
-		const highlightsData = collapseGroupsForExport(highlights, c => createMarkdownContent(c, currentUrl));
+		const highlightsData = collapseGroupsForExport(highlights, c => createAcademicMarkdownContent(c, currentUrl, markdownOpts));
 
 		const noteName = sanitizeFileName(title);
 
@@ -168,6 +191,7 @@ export async function initializePageContent(
 			author,
 			content: markdownBody,
 			contentHtml: content,
+			rawContentHtml: rawContentHtml || content,
 			url: currentUrl,
 			fullHtml,
 			description,

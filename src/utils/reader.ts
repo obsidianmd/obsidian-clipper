@@ -27,7 +27,7 @@ function hl(): HighlighterAPI {
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss, isFontAvailable } from './font-utils';
-import { createMarkdownContent } from 'defuddle/full';
+import { createAcademicMarkdownContent } from './academic';
 import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './iframe-resize';
@@ -2780,7 +2780,7 @@ export class Reader {
 	static copyMarkdownOnReaderPage(doc: Document): void {
 		try {
 			const defuddled = parseForClip(doc);
-			const markdown = createMarkdownContent(defuddled.content, doc.URL);
+			const markdown = createAcademicMarkdownContent(defuddled.content, doc.URL);
 			navigator.clipboard.writeText(markdown).catch(() => {
 				const textArea = doc.createElement('textarea');
 				textArea.value = markdown;
@@ -2797,7 +2797,7 @@ export class Reader {
 	static async saveMarkdownOnReaderPage(doc: Document): Promise<void> {
 		try {
 			const defuddled = parseForClip(doc);
-			const markdown = createMarkdownContent(defuddled.content, doc.URL);
+			const markdown = createAcademicMarkdownContent(defuddled.content, doc.URL);
 			const title = defuddled.title || doc.title || 'Untitled';
 			const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 			await saveFile({ content: markdown, fileName, mimeType: 'text/markdown' });

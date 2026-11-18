@@ -16,6 +16,7 @@ export interface BuildVariablesParams {
 	author: string;
 	content: string;
 	contentHtml: string;
+	rawContentHtml?: string;
 	url: string;
 	fullHtml: string;
 	description: string;
@@ -46,6 +47,7 @@ export function buildVariables(params: BuildVariablesParams): Record<string, str
 		'{{author}}': (params.author || '').trim(),
 		'{{content}}': (params.content || '').trim(),
 		'{{contentHtml}}': (params.contentHtml || '').trim(),
+		'{{rawContentHtml}}': (params.rawContentHtml || '').trim(),
 		'{{selection}}': (params.selection || '').trim(),
 		'{{selectionHtml}}': (params.selectionHtml || '').trim(),
 		'{{date}}': timestamp,

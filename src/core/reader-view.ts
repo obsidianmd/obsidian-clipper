@@ -7,11 +7,42 @@ import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
 import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repositionHighlights } from '../utils/highlighter';
 import { throttle } from '../utils/throttle';
-import { loadSettings } from '../utils/storage-utils';
+import { loadSettings, generalSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
+import {
+	resolveAcademicOptions,
+	prepareDocumentForAcademicClip,
+	restoreAcademicHtml,
+	extractRawArticleHtml,
+	countHtmlWords,
+} from '../utils/academic';
 
 type MessageListener = (request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined;
 let readerPageMessageListener: MessageListener | null = null;
+
+async function extractReaderDocument(parsedDoc: Document, url: string) {
+	await loadSettings();
+	const academicOpts = { academicMode: generalSettings.academicMode ? ('auto' as const) : false };
+	const resolvedAcademic = resolveAcademicOptions(academicOpts, { doc: parsedDoc, url });
+	const extractDoc = resolvedAcademic.anyEnabled ? (parsedDoc.cloneNode(true) as Document) : parsedDoc;
+	const academicState = resolvedAcademic.anyEnabled
+		? prepareDocumentForAcademicClip(extractDoc, url, resolvedAcademic)
+		: null;
+	const rawContentHtml = academicState?.rawContentHtml || extractRawArticleHtml(parsedDoc, url);
+
+	const defuddle = new Defuddle(extractDoc, { url, fetch: proxyFetchAsResponse });
+	const rawResult = await defuddle.parseAsync();
+	const restoredContent = academicState
+		? restoreAcademicHtml(rawResult.content, academicState)
+		: rawResult.content;
+
+	return {
+		...rawResult,
+		content: restoredContent,
+		rawContentHtml,
+		wordCount: academicState ? countHtmlWords(restoredContent) : rawResult.wordCount,
+	};
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
 	await applyReaderTheme();
@@ -47,8 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
 
-		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
-		const result = await defuddle.parseAsync();
+		const result = await extractReaderDocument(parsedDoc, url);
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');
@@ -219,8 +249,7 @@ async function loadArticle(newUrl: string) {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
 
-		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
-		const result = await defuddle.parseAsync();
+		const result = await extractReaderDocument(parsedDoc, newUrl);
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');
@@ -359,6 +388,7 @@ async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult:
 
 	const cachedContent = {
 		content: defuddleResult.content || '',
+		rawContentHtml: defuddleResult.rawContentHtml || defuddleResult.content || '',
 		title: defuddleResult.title || '',
 		author: defuddleResult.author || '',
 		description: defuddleResult.description || '',

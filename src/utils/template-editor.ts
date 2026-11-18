@@ -16,7 +16,7 @@ const silentChange = Annotation.define<boolean>();
 
 // Page-independent variables available when authoring a template in settings.
 const variables: Record<string, unknown> = Object.fromEntries([
-	'author', 'content', 'contentHtml', 'selection', 'selectionHtml', 'date', 'time',
+	'author', 'content', 'contentHtml', 'rawContentHtml', 'selection', 'selectionHtml', 'date', 'time',
 	'description', 'domain', 'favicon', 'fullHtml', 'highlights', 'image', 'noteName',
 	'published', 'site', 'title', 'url', 'language', 'words', 'model', 'modelId', 'modelProvider',
 ].map(name => [name, '']));
