@@ -6,7 +6,7 @@ import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
 import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
-import { flattenShadowDom } from './utils/flatten-shadow-dom';
+import { clearShadowStamps, flattenShadowDom } from './utils/flatten-shadow-dom';
 import { serializeChildren } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
@@ -221,6 +221,8 @@ declare global {
 				);
 				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
 					.catch(() => defuddle.parse());
+				// Defuddle reads the stamps but leaves them on the page.
+				clearShadowStamps(document);
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};

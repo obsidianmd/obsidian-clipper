@@ -25,3 +25,7 @@ export function flattenShadowDom(doc: Document): Promise<void> {
 		(doc.head || doc.documentElement).appendChild(script);
 	});
 }
+
+export function clearShadowStamps(doc: Document): void {
+	doc.querySelectorAll('[data-defuddle-shadow]').forEach(el => el.removeAttribute('data-defuddle-shadow'));
+}
