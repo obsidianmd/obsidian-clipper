@@ -166,8 +166,12 @@ async function initializeExtension(tabId: number) {
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
 
-		// Android shows the popup in a full-width sheet.
-		if ((await browser.runtime.getPlatformInfo()).os === 'android') {
+		// Android shows the popup in a full-width sheet. Firefox doesn't expose
+		// getPlatformInfo in the embedded iframe.
+		const isAndroid = browser.runtime.getPlatformInfo
+			? (await browser.runtime.getPlatformInfo()).os === 'android'
+			: /android/i.test(navigator.userAgent);
+		if (isAndroid) {
 			document.documentElement.classList.add('is-android', 'is-mobile');
 		}
 
