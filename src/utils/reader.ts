@@ -6,6 +6,7 @@ import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import knapSyntax from 'knap/highlightjs';
 import { getDomain } from './string-utils';
+import { isRTLLanguage } from './i18n';
 import type { HighlighterAPI } from './highlighter';
 import * as localHighlighter from './highlighter';
 import { removeExistingHighlights as localRemoveExistingHighlights } from './highlighter-overlays';
@@ -50,6 +51,8 @@ interface ReaderContent {
 	wordCount?: number;
 	parseTime?: number;
 	extractorType?: string;
+	language?: string;
+	dir?: string;
 }
 
 export class Reader {
@@ -74,6 +77,8 @@ export class Reader {
 		wordCount?: number;
 		parseTime?: number;
 		extractorType?: string;
+		language?: string;
+		dir?: string;
 	} | null = null;
 
 	/**
@@ -874,6 +879,10 @@ export class Reader {
 			return pre;
 		}
 
+		// Defuddle may normalize the source document, so preserve an explicit
+		// direction before extraction. Some pages declare it on <body> rather than
+		// <html>.
+		const sourceDir = doc.documentElement.getAttribute('dir') || doc.body?.getAttribute('dir') || undefined;
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
 
@@ -884,8 +893,24 @@ export class Reader {
 			published: defuddled.published,
 			domain: getDomain(doc.URL),
 			wordCount: defuddled.wordCount,
-			parseTime: defuddled.parseTime
+			parseTime: defuddled.parseTime,
+			language: defuddled.language,
+			dir: sourceDir
 		};
+	}
+
+	// Apply the reader's text direction (#864). Honors an explicit source
+	// direction when known, otherwise derives RTL from the article language via
+	// isRTLLanguage. Shared by every reader path (live page, standalone reader,
+	// in-reader navigation) so they cannot drift, and clears any stale direction
+	// left by a previously rendered article.
+	private static applyReaderDirection(doc: Document, sourceDir?: string | null, language?: string | null): void {
+		const dir = sourceDir || (language && isRTLLanguage(language) ? 'rtl' : null);
+		if (dir) {
+			doc.documentElement.setAttribute('dir', dir);
+		} else {
+			doc.documentElement.removeAttribute('dir');
+		}
 	}
 
 	private static generateOutline(doc: Document, title?: string) {
@@ -2072,9 +2097,9 @@ export class Reader {
 				htmlElement.removeAttribute(htmlElement.attributes[0].name);
 			}
 
-			// Restore lang and dir if they existed
+			// Restore lang if it existed. Direction is applied below via
+			// applyReaderDirection once the article language is known. (#864)
 			if (lang) htmlElement.setAttribute('lang', lang);
-			if (dir) htmlElement.setAttribute('dir', dir);
 
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
@@ -2250,10 +2275,15 @@ export class Reader {
 			}
 
 			// Now await content extraction and populate the page
-			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await contentPromise;
+			const { content, title, author, published, domain, extractorType, wordCount, parseTime, language, dir: contentDir } = await contentPromise;
 
 			// If reader was toggled off while waiting, abort
 			if (!this.isActive) return;
+
+			// Apply the reader's text direction now that the article is known (#864).
+			// Prefer an explicit source dir (the page's own on the live path, or the
+			// fetched article's on the reader page), then derive RTL from the language.
+			this.applyReaderDirection(doc, contentDir || dir, language);
 
 			// Remove loading spinner
 			spinner.remove();
@@ -2696,6 +2726,9 @@ export class Reader {
 	static async updateReaderContent(doc: Document, content: ReaderContent): Promise<void> {
 		const main = doc.querySelector('.obsidian-reader-content main') as HTMLElement | null;
 		if (!main) return;
+
+		// Keep the reader direction in sync when navigating between articles. (#864)
+		this.applyReaderDirection(doc, content.dir, content.language);
 
 		this.teardownContent(doc);
 		main.textContent = '';
