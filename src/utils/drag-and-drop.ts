@@ -1,5 +1,5 @@
 import { Template, Property } from '../types/types';
-import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex } from '../managers/template-manager';
+import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex, setEditingTemplateIndex } from '../managers/template-manager';
 import { updateTemplateList } from '../managers/template-ui';
 import { updateVaultList } from '../managers/general-settings';
 import { generalSettings, saveSettings } from './storage-utils';
@@ -95,6 +95,7 @@ function handleTemplateReorder(draggedItemId: string, newIndex: number): void {
 		const [movedTemplate] = templates.splice(oldIndex, 1);
 		templates.splice(newIndex, 0, movedTemplate);
 		saveTemplateSettings().then(() => {
+			setEditingTemplateIndex(newIndex);
 			updateTemplateList();
 		}).catch(error => {
 			console.error('Failed to save template settings:', error);
