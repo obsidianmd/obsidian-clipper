@@ -53,13 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			await initializeGeneralSettings();
 			await initializeReaderSettings();
 			
-			// Initialize interpreter settings with error handling
-			try {
-				await initializeInterpreterSettings();
-			} catch (error) {
-				console.error('Error initializing interpreter settings, continuing with defaults:', error);
-			}
-			
 			// Load templates with error handling
 			let loadedTemplates;
 			try {
@@ -70,6 +63,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// Continue with empty template list
 				updateTemplateList([]);
 			}
+
+			// Initialize interpreter settings with error handling
+			try {
+				await initializeInterpreterSettings();
+			} catch (error) {
+				console.error('Error initializing interpreter settings, continuing with defaults:', error);
+			}
+			
 			initializeTemplateListeners();
 			await handleUrlParameters();
 			initializeSidebar();

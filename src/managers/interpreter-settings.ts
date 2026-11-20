@@ -28,138 +28,85 @@ interface ProviderPresets {
 const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
 const PRESET_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const PRESET_RETRY_DELAY = 60 * 1000; // 1 minute
+const PRESET_FETCH_TIMEOUT = 5000;
 const LOCAL_STORAGE_KEY = 'provider_presets';
 
 let cachedPresets: Record<string, PresetProvider> | null = null;
 let lastFetchTime = 0;
 let lastErrorTime = 0;
-let isFetching = false;
+let refreshing: Promise<Record<string, PresetProvider> | null> | null = null;
 
 let cachedPresetProviders: Record<string, PresetProvider> | null = null;
 
-async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
-	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
-	try {
-		const response = await fetch(PROVIDERS_URL);
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+function toPresetProviders(data: ProviderPresets): Record<string, PresetProvider> {
+	const providers: Record<string, PresetProvider> = {};
+	for (const key in data) {
+		if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+			const provider = data[key] as PresetProvider;
+			provider.id = key;
+			providers[key] = provider;
 		}
-		const data = await response.json() as ProviderPresets;
-		
-		await setLocalStorage(LOCAL_STORAGE_KEY, data);
-		debugLog('Providers', 'Stored providers in local storage:', data);
-
-		const providers: Record<string, PresetProvider> = {};
-		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
-			}
-		}
-
-		debugLog('Providers', 'Successfully fetched presets:', providers);
-		return providers;
-	} catch (error) {
-		console.error('Failed to fetch preset providers:', error);
-		throw error;
 	}
+	return providers;
 }
 
 async function getLocalPresets(): Promise<Record<string, PresetProvider> | null> {
 	try {
 		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
-		if (!data) return null;
-
-		const providers: Record<string, PresetProvider> = {};
-		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
-			}
-		}
-		return providers;
+		return data ? toPresetProviders(data) : null;
 	} catch (error) {
 		console.error('Failed to get providers from local storage:', error);
 		return null;
 	}
 }
 
-async function shouldUpdatePresets(): Promise<boolean> {
-	try {
-		const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
-		
-		const response = await fetch(PROVIDERS_URL);
-		if (!response.ok) return false;
-		
-		const remoteData = await response.json() as ProviderPresets;
-		const remoteVersion = remoteData.version;
-
-		if (!localData) return true;
-		const localVersion = localData.version;
-
-		return localVersion !== remoteVersion; 
-	} catch (error) {
-		console.error('Failed to check provider versions:', error);
-		return false;
-	}
+// Fetch the presets once at a time, and save them for the next settings page.
+function refreshPresets(): Promise<Record<string, PresetProvider> | null> {
+	if (refreshing) return refreshing;
+	refreshing = (async () => {
+		debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
+		const controller = new AbortController();
+		const timeout = setTimeout(() => controller.abort(), PRESET_FETCH_TIMEOUT);
+		try {
+			const response = await fetch(PROVIDERS_URL, { signal: controller.signal });
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			const data = await response.json() as ProviderPresets;
+			await setLocalStorage(LOCAL_STORAGE_KEY, data);
+			cachedPresets = toPresetProviders(data);
+			lastFetchTime = Date.now();
+			lastErrorTime = 0;
+			debugLog('Providers', 'Fetched and stored presets:', cachedPresets);
+			return cachedPresets;
+		} catch (error) {
+			console.error('Failed to fetch preset providers:', error);
+			lastErrorTime = Date.now();
+			return null;
+		} finally {
+			clearTimeout(timeout);
+			refreshing = null;
+		}
+	})();
+	return refreshing;
 }
 
 export async function getPresetProviders(): Promise<Record<string, PresetProvider>> {
 	const now = Date.now();
-
-	if (cachedPresets && (now - lastFetchTime < PRESET_CACHE_DURATION)) {
-		debugLog('Providers', 'Returning in-memory cached presets');
+	if (cachedPresets && now - lastFetchTime < PRESET_CACHE_DURATION) {
 		return cachedPresets;
 	}
 
-	if (isFetching || (lastErrorTime > 0 && now - lastErrorTime < PRESET_RETRY_DELAY)) {
-		debugLog('Providers', 'Fetching is already in progress or recently failed');
-		const localPresets = await getLocalPresets();
-		if (localPresets) {
-			cachedPresets = localPresets;
-		}
-		debugLog('Providers', 'Returning fallback presets (local or previous cache)');
-		return localPresets || cachedPresets || {};
+	const canFetch = !(lastErrorTime > 0 && now - lastErrorTime < PRESET_RETRY_DELAY);
+	// Saved presets show at once, so a slow network doesn't hold up the settings page.
+	const savedPresets = cachedPresets || await getLocalPresets();
+	if (savedPresets) {
+		cachedPresets = savedPresets;
+		if (canFetch) void refreshPresets();
+		return savedPresets;
 	}
 
-	isFetching = true;
-	try {
-		const needsUpdate = await shouldUpdatePresets();
-		
-		if (!needsUpdate) {
-			const localPresets = await getLocalPresets();
-			if (localPresets) {
-				cachedPresets = localPresets;
-				lastFetchTime = now;
-				lastErrorTime = 0;
-				debugLog('Providers', 'Using up-to-date local storage presets');
-				return localPresets;
-			}
-			debugLog('Providers', 'Local presets missing despite version match or failed check, fetching fresh.');
-		}
-
-		debugLog('Providers', 'Fetching fresh presets from remote.');
-		const presets = await fetchPresetProviders();
-		cachedPresets = presets;
-		lastFetchTime = now;
-		lastErrorTime = 0;
-		debugLog('Providers', 'Fetched and cached new presets');
-		return cachedPresets;
-	} catch (error) {
-		console.error('Failed to load or cache preset providers:', error);
-		lastErrorTime = now;
-		
-		const localPresets = await getLocalPresets();
-		if (localPresets) {
-			cachedPresets = localPresets;
-		}
-		debugLog('Providers', 'Fetch failed, returning fallback presets (local or previous cache)');
-		return localPresets || cachedPresets || {};
-	} finally {
-		isFetching = false;
-	}
+	return (canFetch && await refreshPresets()) || {};
 }
 
 export function updatePromptContextVisibility(): void {
