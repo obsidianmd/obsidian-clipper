@@ -29,6 +29,7 @@
 		"release:edge": "node scripts/release.mjs edge",
 		"release:firefox": "node scripts/release.mjs firefox",
 		"release:safari": "node scripts/release.mjs safari",
+		"release:github": "node scripts/release.mjs github",
 		"dev": "npm run dev:chrome",
 		"test": "vitest run",
 		"test:watch": "vitest",

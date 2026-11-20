@@ -56,9 +56,10 @@ npm run release:chrome
 ```
 
 - Uploads the current version to the Chrome Web Store, Edge Add-ons, Firefox Add-ons and the App Store (Safari on iOS and macOS), and submits it for review
+- Then publishes the GitHub release for the version's tag with the Chrome, Firefox and Safari zips, unless it's already there. Push the tag first
 - `npm run release` runs every store; `release:<store>` runs one
 - `--dry-run` checks the build, changelog and credentials (read-only calls for Chrome, Firefox and Safari) without uploading
-- Release notes come from `changelogs/<version>.md`. A store-specific file such as `changelogs/<version>-firefox.md` replaces it for that store
+- Release notes come from `changelogs/<version>.md`. A store-specific file such as `changelogs/<version>-firefox.md` replaces it for that store. GitHub gets the file's Markdown as written, so `changelogs/<version>-github.md` can add links and sections
 - Firefox gets the source code for its reviewers' rebuild: the same zip as "Source code (zip)" on the GitHub release, so tag the release commit first
 - Run `bump-version.sh`, `generate-changelog.sh` and `npm run build` first, then commit and tag
 
