@@ -79,3 +79,163 @@ select {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFF' opacity='0.7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
 	}
 }
+
+.tree-select {
+	position: relative;
+	display: block;
+	width: 100%;
+	min-width: 0;
+}
+
+.tree-select-native {
+	display: none;
+}
+
+.tree-select-button {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	width: 100%;
+	min-width: 100px;
+	height: var(--input-height);
+	padding: var(--dropdown-padding);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-modifier-form-field);
+	color: var(--text-normal);
+	font-family: var(--font-default);
+	font-size: var(--font-ui-smaller);
+	text-align: start;
+	cursor: pointer;
+
+	.tree-select-button-label {
+		flex-grow: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.tree-select-chevron {
+		flex-shrink: 0;
+		opacity: 0.7;
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			border-color: var(--background-modifier-border-hover);
+		}
+	}
+
+	&:focus-visible {
+		outline: none;
+		border-color: var(--background-modifier-border-focus);
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+	}
+}
+
+.tree-select-popover {
+	position: fixed;
+	z-index: 2000;
+	display: none;
+	flex-direction: column;
+	max-height: 280px;
+	overflow: hidden;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+
+	&.is-open {
+		display: flex;
+	}
+}
+
+.tree-select .tree-select-search {
+	width: calc(100% - 0.8rem);
+	margin: 0.4rem;
+	flex-shrink: 0;
+}
+
+.tree-select-list {
+	overflow-y: auto;
+	padding-bottom: 0.25rem;
+}
+
+.tree-select-row {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.3rem 0.5rem;
+	cursor: pointer;
+	white-space: nowrap;
+	font-size: var(--font-ui-smaller);
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+	}
+
+	&.is-selected {
+		color: var(--text-accent);
+		background-color: var(--background-modifier-hover);
+	}
+}
+
+.tree-select-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+
+	svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	&.is-branch {
+		opacity: 0.7;
+	}
+
+	&.is-leaf {
+		visibility: hidden;
+	}
+}
+
+.tree-select-row-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tree-select-empty {
+	padding: 0.5rem;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+#settings {
+	.tree-select-button {
+		border: none;
+		background-color: var(--interactive-normal);
+		box-shadow: var(--input-shadow);
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--interactive-hover);
+				box-shadow: var(--input-shadow-hover);
+			}
+		}
+
+		&:focus-visible {
+			box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+		}
+	}
+}
