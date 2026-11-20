@@ -345,6 +345,12 @@
 	"folder": {
 		"message": "資料夾"
 	},
+	"fetchVaultFolders": {
+		"message": "取得 Vault 資料夾"
+	},
+	"fileSystemApiNotSupported": {
+		"message": "目前瀏覽器不支援資料夾選擇。"
+	},
 	"general": {
 		"message": "一般"
 	},

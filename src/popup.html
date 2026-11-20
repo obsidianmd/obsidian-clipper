@@ -52,7 +52,12 @@
 					<div id="vault-container" style="display: none;">
 						<select id="vault-select"></select>
 					</div>
-					<input id="path-name-field" type="text" data-i18n="folder"/>
+					<input id="path-name-field" type="text" list="path-history-list" data-i18n="folder"/>
+					<datalist id="path-history-list"></datalist>
+					<a href="#" id="fetch-folders-btn" class="clickable-icon fetch-folders-btn"
+						data-i18n-title="fetchVaultFolders">
+						<i data-lucide="folder-tree"></i>
+					</a>
 				</div>
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>
