@@ -281,6 +281,7 @@ body.obsidian-highlighter-active {
 
 // Shared base for floating action buttons (Remove highlight, Highlight selection).
 .obsidian-highlight-delete,
+.obsidian-highlight-annotate-button,
 .obsidian-selection-action {
 	position: absolute;
 	display: none;
@@ -341,5 +342,58 @@ body.obsidian-highlighter-active {
 	to {
 		opacity: 0;
 		transform: scale(0.96);
+	}
+}
+
+// Keep annotation input outside article content and its selection handlers.
+.obsidian-highlight-annotation-editor {
+	position: fixed;
+	z-index: 1000000000;
+	box-sizing: border-box;
+	width: min(320px, calc(100vw - 16px));
+	max-height: calc(100vh - 16px);
+	overflow: auto;
+	padding: 10px;
+	border: 1px solid #555;
+	border-radius: 8px;
+	background: #252525;
+	color: #f0f0f0;
+	box-shadow: 0 4px 16px #0005;
+	font: 13px/1.4 system-ui, sans-serif;
+	text-align: left;
+	white-space: normal;
+	pointer-events: auto;
+	user-select: text;
+
+	.obsidian-highlight-annotation-textarea {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 90px;
+		resize: vertical;
+		padding: 6px;
+		border: 1px solid #666;
+		border-radius: 4px;
+		background: #353535;
+		color: inherit;
+		font: inherit;
+		user-select: text;
+	}
+	.obsidian-highlight-annotation-hint {
+		margin: 6px 0;
+		font-size: 11px;
+	}
+	.obsidian-highlight-annotation-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 6px;
+		button {
+			padding: 5px 10px;
+			border: 1px solid #666;
+			border-radius: 4px;
+			background: #353535;
+			color: inherit;
+			font: inherit;
+			cursor: pointer;
+		}
 	}
 }

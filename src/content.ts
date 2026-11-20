@@ -455,6 +455,7 @@ declare global {
 	window.__obsidianHighlighter = {
 		toggleHighlighterMenu: highlighter.toggleHighlighterMenu,
 		handleTextSelection: highlighter.handleTextSelection,
+		updateHighlightNotes: highlighter.updateHighlightNotes,
 		highlightElement: highlighter.highlightElement,
 		applyHighlights: highlighter.applyHighlights,
 		loadHighlights: highlighter.loadHighlights,
