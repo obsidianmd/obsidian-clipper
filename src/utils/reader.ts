@@ -1376,7 +1376,7 @@ export class Reader {
 		}
 	}
 
-	private static cleanupScripts(doc: Document) {
+	private static cleanupScripts(doc: Document, { keepTimers = false }: { keepTimers?: boolean } = {}) {
 		try {
 			// Polyfill requestIdleCallback for WebKit-based browsers (e.g. Orion)
 			// that don't support it — page scripts may reference it in disconnectedCallback
@@ -1386,7 +1386,7 @@ export class Reader {
 			}
 
 			// Only attempt to clear timeouts if we have access to these methods
-			if (typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
+			if (!keepTimers && typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
 				const nativeClearTimeout = window.clearTimeout.bind(window);
 				const nativeClearInterval = window.clearInterval.bind(window);
 
@@ -2055,7 +2055,8 @@ export class Reader {
 			}
 
 			// Remove page scripts and their effects
-			this.cleanupScripts(doc);
+			// YouTube's player keeps downloading the preserved video on page timers.
+			this.cleanupScripts(doc, { keepTimers: !!youtubeVideoElement });
 
 			// Clear body attributes
 			while (doc.body.attributes.length > 0) {
