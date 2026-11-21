@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "1.8.4",
+	"version": "1.8.5",
 	"description": "Official web clipper for Obsidian.",
 	"bin": {
 		"obsidian-clipper": "./dist/cli.cjs"
