@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, test, expect } from 'vitest';
-import { createTextQuoteAnchor } from './highlighter';
+import { describe, test, expect, afterEach } from 'vitest';
+import { AnyHighlightData, createTextQuoteAnchor, getHighlights, updateHighlights } from './highlighter';
 
 function container(text: string): Element {
 	const el = document.createElement('p');
@@ -37,5 +37,64 @@ describe('createTextQuoteAnchor', () => {
 	test('returns undefined for a whitespace-only selection', () => {
 		const el = container('before    after');
 		expect(createTextQuoteAnchor(el, 'before'.length, 'before    '.length)).toBeUndefined();
+	});
+});
+
+describe('getHighlights', () => {
+	afterEach(() => {
+		updateHighlights([]);
+	});
+
+	test('returns full highlight records including groupId and metadata', () => {
+		const stored: AnyHighlightData[] = [
+			{
+				id: '1700000000000_tx_0',
+				type: 'text',
+				xpath: '/html[1]/body[1]/p[1]',
+				content: '<p>First paragraph.</p>',
+				startOffset: 0,
+				endOffset: 16,
+				groupId: 'grp_1',
+				notes: ['a note'],
+			},
+			{
+				id: '1700000000000_tx_1',
+				type: 'text',
+				xpath: '/html[1]/body[1]/p[2]',
+				content: '<p>Second paragraph.</p>',
+				startOffset: 0,
+				endOffset: 17,
+				groupId: 'grp_1',
+			},
+			{
+				id: '1700000005000_el_0',
+				type: 'element',
+				xpath: '/html[1]/body[1]/figure[1]',
+				content: '<figure><img src="image.png"></figure>',
+			},
+		];
+
+		updateHighlights(stored);
+
+		expect(getHighlights()).toEqual(stored);
+	});
+
+	test('returns a shallow copy so callers cannot mutate stored highlights', () => {
+		const stored: AnyHighlightData[] = [
+			{
+				id: '1700000000000_tx_0',
+				type: 'text',
+				xpath: '/html[1]/body[1]/p[1]',
+				content: '<p>Paragraph.</p>',
+				startOffset: 0,
+				endOffset: 10,
+			},
+		];
+
+		updateHighlights(stored);
+		const returned = getHighlights();
+		returned.pop();
+
+		expect(getHighlights()).toHaveLength(1);
 	});
 });

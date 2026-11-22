@@ -1089,8 +1089,8 @@ function commitHighlightChanges() {
 	updateHighlighterMenu();
 }
 
-export function getHighlights(): string[] {
-	return highlights.map(h => h.content);
+export function getHighlights(): AnyHighlightData[] {
+	return [...highlights];
 }
 
 // Group highlights that share a groupId (produced by a single multi-block
