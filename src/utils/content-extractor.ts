@@ -8,7 +8,6 @@ import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
 import {
-	getElementByXPath,
 	wrapElementWithMark,
 	wrapTextWithMark
 } from './dom-utils';
@@ -223,7 +222,7 @@ export function processHighlights(content: string, highlights: AnyHighlightData[
 		const doc = parser.parseFromString(content, 'text/html');
 		const tempDiv = doc.body;
 
-		const textHighlights = filterAndSortHighlights(highlights);
+		const textHighlights = filterAndSortHighlights(highlights, tempDiv as HTMLDivElement);
 		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
 
 		for (const highlight of textHighlights) {
@@ -248,25 +247,44 @@ export function processHighlights(content: string, highlights: AnyHighlightData[
 	return content;
 }
 
-function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlightData | ElementHighlightData)[] {
+function getElementByXPathIn(xpath: string, root: HTMLDivElement): Element | null {
+	try {
+		return root.ownerDocument.evaluate(
+			xpath,
+			root,
+			null,
+			XPathResult.FIRST_ORDERED_NODE_TYPE,
+			null
+		).singleNodeValue as Element | null;
+	} catch {
+		return null;
+	}
+}
+
+function getSourceElement(html: string): Element | null {
+	if (!html.trim()) return null;
+	return new DOMParser().parseFromString(html, 'text/html').body.firstElementChild;
+}
+
+function filterAndSortHighlights(highlights: AnyHighlightData[], tempDiv: HTMLDivElement): (TextHighlightData | ElementHighlightData)[] {
 	return highlights
 		.filter((h): h is (TextHighlightData | ElementHighlightData) => {
 			if (h.type === 'text') {
 				return !!(h.xpath?.trim() || h.content?.trim());
 			}
 			if (h.type === 'element' && h.xpath?.trim()) {
-				const element = getElementByXPath(h.xpath);
+				const sourceElement = getSourceElement(h.content);
+				if (sourceElement && !canHighlightElement(sourceElement)) {
+					return false;
+				}
+				const element = getElementByXPathIn(h.xpath, tempDiv) ?? sourceElement;
 				return element ? canHighlightElement(element) : false;
 			}
 			return false;
 		})
 		.sort((a, b) => {
-			if (a.xpath && b.xpath) {
-				const elementA = getElementByXPath(a.xpath);
-				const elementB = getElementByXPath(b.xpath);
-				if (elementA === elementB && a.type === 'text' && b.type === 'text') {
-					return b.startOffset - a.startOffset;
-				}
+			if (a.xpath && a.xpath === b.xpath && a.type === 'text' && b.type === 'text') {
+				return b.startOffset - a.startOffset;
 			}
 			return 0;
 		});
@@ -285,21 +303,35 @@ function processHighlight(highlight: TextHighlightData | ElementHighlightData, t
 }
 
 function processXPathHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	const element = document.evaluate(
-		highlight.xpath,
-		tempDiv,
-		null,
-		XPathResult.FIRST_ORDERED_NODE_TYPE,
-		null
-	).singleNodeValue as Element;
+	const element = getElementByXPathIn(highlight.xpath, tempDiv);
 
 	if (element) {
+		const expectedText = normalizeText(highlight.content);
 		if (highlight.type === 'element') {
-			wrapElementWithMark(element);
+			const sourceTag = getSourceElement(highlight.content)?.tagName;
+			if (
+				canHighlightElement(element) &&
+				(!sourceTag || element.tagName === sourceTag) &&
+				(!highlight.content.trim() || normalizeText(element.outerHTML) === expectedText)
+			) {
+				wrapElementWithMark(element);
+				return;
+			}
 		} else {
-			wrapTextWithMark(element, highlight as TextHighlightData);
+			const resolvedText = (element.textContent || '')
+				.slice(highlight.startOffset, highlight.endOffset)
+				.replace(/\s+/g, ' ')
+				.trim();
+			if (expectedText && resolvedText === expectedText) {
+				try {
+					wrapTextWithMark(element, highlight as TextHighlightData);
+					return;
+				} catch {
+					// Range crosses an inline element boundary (surroundContents throws);
+					// fall through to content-based matching below.
+				}
+			}
 		}
-		return;
 	}
 
 	// Xpath didn't resolve (common when the highlight was created in a
