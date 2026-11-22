@@ -6,6 +6,7 @@ import {
 } from 'knap';
 import { htmlFilters } from 'knap/html';
 import { markdown } from './filters/markdown';
+import { replace } from './filters/replace';
 
 export interface ClipperTemplateContext {
 	currentUrl?: string;
@@ -28,6 +29,7 @@ export const clipperFilters: Readonly<FilterRegistry<ClipperTemplateContext>> = 
 	...htmlFilters,
 	markdown: markdownFilter,
 	fragment_link: fragmentLinkFilter,
+	replace,
 });
 
 const diagnosticFilters = new Proxy(clipperFilters, {
