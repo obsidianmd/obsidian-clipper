@@ -5,8 +5,7 @@ import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData, ClipHighlight, TextHighlightData, HighlightData, TEXT_BLOCK_SPLIT_TAGS, collapseGroupsForExport } from './highlighter';
-import { findTextQuoteRange } from './highlighter-overlays';
+import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
 import {
 	getElementByXPath,
@@ -80,18 +79,18 @@ async function sendExtractRequest(tabId: number): Promise<ContentResponse> {
 	if (response && response.content) {
 		// Ensure highlights are of the correct type
 		if (response.highlights && Array.isArray(response.highlights)) {
-			// A content script from before an extension update still sends strings.
-			response.highlights = (response.highlights as unknown as (string | ClipHighlight)[]).map(highlight => {
-				const { content, textQuote } = typeof highlight === 'string' ? { content: highlight, textQuote: undefined } : highlight;
-				return {
-					type: 'text',
-					id: Date.now().toString(),
-					xpath: '',
-					content: `<div>` + content + `</div>`,
-					startOffset: 0,
-					endOffset: content.length,
-					...(textQuote ? { textQuote } : {}),
-				};
+			response.highlights = response.highlights.map((highlight: string | AnyHighlightData) => {
+				if (typeof highlight === 'string') {
+					return {
+						type: 'text',
+						id: Date.now().toString(),
+						xpath: '',
+						content: `<div>` + highlight + `</div>`,
+						startOffset: 0,
+						endOffset: highlight.length
+					};
+				}
+				return highlight as AnyHighlightData;
 			});
 		} else {
 			response.highlights = [];
@@ -311,8 +310,6 @@ function processXPathHighlight(highlight: TextHighlightData | ElementHighlightDa
 }
 
 function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	if (highlight.type === 'text' && markQuotedText(highlight, tempDiv)) return;
-
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(highlight.content, 'text/html');
 	const contentDiv = doc.body;
@@ -369,30 +366,6 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 	processInlineContent(innerContent, tempDiv);
 }
 
-const BLOCK_SELECTOR = [
-	...TEXT_BLOCK_SPLIT_TAGS,
-	'ADDRESS', 'ARTICLE', 'ASIDE', 'CAPTION', 'DD', 'DETAILS', 'DIV', 'DL', 'DT', 'FIELDSET', 'FIGURE', 'FOOTER',
-	'FORM', 'HEADER', 'HR', 'MAIN', 'NAV', 'OL', 'PRE', 'SECTION', 'SUMMARY', 'TABLE', 'TR', 'UL',
-].join(',');
-
-// Partial highlights use their stored context, because the same words can
-// appear earlier in the article.
-function markQuotedText(highlight: TextHighlightData, root: HTMLElement): boolean {
-	if (!highlight.textQuote?.prefix && !highlight.textQuote?.suffix) return false;
-	const range = findTextQuoteRange(highlight, root);
-	if (!range || range.cloneContents().querySelector(BLOCK_SELECTOR)) return false;
-	wrapRangeWithMark(range);
-	return true;
-}
-
-// surroundContents() throws when a range crosses element boundaries.
-function wrapRangeWithMark(range: Range) {
-	const mark = document.createElement('mark');
-	mark.appendChild(range.extractContents());
-	range.insertNode(mark);
-	debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-}
-
 function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
 	// Strip each target paragraph's text once, reused across every source
 	// paragraph and both the exact and substring passes below.
@@ -439,8 +412,9 @@ function findTextNodeAtOffset(root: Node, offset: number): { node: Node; index: 
 
 // Wrap `searchText` in a <mark>. When `spanInline` is set the match is resolved
 // against the element's full text and may cross inline elements (a link/bold
-// mid-sentence). Callers pass a scoped element in that case; the whole-body
-// fallback stays single-node so a range can't span blocks.
+// mid-sentence), so it uses extractContents() — surroundContents() throws when
+// a range crosses element boundaries. Callers pass a scoped element in that
+// case; the whole-body fallback stays single-node so a range can't span blocks.
 function processInlineContent(content: string, root: HTMLElement, spanInline = false) {
 	const searchText = stripHtml(content).trim();
 	if (!searchText) return;
@@ -458,7 +432,10 @@ function processInlineContent(content: string, root: HTMLElement, spanInline = f
 		range.setEnd(end.node, end.index);
 		if (range.collapsed) return;
 
-		wrapRangeWithMark(range);
+		const mark = document.createElement('mark');
+		mark.appendChild(range.extractContents());
+		range.insertNode(mark);
+		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 		return;
 	}
 
@@ -474,7 +451,9 @@ function processInlineContent(content: string, root: HTMLElement, spanInline = f
 		range.setStart(node, index);
 		range.setEnd(node, index + searchText.length);
 
-		wrapRangeWithMark(range);
+		const mark = document.createElement('mark');
+		range.surroundContents(mark);
+		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 		return;
 	}
 }

@@ -168,7 +168,7 @@ export const BLOCK_HIGHLIGHT_TAGS = new Set(['FIGURE', 'PICTURE', 'IMG', 'TABLE'
 
 // Block containers the text-splitting logic uses to split a multi-block
 // selection into one TextHighlightData per paragraph-ish block.
-export const TEXT_BLOCK_SPLIT_TAGS = [
+const TEXT_BLOCK_SPLIT_TAGS = [
 	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'FIGCAPTION', 'TD', 'TH'
 ];
 
@@ -200,8 +200,6 @@ export interface TextHighlightData extends HighlightData {
 export interface ElementHighlightData extends HighlightData {
 	type: 'element';
 }
-
-export type ClipHighlight = Pick<TextHighlightData, 'content' | 'textQuote'>;
 
 export interface StoredData {
 	highlights: AnyHighlightData[];
@@ -1093,13 +1091,6 @@ function commitHighlightChanges() {
 
 export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
-}
-
-export function getClipHighlights(): ClipHighlight[] {
-	return highlights.map(h => ({
-		content: h.content,
-		...(h.type === 'text' && h.textQuote ? { textQuote: h.textQuote } : {}),
-	}));
 }
 
 // Group highlights that share a groupId (produced by a single multi-block

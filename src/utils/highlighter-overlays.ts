@@ -168,10 +168,11 @@ function buildTextRangeFromXPath(highlight: RenderableTextHighlight): Range | nu
 // When the exact text occurs more than once, the stored prefix/suffix context
 // picks the right occurrence. The match maps back to live DOM nodes, so a
 // highlight spanning inline elements (a link mid-sentence) still resolves.
-function buildTextRangeFromQuote(highlight: RenderableTextHighlight, index = getNormalizedTextIndex()): Range | null {
+function buildTextRangeFromQuote(highlight: RenderableTextHighlight): Range | null {
 	const exact = highlightExactText(highlight);
 	if (!exact) return null;
 
+	const index = getNormalizedTextIndex();
 	// Collapse internal whitespace but keep the edge adjacent to the exact text:
 	// commonSuffixLength/commonPrefixLength compare from that boundary, so the
 	// space between the context and the highlighted text must be preserved.
@@ -184,12 +185,9 @@ function buildTextRangeFromQuote(highlight: RenderableTextHighlight, index = get
 	for (let from = 0; from <= index.text.length;) {
 		const start = index.text.indexOf(exact, from);
 		if (start === -1) break;
-		const before = index.text.slice(Math.max(0, start - prefix.length - 1), start);
-		const after = index.text.slice(start + exact.length, start + exact.length + suffix.length + 1);
-		// A selection can include the space beside a word, which the exact text
-		// drops, so also compare the context without its edge spaces.
-		const score = Math.max(commonSuffixLength(before, prefix), commonSuffixLength(before.trimEnd(), prefix.trimEnd()))
-			+ Math.max(commonPrefixLength(after, suffix), commonPrefixLength(after.trimStart(), suffix.trimStart()));
+		const before = index.text.slice(Math.max(0, start - prefix.length), start);
+		const after = index.text.slice(start + exact.length, start + exact.length + suffix.length);
+		const score = commonSuffixLength(before, prefix) + commonPrefixLength(after, suffix);
 		if (score > bestScore) {
 			bestScore = score;
 			bestStart = start;
@@ -210,10 +208,6 @@ function buildTextRangeFromQuote(highlight: RenderableTextHighlight, index = get
 		console.warn('Failed to build Range from text quote', e);
 		return null;
 	}
-}
-
-export function findTextQuoteRange(highlight: RenderableTextHighlight, root: Element): Range | null {
-	return buildTextRangeFromQuote(highlight, buildNormalizedTextIndex(root));
 }
 
 // The highlighted text, derived from content (which is HTML). Cached by content
