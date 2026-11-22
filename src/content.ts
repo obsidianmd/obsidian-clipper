@@ -93,7 +93,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: highlighter.ClipHighlight[];
 		title: string;
 		description: string;
 		domain: string;
@@ -277,7 +277,7 @@ declare global {
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
-					highlights: highlighter.getHighlights(),
+					highlights: highlighter.getClipHighlights(),
 					image: defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,

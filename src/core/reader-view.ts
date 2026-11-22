@@ -5,7 +5,7 @@ import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
-import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repositionHighlights } from '../utils/highlighter';
+import { setPageUrl, setPageTitle, updatePageDomainSettings, getClipHighlights, repositionHighlights } from '../utils/highlighter';
 import { throttle } from '../utils/throttle';
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
@@ -394,7 +394,7 @@ async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult:
 		}
 
 		if (message.action === 'getPageContent') {
-			sendResponse({ ...cachedContent, highlights: getHighlights() });
+			sendResponse({ ...cachedContent, highlights: getClipHighlights() });
 			return true;
 		}
 
