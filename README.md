@@ -17,6 +17,18 @@ Install the extension by downloading it from the official directory for your bro
 
 Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
 
+### Rapid-MLX Interpreter provider
+
+[Rapid-MLX](https://github.com/raullenchai/Rapid-MLX) runs models locally on Apple Silicon Macs. Install it with `pip install rapid-mlx`, then start it with the Chrome Web Store extension's origin allowed:
+
+```sh
+rapid-mlx serve qwen3.5-4b-4bit --cors-origins chrome-extension://cnjifjpddelmedmihgijeibhnjfabmlf
+```
+
+For an unpacked Chromium installation, replace the ID with the one shown at `chrome://extensions`. For Firefox, use `--cors-origins moz-extension://<uuid>` with the extension's UUID from `about:debugging#/runtime/this-firefox`. Rapid-MLX rejects foreign origins unless they are allowed.
+
+In Web Clipper's **Settings → Interpreter**, enable the Interpreter and add a provider using the **Rapid-MLX** preset. The default URL is `http://127.0.0.1:8000/v1/chat/completions`; no API key is required by default. Add a model using an exact model ID returned by `curl http://127.0.0.1:8000/v1/models`. Model IDs are entered manually; the model-list link opens documentation. Use a template containing a prompt such as `{{"Summarize this page"}}`, then run the Interpreter when clipping a page.
+
 ## Contribute
 
 ### Documentation

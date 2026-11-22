@@ -1,5 +1,5 @@
 {
-	"version": "2026.07.24",
+	"version": "2026.11.19",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -128,6 +128,13 @@
 			{ "id": "sonar", "name": "Sonar" },
 			{ "id": "sonar-pro", "name": "Sonar Pro" }
 		]
+	},
+	"rapid-mlx": {
+		"id": "rapid-mlx",
+		"name": "Rapid-MLX",
+		"apiKeyRequired": false,
+		"modelsList": "https://github.com/raullenchai/Rapid-MLX#models",
+		"baseUrl": "http://127.0.0.1:8000/v1/chat/completions"
 	},
 	"xai": {
 		"id": "xai",
