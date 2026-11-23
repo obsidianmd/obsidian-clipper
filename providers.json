@@ -55,7 +55,7 @@
 		"name": "Hugging Face",
 		"apiKeyUrl": "https://huggingface.co/settings/tokens",
 		"modelsList": "https://huggingface.co/models",
-		"baseUrl": "https://api-inference.huggingface.co/models/{model-id}/chat/completions"
+		"baseUrl": "https://router.huggingface.co/v1/chat/completions"
 	},
 	"meta": {
 		"id": "meta",
