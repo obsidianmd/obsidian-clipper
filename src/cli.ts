@@ -21,6 +21,7 @@ interface CliArgs {
 	uri: boolean;
 	propertyTypesPath?: string;
 	htmlPath?: string;
+	userAgent?: string;
 }
 
 function printUsage(): void {
@@ -32,6 +33,7 @@ Options:
                                If a directory, auto-matches template by URL triggers
   -o, --output <path>          Output .md file path (default: stdout)
       --html <path>            Read HTML from file instead of fetching URL (use - for stdin)
+      --user-agent <string>    User-Agent header to send when fetching the URL
       --vault <name>           Obsidian vault name
       --open                   Send to Obsidian instead of writing file
       --uri                    Use URI scheme instead of Obsidian CLI
@@ -53,6 +55,7 @@ function parseArgs(argv: string[]): CliArgs {
 	let uri = false;
 	let propertyTypesPath: string | undefined;
 	let htmlPath: string | undefined;
+	let userAgent: string | undefined;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
@@ -89,6 +92,10 @@ function parseArgs(argv: string[]): CliArgs {
 				if (i + 1 >= args.length) { console.error('Error: --html requires a value'); process.exit(1); }
 				htmlPath = args[++i];
 				break;
+			case '--user-agent':
+				if (i + 1 >= args.length) { console.error('Error: --user-agent requires a value'); process.exit(1); }
+				userAgent = args[++i];
+				break;
 			case '--property-types':
 				if (i + 1 >= args.length) { console.error('Error: --property-types requires a value'); process.exit(1); }
 				propertyTypesPath = args[++i];
@@ -116,7 +123,7 @@ function parseArgs(argv: string[]): CliArgs {
 		process.exit(1);
 	}
 
-	return { url, templatePath, outputPath, vault, open, silent, uri, propertyTypesPath, htmlPath };
+	return { url, templatePath, outputPath, vault, open, silent, uri, propertyTypesPath, htmlPath, userAgent };
 }
 
 // ---------------------------------------------------------------------------
@@ -186,7 +193,7 @@ async function main(): Promise<void> {
 			html = fs.readFileSync(path.resolve(args.htmlPath), 'utf-8');
 		}
 	} else {
-		const response = await fetch(args.url);
+		const response = await fetch(args.url, args.userAgent ? { headers: { 'User-Agent': args.userAgent } } : undefined);
 		if (!response.ok) {
 			console.error(`Failed to fetch ${args.url}: ${response.status} ${response.statusText}`);
 			process.exit(1);
