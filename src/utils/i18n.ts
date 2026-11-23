@@ -243,26 +243,38 @@ export async function getEffectiveLanguage(): Promise<{ code: string; isRTL: boo
 }
 
 export function isRTLLanguage(languageCode: string): boolean {
-	// List of RTL language codes
+	const normalizedCode = languageCode.trim().toLowerCase().replace(/_/g, '-');
+	const subtags = normalizedCode.split('-');
+	const language = subtags[0];
+	const script = subtags.find((subtag, index) => index > 0 && /^[a-z]{4}$/.test(subtag));
+
+	// An explicit script is more reliable than the language default. This is
+	// important for languages such as Hausa and Kurdish that use both Latin and
+	// Arabic scripts.
+	if (script) {
+		return ['adlm', 'arab', 'hebr', 'mand', 'nkoo', 'rohg', 'samr', 'syrc', 'thaa'].includes(script);
+	}
+
+	// Languages whose usual writing system is right-to-left.
 	const rtlLanguages = [
 		'ar',  // Arabic
 		'arc', // Aramaic
 		'ckb', // Central Kurdish (Sorani)
 		'dv',  // Divehi/Maldivian
 		'fa',  // Persian/Farsi
-		'ha',  // Hausa (when written in Arabic script)
 		'he',  // Hebrew
 		'khw', // Khowar
 		'ks',  // Kashmiri
-		'ku',  // Kurdish (in Arabic script)
 		'ps',  // Pashto
 		'sd',  // Sindhi
 		'syr', // Syriac
 		'ur',  // Urdu
-		'uz-AF', // Uzbek (in Afghanistan)
 		'yi'   // Yiddish
 	];
-	return rtlLanguages.includes(languageCode.toLowerCase().split('-')[0]);
+
+	// Uzbek in Afghanistan is conventionally written in the Arabic script even
+	// when the script subtag is omitted.
+	return rtlLanguages.includes(language) || normalizedCode === 'uz-af';
 }
 
 // Helper function to set up language and RTL support
