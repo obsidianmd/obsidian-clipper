@@ -1,4 +1,5 @@
 import Defuddle from 'defuddle/full';
+import { getPreferredLanguage } from './preferred-language';
 import browser from './browser-polyfill';
 import { detectBrowser } from './browser-detection';
 import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
@@ -874,7 +875,7 @@ export class Reader {
 			return pre;
 		}
 
-		const defuddle = new Defuddle(doc, { url: doc.URL });
+		const defuddle = new Defuddle(doc, { url: doc.URL, language: getPreferredLanguage(doc) });
 		const defuddled = await defuddle.parseAsync();
 
 		return {

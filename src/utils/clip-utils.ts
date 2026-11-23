@@ -1,4 +1,5 @@
 import Defuddle from 'defuddle/full';
+import { getPreferredLanguage } from './preferred-language';
 import { setElementHTML } from './dom-utils';
 
 // Parse document content for clipping. In reader mode, extracts from
@@ -15,7 +16,7 @@ export function parseForClip(doc: Document) {
 				...Array.from(readerArticle.childNodes).map(n => readerDoc.importNode(n, true))
 			);
 		}
-		return new Defuddle(readerDoc, { url: '' }).parse();
+		return new Defuddle(readerDoc, { url: '', language: getPreferredLanguage(doc) }).parse();
 	}
-	return new Defuddle(doc, { url: doc.URL }).parse();
+	return new Defuddle(doc, { url: doc.URL, language: getPreferredLanguage(doc) }).parse();
 }
