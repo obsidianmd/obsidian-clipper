@@ -180,6 +180,7 @@ function sourceZip() {
 }
 
 async function safari() {
+	const notes = safariReleaseNotes();
 	requireEnv('ASC_KEY_ID', 'ASC_ISSUER_ID');
 	if (!optionalEnv('ASC_PRIVATE_KEY') && !optionalEnv('ASC_KEY_PATH')) throw new Error('Missing ASC_PRIVATE_KEY or ASC_KEY_PATH in .env');
 	const build = currentProjectVersion();
@@ -208,11 +209,11 @@ async function safari() {
 	}
 
 	for (const { platform } of SAFARI_PLATFORMS) {
-		await submitSafariVersion(app.id, platform, build);
+		await submitSafariVersion(app.id, platform, build, notes);
 	}
 }
 
-async function submitSafariVersion(appId, platform, build) {
+async function submitSafariVersion(appId, platform, build, notes) {
 	const processed = await poll(`${platform} build processing`, async () => {
 		const found = await findBuild(appId, platform, build);
 		const state = found?.attributes.processingState;
@@ -234,7 +235,7 @@ async function submitSafariVersion(appId, platform, build) {
 	const localizations = await asc('GET', `/v1/appStoreVersions/${appVersion.id}/appStoreVersionLocalizations`);
 	for (const localization of localizations.data) {
 		await asc('PATCH', `/v1/appStoreVersionLocalizations/${localization.id}`, {
-			data: { type: 'appStoreVersionLocalizations', id: localization.id, attributes: { whatsNew: releaseNotes('safari').slice(0, 4000) } },
+			data: { type: 'appStoreVersionLocalizations', id: localization.id, attributes: { whatsNew: notes } },
 		});
 	}
 
@@ -357,6 +358,14 @@ function releaseNotes(store) {
 		.replace(/`([^`]+)`/g, '$1')
 		.replace(/^## (.+)$/gm, '$1:')
 		.trim();
+}
+
+// App Review rejects What's New text that names other platforms (guideline 2.3.10).
+function safariReleaseNotes() {
+	const notes = releaseNotes('safari').slice(0, 4000);
+	const mentions = [...new Set(notes.match(/\b(Android|Brave|Chrome|Chromium|Edge|Firefox|Google Play|Linux|Opera|Vivaldi|Windows)\b/g))];
+	if (mentions.length) throw new Error(`Safari release notes mention ${mentions.join(', ')}. Write changelogs/${version}-safari.md without other platforms.`);
+	return notes;
 }
 
 async function request(method, url, { headers = {}, body } = {}) {
