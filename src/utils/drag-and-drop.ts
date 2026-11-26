@@ -1,5 +1,5 @@
 import { Template, Property } from '../types/types';
-import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex } from '../managers/template-manager';
+import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex, setEditingTemplateIndex } from '../managers/template-manager';
 import { updateTemplateList } from '../managers/template-ui';
 import { updateVaultList } from '../managers/general-settings';
 import { generalSettings, saveSettings } from './storage-utils';
@@ -92,8 +92,16 @@ function handleTemplateReorder(draggedItemId: string, newIndex: number): void {
 	const templates = getTemplates();
 	const oldIndex = templates.findIndex(t => (t as Template).id === draggedItemId);
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
+		const editingIndex = getEditingTemplateIndex();
+		const editingTemplateId = editingIndex !== -1 ? (templates[editingIndex] as Template | undefined)?.id : undefined;
+
 		const [movedTemplate] = templates.splice(oldIndex, 1);
 		templates.splice(newIndex, 0, movedTemplate);
+
+		if (editingTemplateId) {
+			setEditingTemplateIndex(templates.findIndex(t => (t as Template).id === editingTemplateId));
+		}
+
 		saveTemplateSettings().then(() => {
 			updateTemplateList();
 		}).catch(error => {
