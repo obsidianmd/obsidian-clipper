@@ -29,15 +29,15 @@ export async function saveFile({
 		}
 
 		const browserType = await detectBrowser();
-		const isSafari = ['ios', 'mobile-ios', 'ipad-os', 'safari', 'mobile-safari'].includes(browserType);
-		
-		if (isSafari) {
-			const blob = new Blob([content], { type: 'application/json' });
-			const file = new File([blob], fileName, { type: 'application/json' });
-			const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
+		const isMobileSafari = browserType === 'mobile-safari' || browserType === 'ipad-os';
 
+		if (browserType === 'safari' || isMobileSafari) {
 			// Use share API if there is no tab ID, e.g. in settings pages
-			if (!tabId) {				
+			if (!tabId) {
+				const blob = new Blob([content], { type: 'application/json' });
+				const file = new File([blob], fileName, { type: 'application/json' });
+				const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
+
 				if (navigator.share) {
 					try {
 						await navigator.share({
@@ -58,15 +58,24 @@ export async function saveFile({
 
 			await browser.scripting.executeScript({
 				target: { tabId },
-				func: (fileName: string, dataUri: string) => {
+				func: (fileName: string, content: string, mimeType: string, useBlob: boolean) => {
+					const type = `${mimeType};charset=utf-8`;
+					const url = useBlob
+						? URL.createObjectURL(new Blob([content], { type }))
+						: `data:${type},${encodeURIComponent(content)}`;
 					const a = document.createElement('a');
-					a.href = dataUri;
+					a.href = url;
 					a.download = fileName;
 					document.body.appendChild(a);
 					a.click();
 					document.body.removeChild(a);
+
+					if (useBlob) {
+						// Keep the URL available while Safari waits for download confirmation.
+						setTimeout(() => URL.revokeObjectURL(url), 120_000);
+					}
 				},
-				args: [fileName, dataUri]
+				args: [fileName, content, mimeType, isMobileSafari]
 			});
 		} else {
 			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
@@ -85,4 +94,4 @@ export async function saveFile({
 			onError(error as Error);
 		}
 	}
-} 
+}
