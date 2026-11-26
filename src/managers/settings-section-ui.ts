@@ -22,6 +22,7 @@ export function showSettingsSection(section: SettingsSection, templateId?: strin
 		selectedSidebarItem.classList.add('active');
 	}
 
+	updateTemplateListActiveState(section === 'templates' ? templateId : undefined);
 	updateUrl(section, templateId);
 
 	if (section === 'properties') {
@@ -44,7 +45,7 @@ function updateSidebarActiveState(activeSection: string): void {
 	if (activeItem) activeItem.classList.add('active');
 }
 
-function updateTemplateListActiveState(templateId: string): void {
+function updateTemplateListActiveState(templateId?: string): void {
 	const templateListItems = document.querySelectorAll('#template-list li');
 	templateListItems.forEach(item => {
 		item.classList.remove('active');
