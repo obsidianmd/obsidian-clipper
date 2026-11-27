@@ -167,12 +167,9 @@ async function injectContentScript(tabId: number): Promise<void> {
 	// Try immediately after injection, then back off with 50ms sleeps.
 	let ready = false;
 	for (let i = 0; i < 8; i++) {
-		try {
-			await browser.tabs.sendMessage(tabId, { action: "ping" });
+		if (await pingContentScript(tabId)) {
 			ready = true;
 			break;
-		} catch {
-			// Not ready yet
 		}
 		await new Promise(resolve => setTimeout(resolve, 50));
 	}
@@ -180,6 +177,15 @@ async function injectContentScript(tabId: number): Promise<void> {
 		throw new Error('Content script did not respond after injection');
 	}
 	debugLog('Clipper', 'Post-injection ping succeeded');
+}
+
+// Safari can resolve with undefined instead of rejecting when no content script answers.
+async function pingContentScript(tabId: number): Promise<boolean> {
+	try {
+		return (await browser.tabs.sendMessage(tabId, { action: "ping" })) !== undefined;
+	} catch {
+		return false;
+	}
 }
 
 async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
@@ -197,13 +203,10 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 	}
 
 	const load = (async () => {
-		try {
-			// Attempt to send a message to the content script
-			await browser.tabs.sendMessage(tabId, { action: "ping" });
+		if (await pingContentScript(tabId)) {
 			debugLog('Clipper', 'Content script ping succeeded');
-		} catch (error) {
-			// If the message fails, the content script is not loaded, so inject it
-			debugLog('Clipper', 'Ping failed, injecting content script...', error);
+		} else {
+			debugLog('Clipper', 'Ping failed, injecting content script...');
 			await injectContentScript(tabId);
 		}
 	})();
