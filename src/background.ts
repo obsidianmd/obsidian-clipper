@@ -9,6 +9,13 @@ import { debugLog } from './utils/debug';
 import { incrementStat } from './utils/storage-utils';
 import { hasStoredHighlights } from './utils/url-utils';
 
+const enMessages: Record<string, { message: string }> = require('./_locales/en/messages.json');
+
+// Safari's bundle has no _locales folder, so browser.i18n returns empty strings there.
+function getMessage(key: string): string {
+	return browser.i18n.getMessage(key) || enMessages[key]?.message || key;
+}
+
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
 
@@ -855,17 +862,17 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				},
 				{
 					id: 'copy-markdown-to-clipboard',
-					title: browser.i18n.getMessage('copyToClipboard'),
+					title: getMessage('copyToClipboard'),
 					contexts: ["page", "selection"]
 				},
 				{
 					id: isReaderMode ? "exit-reader" : "enter-reader",
-					title: isReaderMode ? browser.i18n.getMessage('disableReader') : browser.i18n.getMessage('readerOn'),
+					title: isReaderMode ? getMessage('disableReader') : getMessage('readerOn'),
 					contexts: ["page", "selection"]
 				},
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? browser.i18n.getMessage('disableHighlighter') : browser.i18n.getMessage('highlighterOn'),
+					title: isHighlighterMode ? getMessage('disableHighlighter') : getMessage('highlighterOn'),
 					contexts: ["page","image", "video", "audio"]
 				},
 				{
@@ -880,7 +887,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				},
 				{
 					id: 'open-embedded',
-					title: browser.i18n.getMessage('openEmbedded'),
+					title: getMessage('openEmbedded'),
 					contexts: ["page", "selection"]
 				}
 			];
@@ -889,7 +896,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 		if (browserType === 'chrome') {
 			menuItems.push({
 				id: 'open-side-panel',
-				title: browser.i18n.getMessage('openSidePanel'),
+				title: getMessage('openSidePanel'),
 				contexts: ["page", "selection"]
 			});
 		}
